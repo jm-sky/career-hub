@@ -100,18 +100,40 @@ CREATE TABLE projects (
     profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
     name VARCHAR(200) NOT NULL,
     description TEXT,
-    role VARCHAR(100),
+    role VARCHAR(100),  -- myRole from JS model
     start_date DATE,
     end_date DATE,
     is_ongoing BOOLEAN DEFAULT false,
     is_anonymized BOOLEAN DEFAULT false,
     anonymized_company VARCHAR(200),  -- "Fortune 500 Bank"
-    project_url VARCHAR(500),
+
+    -- Enhanced fields from proven JS model
+    status VARCHAR(20) DEFAULT 'Active',  -- Active, Staging, Archived
+    category VARCHAR(20) DEFAULT 'Production',  -- Demo, Internal, Production
+    achievements JSONB DEFAULT '[]',  -- Array of achievement strings
+    challenges JSONB DEFAULT '[]',  -- Array of challenge strings
+    clients JSONB DEFAULT '[]',  -- Array of client strings
+
+    -- Project scale/scope
+    team_size INTEGER,
+    duration_months INTEGER,
+    users_count INTEGER,
+    budget_range VARCHAR(20),  -- small, medium, large
+
+    -- Links
+    demo_url VARCHAR(500),
+    github_url VARCHAR(500),
+    documentation_url VARCHAR(500),
+
     visibility VARCHAR(20) DEFAULT 'PUBLIC',  -- PUBLIC, ANONYMOUS
-    technologies TEXT[],
+    technologies TEXT[],  -- Will be replaced with technology relationships
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT check_visibility CHECK (visibility IN ('PUBLIC', 'ANONYMOUS'))
+
+    CONSTRAINT check_visibility CHECK (visibility IN ('PUBLIC', 'ANONYMOUS')),
+    CONSTRAINT check_status CHECK (status IN ('Active', 'Staging', 'Archived')),
+    CONSTRAINT check_category CHECK (category IN ('Demo', 'Internal', 'Production')),
+    CONSTRAINT check_budget CHECK (budget_range IS NULL OR budget_range IN ('small', 'medium', 'large'))
 );
 
 CREATE INDEX idx_projects_profile_id ON projects(profile_id);
@@ -132,40 +154,69 @@ CREATE INDEX idx_project_exp_project ON project_experiences(project_id);
 CREATE INDEX idx_project_exp_experience ON project_experiences(experience_id);
 ```
 
-### Skills
+### Technologies (Global Reference)
 
 ```sql
--- skills table
+-- technologies table - global reference for all technologies
+CREATE TABLE technologies (
+    id TEXT PRIMARY KEY,  -- ULID
+    name VARCHAR(100) UNIQUE NOT NULL,
+    category VARCHAR(50) NOT NULL,  -- Framework, Library, Platform, Service, System
+    layer VARCHAR(50) NOT NULL,  -- Backend, Database, DevOps, Frontend, Language, Tools
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT check_category CHECK (category IN ('Framework', 'Library', 'Platform', 'Service', 'System')),
+    CONSTRAINT check_layer CHECK (layer IN ('Backend', 'Database', 'DevOps', 'Frontend', 'Language', 'Tools'))
+);
+
+CREATE INDEX idx_technologies_name ON technologies(name);
+CREATE INDEX idx_technologies_category ON technologies(category);
+CREATE INDEX idx_technologies_layer ON technologies(layer);
+```
+
+### Skills (User-specific technology usage)
+
+```sql
+-- skills table - user's relationship with technologies
 CREATE TABLE skills (
     id TEXT PRIMARY KEY,  -- ULID
     profile_id TEXT NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-    name VARCHAR(100) NOT NULL,
-    category VARCHAR(50) DEFAULT 'TECHNICAL',  -- TECHNICAL, TOOLS, SOFT
-    level INTEGER CHECK (level >= 1 AND level <= 5),
+    technology_id TEXT NOT NULL REFERENCES technologies(id) ON DELETE CASCADE,
+    level INTEGER CHECK (level >= 1 AND level <= 5),  -- 1=Basic, 2=Intermediate, 3=Advanced, 4=Expert, 5=Master
     years_of_experience INTEGER,
+    started_using_year INTEGER,  -- Year when user started using this technology
     is_primary BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT unique_profile_skill UNIQUE (profile_id, name),
-    CONSTRAINT check_category CHECK (category IN ('TECHNICAL', 'TOOLS', 'SOFT'))
+    CONSTRAINT unique_profile_technology UNIQUE (profile_id, technology_id)
 );
 
 CREATE INDEX idx_skills_profile_id ON skills(profile_id);
-CREATE INDEX idx_skills_category ON skills(profile_id, category);
+CREATE INDEX idx_skills_technology_id ON skills(technology_id);
+CREATE INDEX idx_skills_level ON skills(profile_id, level DESC);
 ```
 
-### Project-Skill Relations
+### Technology Relationships
 
 ```sql
--- project_skills junction table
-CREATE TABLE project_skills (
+-- project_technologies junction table - which technologies were used in each project
+CREATE TABLE project_technologies (
     project_id TEXT REFERENCES projects(id) ON DELETE CASCADE,
-    skill_id TEXT REFERENCES skills(id) ON DELETE CASCADE,
-    PRIMARY KEY (project_id, skill_id)
+    technology_id TEXT REFERENCES technologies(id) ON DELETE CASCADE,
+    PRIMARY KEY (project_id, technology_id)
 );
 
-CREATE INDEX idx_project_skill_project ON project_skills(project_id);
-CREATE INDEX idx_project_skill_skill ON project_skills(skill_id);
+CREATE INDEX idx_project_tech_project ON project_technologies(project_id);
+CREATE INDEX idx_project_tech_technology ON project_technologies(technology_id);
+
+-- experience_technologies junction table - which technologies were used in each role
+CREATE TABLE experience_technologies (
+    experience_id TEXT REFERENCES experiences(id) ON DELETE CASCADE,
+    technology_id TEXT REFERENCES technologies(id) ON DELETE CASCADE,
+    PRIMARY KEY (experience_id, technology_id)
+);
+
+CREATE INDEX idx_exp_tech_experience ON experience_technologies(experience_id);
+CREATE INDEX idx_exp_tech_technology ON experience_technologies(technology_id);
 ```
 
 ### Education

@@ -35,7 +35,7 @@ You now have a complete blueprint for building **CareerHub** - a professional pr
 
 ### Tech Stack Chosen
 - **Backend:** FastAPI (Python) - Better for AI integrations
-- **Frontend:** Next.js 14 with TypeScript
+- **Frontend:** Next.js 15 with TypeScript
 - **Database:** PostgreSQL 15+
 - **Cache:** Redis
 - **Storage:** MinIO (S3-compatible)
@@ -43,12 +43,14 @@ You now have a complete blueprint for building **CareerHub** - a professional pr
 - **Auth:** JWT with refresh tokens
 
 ### Key Design Decisions
+- ✅ **Rich Career Database** - Primary focus on comprehensive data capture
+- ✅ **Technology Context Tracking** - Show skill usage across projects/roles
+- ✅ **Project Status & Categories** - Active/Staging/Archived + Demo/Internal/Production
+- ✅ **Real-time Skill Analytics** - "TypeScript used in 6 projects since 2020"
 - ✅ API-first architecture
-- ✅ Monolith first, microservices-ready
-- ✅ JSONB for flexible data (responsibilities)
-- ✅ Granular privacy controls
+- ✅ JSONB for flexible data (achievements, challenges, responsibilities)
+- ✅ Proper technology relationships with categories and layers
 - ✅ Draft system for wizard
-- ✅ Many-to-many relationships for projects
 
 ## 🚀 How to Start
 
@@ -86,58 +88,63 @@ claude-code "Implement the authentication system based on docs/API.md"
 
 ## 📈 Implementation Roadmap
 
-### Phase 1: MVP (3 months)
+### Phase 1: MVP - Rich Career Database (3 months)
 **Weeks 1-2: Foundation**
 - ✓ Project setup
 - ✓ Authentication system
-- ✓ Database schema
+- ✓ Enhanced database schema with technology relationships
 
-**Weeks 3-4: Profile Management**
-- Profile CRUD
-- Wizard with drafts
-- Experience management
+**Weeks 3-4: Core Data Management**
+- Profile wizard with draft saving
+- Experience CRUD with technology tagging
+- Technology master table with categories/layers
 
-**Weeks 5-6: Advanced Features**
-- Projects with relationships
-- Skills management
-- LinkedIn import
+**Weeks 5-6: Project & Skills Context**
+- Projects with status/category/scale tracking
+- Project-technology relationships
+- Real-time skill analytics ("TypeScript: 6 projects since 2020")
 
-**Weeks 7-8: CV Generation**
-- CV builder
-- PDF generation
-- Templates
+**Weeks 7-8: Rich Data Features**
+- Project achievements, challenges, clients tracking
+- Technology usage patterns and statistics
+- Profile completeness and data visualization
 
-**Weeks 9-10: Polish**
-- Public profiles
-- Testing
-- Deployment
+**Weeks 9-10: Polish & Future Prep**
+- Data validation and integrity
+- Basic public profiles
+- Testing and performance optimization
 
-### Phase 2: Enhancements
+### Phase 2: CV Generation & Export
+- CV builder using rich career database
+- PDF generation with templates
+- LinkedIn import functionality
+- Advanced filtering and selection
+
+### Phase 3: AI & Monetization
 - AI features (optimization, suggestions)
-- Multiple CV templates
 - Payment integration (Stripe)
-- Advanced analytics
+- Advanced analytics and insights
 
 ## 💡 Key Features Implemented
 
-### For Senior Professionals
-1. **Rich Profile Structure**
-   - Detailed experience with responsibilities
-   - Projects separate from roles
-   - Skills with levels and years
-   - Achievements and certifications
+### Core MVP: Rich Career Database
+1. **Comprehensive Data Structure**
+   - Projects with status (Active/Staging/Archived) and category (Demo/Internal/Production)
+   - Detailed project metadata: achievements, challenges, clients, scale
+   - Technology relationships with categories and layers
+   - Real-time skill analytics and usage patterns
 
-2. **Smart Features**
-   - AI-powered description optimization
-   - Responsibility suggestions
-   - LinkedIn import
-   - Multiple CV versions
+2. **Technology Context Tracking**
+   - "TypeScript: Used since 2020, 6 projects, 4 production deployments"
+   - Cross-project technology usage analysis
+   - Skill progression over time
+   - Technology categorization (Framework/Library, Backend/Frontend)
 
-3. **Privacy & Control**
-   - Granular visibility settings
-   - Project anonymization
-   - Draft saving
-   - Version control
+3. **Professional Data Management**
+   - Experience-project-technology relationships
+   - Draft saving during profile creation
+   - Data integrity and validation
+   - Privacy controls and project anonymization
 
 ## 🔧 Development Tips
 
