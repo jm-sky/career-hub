@@ -33,8 +33,8 @@ Primary: Senior professionals (10+ years experience) who need to:
 ## 🏗️ Technical Stack
 
 ### Frontend
-- **Framework:** Next.js 14 (App Router)
-- **UI:** Tailwind CSS + shadcn/ui
+- **Framework:** Next.js 15 (App Router)
+- **UI:** Tailwind CSS v4 + shadcn/ui
 - **State:** TanStack Query + Zustand
 - **Forms:** React Hook Form + Zod
 - **Language:** TypeScript
@@ -50,6 +50,8 @@ Primary: Senior professionals (10+ years experience) who need to:
 ### Infrastructure
 - **IDs:** ULID (sortable, time-based)
 - **Auth:** JWT + Refresh tokens
+- **Storage:** S3-compatible (MinIO/AWS S3)
+- **Package Manager:** pnpm (frontend)
 - **AI:** OpenAI API / Anthropic Claude
 - **PDF:** WeasyPrint / ReportLab
 
@@ -85,45 +87,17 @@ career-hub/
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Python 3.11+
-- Node.js 20+
-- PostgreSQL 15+
-- Redis
-- Docker (optional)
+For detailed development environment setup, see **[SETUP.md](docs/SETUP.md)**.
 
-### Development Setup
-
-1. **Clone repository**
+**TL;DR:**
 ```bash
-git clone https://github.com/yourusername/career-hub.git
-cd career-hub
-```
+# Automated setup
+chmod +x scripts/setup.sh && ./scripts/setup.sh
 
-2. **Backend setup**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-# Edit .env with your configuration
-alembic upgrade head
-uvicorn main:app --reload
-```
-
-3. **Frontend setup**
-```bash
-cd frontend
-npm install
-cp .env.example .env.local
-# Edit .env.local
-npm run dev
-```
-
-4. **Docker alternative**
-```bash
-docker-compose up
+# Manual setup
+docker-compose up -d  # Start services
+cd backend && source .venv/bin/activate && uvicorn app.main:app --reload
+cd frontend && pnpm dev
 ```
 
 ## 📊 MVP Scope
@@ -161,4 +135,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development guidelines.
 
 ## 📞 Contact
 
-For questions about the project, please contact [your-email@example.com]
+For questions about the project, please contact jan.madeyski@gmail.com

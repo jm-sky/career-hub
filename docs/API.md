@@ -25,9 +25,20 @@ Authorization: Bearer <token>
 // Error Response
 {
     "error": {
-        "code": "ERROR_CODE",
-        "message": "Human-readable error message",
-        "details": [ ... ]  // Optional field-specific errors
+        "code": "VALIDATION_ERROR", // Error code
+        "message": "Validation failed", // Human-readable error message
+        "details": [ // Optional field-specific errors
+            {"field": "email", "message": "Invalid email format"},
+            {"field": "password", "message": "Password must be at least 8 characters"}
+        ]
+    }
+}
+
+// Error Response (Simple)
+{
+    "error": {
+        "code": "NOT_FOUND",
+        "message": "Resource not found"
     }
 }
 
@@ -53,7 +64,7 @@ Content-Type: application/json
 {
     "email": "user@example.com",
     "password": "SecurePassword123!",
-    "password_confirm": "SecurePassword123!"
+    "passwordConfirm": "SecurePassword123!"
 }
 
 Response: 201 Created
@@ -62,7 +73,7 @@ Response: 201 Created
         "id": "01HKQW3F5D3QJXZB5XYQ3VWZJM",
         "email": "user@example.com",
         "plan": "FREE",
-        "created_at": "2024-01-15T10:30:00Z"
+        "createdAt": "2024-01-15T10:30:00Z"
     }
 }
 ```
@@ -80,10 +91,10 @@ Content-Type: application/json
 Response: 200 OK
 {
     "data": {
-        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-        "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-        "token_type": "Bearer",
-        "expires_in": 900  // 15 minutes
+        "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+        "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+        "tokenType": "Bearer",
+        "expiresIn": 900  // 15 minutes
     }
 }
 ```
@@ -94,15 +105,15 @@ POST /auth/refresh
 Content-Type: application/json
 
 {
-    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc..."
+    "refreshToken": "eyJ0eXAiOiJKV1QiLCJhbGc..."
 }
 
 Response: 200 OK
 {
     "data": {
-        "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-        "token_type": "Bearer",
-        "expires_in": 900
+        "accessToken": "eyJ0eXAiOiJKV1QiLCJhbGc...",
+        "tokenType": "Bearer",
+        "expiresIn": 900
     }
 }
 ```
@@ -129,8 +140,8 @@ Response: 200 OK
         "id": "01HKQW3F5D3QJXZB5XYQ3VWZJM",
         "email": "user@example.com",
         "plan": "PRO",
-        "plan_expires_at": "2024-02-15T00:00:00Z",
-        "profile_id": "01HKQW3F5D3QJXZB5XYQ3VWZJN"
+        "planExpiresAt": "2024-02-15T00:00:00Z",
+        "profileId": "01HKQW3F5D3QJXZB5XYQ3VWZJN"
     }
 }
 ```
@@ -157,9 +168,9 @@ Response: 200 OK
             "linkedin": "https://linkedin.com/in/johndoe",
             "website": "https://johndoe.com"
         },
-        "completeness_score": 85,
-        "created_at": "2024-01-15T10:30:00Z",
-        "updated_at": "2024-01-15T10:30:00Z"
+        "completenessScore": 85,
+        "createdAt": "2024-01-15T10:30:00Z",
+        "updatedAt": "2024-01-15T10:30:00Z"
     }
 }
 ```
@@ -214,7 +225,7 @@ Content-Type: application/json
 {
     "step": "experience",
     "data": {
-        "company_name": "Tech Corp",
+        "companyName": "Tech Corp",
         "position": "Software Engineer"
     }
 }
@@ -237,23 +248,23 @@ Response: 200 OK
     "data": [
         {
             "id": "01HKQW3F5D3QJXZB5XYQ3VWZJP",
-            "company_name": "Tech Corp",
-            "company_website": "https://techcorp.com",
-            "company_size": "1000-5000",
+            "companyName": "Tech Corp",
+            "companyWebsite": "https://techcorp.com",
+            "companySize": "1000-5000",
             "industry": "Software Development",
-            "company_location": "Warsaw, Poland",
+            "companyLocation": "Warsaw, Poland",
             "position": "Senior Software Architect",
-            "employment_type": "FULL_TIME",
-            "start_date": "2020-01-15",
-            "end_date": null,
-            "is_current": true,
+            "employmentType": "FULL_TIME",
+            "startDate": "2020-01-15",
+            "endDate": null,
+            "isCurrent": true,
             "responsibilities": [
                 "Designing scalable microservices architecture",
                 "Leading team of 8 developers",
                 "Code review and mentoring"
             ],
             "technologies": ["Python", "FastAPI", "PostgreSQL", "Redis"],
-            "display_order": 0
+            "displayOrder": 0
         }
     ]
 }
@@ -266,16 +277,16 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "company_name": "New Company",
-    "company_website": "https://newcompany.com",
-    "company_size": "50-200",
+    "companyName": "New Company",
+    "companyWebsite": "https://newcompany.com",
+    "companySize": "50-200",
     "industry": "FinTech",
-    "company_location": "Warsaw, Poland",
+    "companyLocation": "Warsaw, Poland",
     "position": "Lead Developer",
-    "employment_type": "FULL_TIME",
-    "start_date": "2018-03-01",
-    "end_date": "2019-12-31",
-    "is_current": false,
+    "employmentType": "FULL_TIME",
+    "startDate": "2018-03-01",
+    "endDate": "2019-12-31",
+    "isCurrent": false,
     "responsibilities": [
         "Building payment processing system",
         "Team leadership"
@@ -353,14 +364,14 @@ Response: 200 OK
             "name": "E-commerce Platform Redesign",
             "description": "Complete redesign of legacy e-commerce system...",
             "role": "Technical Lead",
-            "start_date": "2023-01-01",
-            "end_date": "2023-12-31",
-            "is_ongoing": false,
-            "is_anonymized": false,
+            "startDate": "2023-01-01",
+            "endDate": "2023-12-31",
+            "isOngoing": false,
+            "isAnonymized": false,
             "visibility": "PUBLIC",
             "technologies": ["React", "Node.js", "PostgreSQL"],
-            "linked_experiences": ["01HKQW3F5D3QJXZB5XYQ3VWZJP"],
-            "linked_skills": ["01HKQW3F5D3QJXZB5XYQ3VWZJT"]
+            "linkedExperiences": ["01HKQW3F5D3QJXZB5XYQ3VWZJP"],
+            "linkedSkills": ["01HKQW3F5D3QJXZB5XYQ3VWZJT"]
         }
     ]
 }
@@ -376,10 +387,10 @@ Content-Type: application/json
     "name": "Banking System Migration",
     "description": "Led migration of core banking system to cloud...",
     "role": "Solution Architect",
-    "start_date": "2022-06-01",
-    "end_date": "2023-05-31",
-    "is_anonymized": true,
-    "anonymized_company": "Major European Bank",
+    "startDate": "2022-06-01",
+    "endDate": "2023-05-31",
+    "isAnonymized": true,
+    "anonymizedCompany": "Major European Bank",
     "technologies": ["AWS", "Kubernetes", "Terraform"]
 }
 
@@ -391,12 +402,12 @@ Response: 201 Created
 
 ### Link Experience to Project
 ```http
-POST /projects/{project_id}/link-experience
+POST /projects/{projectId}/link-experience
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "experience_id": "01HKQW3F5D3QJXZB5XYQ3VWZJP"
+    "experienceId": "01HKQW3F5D3QJXZB5XYQ3VWZJP"
 }
 
 Response: 200 OK
@@ -407,12 +418,12 @@ Response: 200 OK
 
 ### Link Skill to Project
 ```http
-POST /projects/{project_id}/link-skill
+POST /projects/{projectId}/link-skill
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "skill_id": "01HKQW3F5D3QJXZB5XYQ3VWZJT"
+    "skillId": "01HKQW3F5D3QJXZB5XYQ3VWZJT"
 }
 
 Response: 200 OK
@@ -436,8 +447,8 @@ Response: 200 OK
             "name": "Python",
             "category": "TECHNICAL",
             "level": 5,
-            "years_of_experience": 15,
-            "is_primary": true
+            "yearsOfExperience": 15,
+            "isPrimary": true
         }
     ]
 }
@@ -455,13 +466,13 @@ Content-Type: application/json
             "name": "FastAPI",
             "category": "TECHNICAL",
             "level": 5,
-            "years_of_experience": 3
+            "yearsOfExperience": 3
         },
         {
             "name": "Docker",
             "category": "TOOLS",
             "level": 4,
-            "years_of_experience": 7
+            "yearsOfExperience": 7
         }
     ]
 }
@@ -509,9 +520,9 @@ Response: 200 OK
             "id": "01HKQW3F5D3QJXZB5XYQ3VWZJU",
             "name": "Technical Lead - Full Stack",
             "template": "modern",
-            "is_default": true,
-            "created_at": "2024-01-15T10:30:00Z",
-            "pdf_url": "https://storage.careerhub.com/cvs/..."
+            "isDefault": true,
+            "createdAt": "2024-01-15T10:30:00Z",
+            "pdfUrl": "https://storage.careerhub.com/cvs/..."
         }
     ]
 }
@@ -526,16 +537,16 @@ Content-Type: application/json
 {
     "name": "Solution Architect - Cloud",
     "template": "modern",
-    "sections_config": {
-        "include_photo": false,
-        "include_summary": true,
+    "sectionsConfig": {
+        "includePhoto": false,
+        "includeSummary": true,
         "experiences": [
             "01HKQW3F5D3QJXZB5XYQ3VWZJP",
             "01HKQW3F5D3QJXZB5XYQ3VWZJQ"
         ],
         "projects": ["01HKQW3F5D3QJXZB5XYQ3VWZJS"],
         "skills": ["01HKQW3F5D3QJXZB5XYQ3VWZJT"],
-        "custom_summary": "Experienced architect focused on cloud solutions..."
+        "customSummary": "Experienced architect focused on cloud solutions..."
     }
 }
 
@@ -553,7 +564,7 @@ Authorization: Bearer <token>
 Response: 202 Accepted
 {
     "data": {
-        "job_id": "01HKQW3F5D3QJXZB5XYQ3VWZJV",
+        "jobId": "01HKQW3F5D3QJXZB5XYQ3VWZJV",
         "status": "processing",
         "message": "PDF generation started"
     }
@@ -586,7 +597,7 @@ Content-Type: multipart/form-data
 Response: 202 Accepted
 {
     "data": {
-        "import_id": "01HKQW3F5D3QJXZB5XYQ3VWZJW",
+        "importId": "01HKQW3F5D3QJXZB5XYQ3VWZJW",
         "status": "processing",
         "message": "Import started, check status for progress"
     }
@@ -628,7 +639,121 @@ Content-Disposition: attachment; filename="profile-export.json"
     "experiences": [ ... ],
     "projects": [ ... ],
     "skills": [ ... ],
-    "export_date": "2024-01-15T10:30:00Z"
+    "exportDate": "2024-01-15T10:30:00Z"
+}
+```
+
+## Health Check Endpoints
+
+### System Health
+```http
+GET /health
+
+Response: 200 OK
+{
+    "data": {
+        "status": "healthy",
+        "version": "1.0.0",
+        "timestamp": "2024-01-15T10:30:00Z",
+        "services": {
+            "database": "healthy",
+            "redis": "healthy",
+            "minio": "healthy"
+        }
+    }
+}
+```
+
+## Subscription Management Endpoints
+
+### Get Current Plan
+```http
+GET /subscription
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+    "data": {
+        "plan": "PRO",
+        "planExpiresAt": "2024-02-15T00:00:00Z",
+        "features": {
+            "unlimitedCvVersions": true,
+            "noWatermark": true,
+            "aiSuggestions": true
+        },
+        "usage": {
+            "cvVersionsCreated": 15,
+            "aiRequestsUsed": 45
+        }
+    }
+}
+```
+
+### Upgrade Plan
+```http
+POST /subscription/upgrade
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+    "plan": "EXPERT",
+    "paymentMethod": "stripe_pm_123456"
+}
+
+Response: 200 OK
+{
+    "data": {
+        "subscriptionId": "sub_123456",
+        "plan": "EXPERT",
+        "planExpiresAt": "2025-01-15T00:00:00Z",
+        "paymentStatus": "succeeded"
+    }
+}
+```
+
+### Cancel Subscription
+```http
+DELETE /subscription
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+    "message": "Subscription cancelled. Access will continue until plan expiration."
+}
+```
+
+## Audit Log Endpoints
+
+### Get Audit Log
+```http
+GET /audit-log
+Authorization: Bearer <token>
+
+Response: 200 OK
+{
+    "data": [
+        {
+            "id": "01HKQW3F5D3QJXZB5XYQ3VWZJX",
+            "action": "PROFILE_UPDATE",
+            "entityType": "profile",
+            "entityId": "01HKQW3F5D3QJXZB5XYQ3VWZJN",
+            "changes": {
+                "headline": {
+                    "old": "Software Engineer",
+                    "new": "Senior Software Engineer"
+                }
+            },
+            "ipAddress": "192.168.1.1",
+            "userAgent": "Mozilla/5.0...",
+            "createdAt": "2024-01-15T10:30:00Z"
+        }
+    ],
+    "pagination": {
+        "page": 1,
+        "size": 20,
+        "total": 45,
+        "pages": 3
+    }
 }
 ```
 
@@ -695,13 +820,13 @@ Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-    "target_role": "Cloud Solutions Architect"
+    "targetRole": "Cloud Solutions Architect"
 }
 
 Response: 200 OK
 {
     "data": {
-        "match_score": 78,
+        "matchScore": 78,
         "strengths": [
             "Strong experience with microservices",
             "AWS certifications",
@@ -723,33 +848,33 @@ Response: 200 OK
 
 ## Error Codes
 
-| Code | Description | HTTP Status |
-|------|------------|-------------|
-| `UNAUTHORIZED` | Missing or invalid authentication | 401 |
-| `FORBIDDEN` | Insufficient permissions | 403 |
-| `NOT_FOUND` | Resource not found | 404 |
-| `VALIDATION_ERROR` | Invalid input data | 400 |
-| `DUPLICATE_ENTRY` | Resource already exists | 409 |
+| Code               | Description    | HTTP Status |
+|--------------------|----------------|-------------|
+| `UNAUTHORIZED`     | Missing or invalid authentication | 401 |
+| `FORBIDDEN`        | Insufficient permissions | 403 |
+| `NOT_FOUND`        | Resource not found   | 404 |
+| `VALIDATION_ERROR` | Invalid input data   | 400 |
+| `DUPLICATE_ENTRY`  | Resource already exists | 409 |
 | `RATE_LIMIT_EXCEEDED` | Too many requests | 429 |
-| `INTERNAL_ERROR` | Server error | 500 |
+| `INTERNAL_ERROR`   | Server error         | 500 |
 | `SERVICE_UNAVAILABLE` | Service temporarily unavailable | 503 |
 
 ## Rate Limiting
 
-| Endpoint Category | Free | Pro | Expert |
-|------------------|------|-----|---------|
-| Auth endpoints | 10/hour | 20/hour | 50/hour |
-| Profile read | 100/hour | 500/hour | Unlimited |
-| Profile write | 20/hour | 100/hour | 500/hour |
-| AI endpoints | 5/hour | 50/hour | 200/hour |
-| PDF generation | 5/day | 50/day | 200/day |
-| Import/Export | 3/day | 20/day | 100/day |
+| Endpoint Category | Free       | Pro        | Expert     |
+|-------------------|------------|------------|------------|
+| Auth endpoints    | 100/hour   | 500/hour   | 2000/hour  |
+| Profile read      | 1000/hour  | 5000/hour  | Unlimited  |
+| Profile write     | 200/hour   | 1000/hour  | 5000/hour  |
+| AI endpoints      | 50/hour    | 500/hour   | 2000/hour  |
+| PDF generation    | 20/day     | 200/day    | 1000/day   |
+| Import/Export     | 10/day     | 100/day    | 500/day    |
 
 ## Pagination
 
 All list endpoints support pagination:
 ```
-GET /experiences?page=1&size=20&sort=start_date:desc
+GET /experiences?page=1&size=20&sort=startDate:desc
 ```
 
 Parameters:
@@ -761,15 +886,15 @@ Parameters:
 
 List endpoints support filtering:
 ```
-GET /projects?is_anonymized=true&start_date_gte=2020-01-01
+GET /projects?isAnonymized=true&startDate_gte=2020-01-01
 ```
 
 Common filters:
-- `field_eq`: Exact match
-- `field_ne`: Not equal
-- `field_gt`: Greater than
-- `field_gte`: Greater than or equal
-- `field_lt`: Less than
-- `field_lte`: Less than or equal
-- `field_like`: Partial match
-- `field_in`: In list (comma-separated)
+- `fieldEq`: Exact match
+- `fieldNe`: Not equal
+- `fieldGt`: Greater than
+- `fieldGte`: Greater than or equal
+- `fieldLt`: Less than
+- `fieldLte`: Less than or equal
+- `fieldLike`: Partial match
+- `fieldIn`: In list (comma-separated)
