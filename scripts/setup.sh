@@ -59,7 +59,7 @@ if command -v python3 &> /dev/null; then
     PYTHON_VERSION=$(python3 --version | cut -d " " -f 2 | cut -d "." -f 1,2)
     print_status "Python 3 found: $(python3 --version)"
 else
-    print_error "Python 3 is not installed. Please install Python 3.11+"
+    print_error "Python 3 is not installed. Please install Python 3.12+"
     exit 1
 fi
 

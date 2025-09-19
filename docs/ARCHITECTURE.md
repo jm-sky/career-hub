@@ -82,7 +82,7 @@ Development:
 ```yaml
 Core:
   - Framework: FastAPI 0.104+
-  - Language: Python 3.11+
+  - Language: Python 3.12+
   - ASGI Server: Uvicorn + Gunicorn
 
 Database:

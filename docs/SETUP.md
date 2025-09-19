@@ -7,7 +7,7 @@ This guide walks you through setting up the CareerHub development environment on
 ## Prerequisites
 
 ### Required Software
-- **Python 3.11+** - Backend runtime
+- **Python 3.12+** - Backend runtime
 - **Node.js 20+** - Frontend runtime  
 - **Docker & Docker Compose** - For database and services
 - **Git** - Version control
