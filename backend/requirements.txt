@@ -14,8 +14,10 @@ celery==5.3.4
 
 # Authentication and Security
 passlib[bcrypt]==1.7.4
-python-jose[cryptography]==3.3.0
+PyJWT==2.10.1
 python-multipart==0.0.6
+Authlib==1.6.4
+limits==5.5.0
 
 # Validation and Settings
 pydantic==2.5.0
@@ -23,8 +25,9 @@ pydantic-settings==2.1.0
 email-validator==2.1.0
 
 # Utilities
-python-ulid==1.1.0
+python-ulid==2.7.0
 python-dotenv==1.0.0
+httpx==0.25.2
 
 # File Processing and PDF
 beautifulsoup4==4.12.2
