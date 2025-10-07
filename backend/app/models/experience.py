@@ -45,7 +45,7 @@ class Experience(Base):
     responsibilities = Column(JSONB, default=[], nullable=False, server_default="[]")
 
     # Technologies used (will be replaced with relationships later)
-    technologies: list[str] = Column(ARRAY(Text), default=[], nullable=False, server_default="{}") # type: ignore
+    technologies: list[str] = Column(ARRAY(Text), default=[], nullable=False, server_default="{}")  # type: ignore
 
     # Display order for sorting
     display_order = Column(Integer, default=0, nullable=False)

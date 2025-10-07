@@ -79,10 +79,15 @@ function DashboardContent() {
                   <dd className="text-gray-900 capitalize">{profile?.visibility?.toLowerCase() ?? 'private'}</dd>
                 </div>
               </dl>
-              <div className="mt-4">
-                <Button asChild variant="outline" size="sm">
+              <div className="mt-4 flex gap-2">
+                <Button asChild variant="outline" size="sm" className="flex-1">
                   <Link href="/profile/edit">
                     Edit Profile
+                  </Link>
+                </Button>
+                <Button asChild size="sm" className="flex-1">
+                  <Link href="/profile/create">
+                    Create Profile
                   </Link>
                 </Button>
               </div>
@@ -155,6 +160,13 @@ function DashboardContent() {
               <li>Customize your CV for specific job applications</li>
               <li>Export to PDF and share with employers</li>
             </ol>
+            <div className="mt-4 pt-4 border-t">
+              <Button asChild className="w-full">
+                <Link href="/profile/create">
+                  🚀 Create Your Profile
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
