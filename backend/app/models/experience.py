@@ -45,7 +45,7 @@ class Experience(Base):
     responsibilities = Column(JSONB, default=[], nullable=False, server_default="[]")
 
     # Technologies used (will be replaced with relationships later)
-    technologies = Column(ARRAY(Text), default=[], nullable=False, server_default="{}")
+    technologies: list[str] = Column(ARRAY(Text), default=[], nullable=False, server_default="{}") # type: ignore
 
     # Display order for sorting
     display_order = Column(Integer, default=0, nullable=False)
@@ -93,34 +93,34 @@ class Experience(Base):
     def add_responsibility(self, responsibility: str) -> None:
         """Add a responsibility to the list."""
         if not self.responsibilities:
-            self.responsibilities = []
+            self.responsibilities = []  # type: ignore
 
         if responsibility.strip() and responsibility not in self.responsibilities:
-            self.responsibilities = self.responsibilities + [responsibility.strip()]
+            self.responsibilities = self.responsibilities + [responsibility.strip()]  # type: ignore
 
     def remove_responsibility(self, responsibility: str) -> None:
         """Remove a responsibility from the list."""
         if self.responsibilities and responsibility in self.responsibilities:
-            self.responsibilities = [r for r in self.responsibilities if r != responsibility]
+            self.responsibilities = [r for r in self.responsibilities if r != responsibility]  # type: ignore
 
     def add_technology(self, technology: str) -> None:
         """Add a technology to the list."""
         if not self.technologies:
-            self.technologies = []
+            self.technologies = []  # type: ignore
 
         if technology.strip() and technology not in self.technologies:
-            self.technologies = self.technologies + [technology.strip()]
+            self.technologies = self.technologies + [technology.strip()]  # type: ignore
 
     def remove_technology(self, technology: str) -> None:
         """Remove a technology from the list."""
         if self.technologies and technology in self.technologies:
-            self.technologies = [t for t in self.technologies if t != technology]
+            self.technologies = [t for t in self.technologies if t != technology]  # type: ignore
 
     def is_date_valid(self) -> bool:
         """Validate that end_date is after start_date."""
         if not self.end_date:
             return True
-        return self.end_date > self.start_date
+        return self.end_date > self.start_date  # type: ignore[return-value]
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to camelCase dict for API responses."""

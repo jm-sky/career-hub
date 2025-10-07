@@ -228,7 +228,7 @@ class ExperienceService:
         # Update display order based on the provided order
         for index, experience_id in enumerate(experience_ids):
             if experience_id in experience_map:
-                experience_map[experience_id].display_order = len(experience_ids) - index
+                experience_map[experience_id].display_order = len(experience_ids) - index  # type: ignore[assignment]
 
         self.db.commit()
 
