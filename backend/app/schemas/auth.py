@@ -63,11 +63,11 @@ class UserResponse(BaseModel):
     id: str  # ULID as string
     email: EmailStr
     name: str
-    isActive: bool
-    createdAt: datetime
+    isActive: bool = Field(alias="is_active")
+    createdAt: datetime = Field(alias="created_at")
     tier: str = "free"
 
-    model_config = {"from_attributes": True}
+    model_config = {"from_attributes": True, "populate_by_name": True}
 
 
 class LoginResponse(BaseModel):

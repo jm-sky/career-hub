@@ -2,7 +2,7 @@
 
 import secrets
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
@@ -10,6 +10,9 @@ from ulid import ULID
 
 from app.core.database import Base
 from app.core.security import verify_password, get_password_hash, verify_token
+
+if TYPE_CHECKING:
+    pass
 
 
 class User(Base):
@@ -40,21 +43,21 @@ class User(Base):
 
     def verify_password(self, password: str) -> bool:
         """Verify password against stored hash."""
-        return verify_password(password, self.hashed_password)
+        return verify_password(password, str(self.hashed_password))
 
     def set_password(self, password: str) -> None:
         """Set new password hash."""
-        self.hashed_password = get_password_hash(password)
+        self.hashed_password = get_password_hash(password)  # type: ignore[assignment]
 
     def set_reset_token(self, token: str, expiry: datetime) -> None:
         """Set password reset token and expiry."""
-        self.reset_token = token
-        self.reset_token_expiry = expiry
+        self.reset_token = token  # type: ignore[assignment]
+        self.reset_token_expiry = expiry  # type: ignore[assignment]
 
     def clear_reset_token(self) -> None:
         """Clear password reset token."""
-        self.reset_token = None
-        self.reset_token_expiry = None
+        self.reset_token = None  # type: ignore[assignment]
+        self.reset_token_expiry = None  # type: ignore[assignment]
 
     def is_reset_token_valid(self, token: str) -> bool:
         """Check if reset token is valid and not expired using secure comparison."""
@@ -70,11 +73,11 @@ class User(Base):
                 return False
 
             # Check if it matches stored token using secure comparison
-            if not secrets.compare_digest(self.reset_token, token):
+            if not secrets.compare_digest(str(self.reset_token), token):
                 return False
 
             # Check user ID matches
-            if payload.get("sub") != self.id:
+            if payload.get("sub") != str(self.id):
                 return False
 
             return True

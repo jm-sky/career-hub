@@ -1,6 +1,6 @@
 """OAuth configuration for third-party authentication providers."""
 
-from authlib.integrations.starlette_client import OAuth
+from authlib.integrations.starlette_client import OAuth  # type: ignore[import-untyped]
 
 from app.core.config import settings
 

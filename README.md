@@ -24,11 +24,11 @@ Primary: Senior professionals (10+ years experience) who need to:
 
 **Freemium** with three tiers:
 
-| Plan | Price (PLN/month) | Features |
-|------|-------------------|----------|
-| FREE | 0 | • Rich profile<br>• Basic public profile<br>• 2 CV versions<br>• PDF export (watermark)<br>• LinkedIn import |
-| PRO | 19 | • Everything in FREE<br>• Unlimited CV versions<br>• No watermark<br>• One-pager generator<br>• Basic AI suggestions<br>• Advanced privacy controls |
-| EXPERT | 50 | • Everything in PRO<br>• Deep AI analysis<br>• Custom domain<br>• API access<br>• Priority support<br>• Backup & versioning |
+| Plan   | Price (PLN/month) | Features |
+|--------|-------------------|----------|
+| FREE   | 0                 | • Rich profile<br>• Basic public profile<br>• 2 CV versions<br>• PDF export (watermark)<br>• LinkedIn import |
+| PRO    | 19                | • Everything in FREE<br>• Unlimited CV versions<br>• No watermark<br>• One-pager generator<br>• Basic AI suggestions<br>• Advanced privacy controls |
+| EXPERT | 50                | • Everything in PRO<br>• Deep AI analysis<br>• Custom domain<br>• API access<br>• Priority support<br>• Backup & versioning |
 
 ## 🏗️ Technical Stack
 

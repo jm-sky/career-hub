@@ -140,7 +140,8 @@ class RedisTokenBlacklist:
         """Check if a token is blacklisted."""
         try:
             r = self._get_redis()
-            return r.exists(f"blacklist:{token}") > 0
+            result = r.exists(f"blacklist:{token}")
+            return int(result) > 0
         except redis.RedisError:
             # If Redis is down, assume token is not blacklisted (fail open)
             # In production, you might want to fail closed for security
@@ -161,7 +162,7 @@ class RedisTokenBlacklist:
             # Delete all keys matching blacklist:*
             keys = r.keys("blacklist:*")
             if keys:
-                r.delete(*keys)
+                r.delete(*keys)  # type: ignore[arg-type]
         except redis.RedisError:
             pass
 

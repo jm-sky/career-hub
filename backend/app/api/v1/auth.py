@@ -2,7 +2,7 @@
 
 import logging
 
-from authlib.integrations.starlette_client import OAuthError
+from authlib.integrations.starlette_client import OAuthError  # type: ignore[import-untyped]
 from fastapi import APIRouter, Request, status
 
 from app.core.config import settings
@@ -194,7 +194,7 @@ async def change_password(
     Requires: Valid access token in Authorization header
     """
     await AuthService.change_password(
-        user_id=current_user.id,
+        user_id=str(current_user.id),
         current_password=change_request.currentPassword,
         new_password=change_request.newPassword,
         db=db
