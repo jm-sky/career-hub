@@ -6,6 +6,7 @@ from typing import Any, Dict, TYPE_CHECKING
 
 from sqlalchemy import Boolean, Column, DateTime, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.orm import relationship
 from ulid import ULID
 
 from app.core.database import Base
@@ -40,6 +41,9 @@ class User(Base):
 
     # User settings (JSONB for flexibility)
     settings = Column(JSONB, default={}, nullable=False, server_default="{}")
+
+    # Relationships
+    profile = relationship("Profile", back_populates="user", uselist=False, cascade="all, delete-orphan")
 
     def verify_password(self, password: str) -> bool:
         """Verify password against stored hash."""

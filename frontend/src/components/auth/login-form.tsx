@@ -21,6 +21,8 @@ export function LoginForm() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -33,17 +35,25 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
+    setSuccessMessage(null);
 
     try {
       await login(data);
-      router.push(AUTH_CONFIG.loginRedirect);
+      setSuccessMessage('Login successful! Redirecting...');
+      setIsRedirecting(true);
+      
+      // Small delay to show success message
+      setTimeout(() => {
+        router.push(AUTH_CONFIG.loginRedirect);
+      }, 500);
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
       setError(errorMessage);
+      setIsRedirecting(false);
     }
   };
 
-  const isFormLoading = isLoading || isSubmitting;
+  const isFormLoading = isLoading || isSubmitting || isRedirecting;
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -58,6 +68,12 @@ export function LoginForm() {
           {error && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
               {error}
+            </div>
+          )}
+          
+          {successMessage && (
+            <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
+              {successMessage}
             </div>
           )}
 
@@ -100,7 +116,7 @@ export function LoginForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isLoading ? 'Authenticating...' : isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isRedirecting ? 'Redirecting...' : isLoading ? 'Authenticating...' : isSubmitting ? 'Signing in...' : 'Sign In'}
           </Button>
 
           <div className="text-center text-sm text-gray-600">

@@ -2,12 +2,39 @@
 
 // Protected dashboard page - example of using auth
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/auth-context';
+import { useMyProfile } from '@/hooks/use-profile';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 function DashboardContent() {
+  const router = useRouter();
   const { user } = useAuth();
+  const { data: profile, isLoading: profileLoading, error: profileError } = useMyProfile();
+
+  // Redirect to profile creation if user doesn't have a profile
+  useEffect(() => {
+    if (!profileLoading && !profile && profileError) {
+      // If we get a 404 error, it means the user doesn't have a profile yet
+      router.push('/profile/create');
+    }
+  }, [profile, profileLoading, profileError, router]);
+
+  // Show loading state while checking for profile
+  if (profileLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto p-8">
@@ -21,6 +48,50 @@ function DashboardContent() {
           <Card>
             <CardHeader>
               <CardTitle>Profile</CardTitle>
+              <CardDescription>Your professional profile</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <dl className="space-y-2 text-sm">
+                <div>
+                  <dt className="font-medium text-gray-500">Headline</dt>
+                  <dd className="text-gray-900">{profile?.headline ?? 'Not set'}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-gray-500">Location</dt>
+                  <dd className="text-gray-900">{profile?.location ?? 'Not set'}</dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-gray-500">Completeness</dt>
+                  <dd className="text-gray-900">
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-gray-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full" 
+                               style={{ width: `${profile?.completenessScore ?? 0}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs">{profile?.completenessScore ?? 0}%</span>
+                    </div>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-medium text-gray-500">Visibility</dt>
+                  <dd className="text-gray-900 capitalize">{profile?.visibility?.toLowerCase() ?? 'private'}</dd>
+                </div>
+              </dl>
+              <div className="mt-4">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/profile/edit">
+                    Edit Profile
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Account</CardTitle>
               <CardDescription>Your account information</CardDescription>
             </CardHeader>
             <CardContent>

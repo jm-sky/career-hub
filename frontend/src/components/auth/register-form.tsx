@@ -21,6 +21,8 @@ export function RegisterForm() {
   const router = useRouter();
   const { register: registerUser, isLoading } = useAuth();
   const [error, setError] = useState<string | null>(null);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const {
     register,
@@ -36,14 +38,16 @@ export function RegisterForm() {
 
     try {
       await registerUser(data);
+      setIsRedirecting(true);
       router.push(AUTH_CONFIG.registerRedirect || AUTH_CONFIG.loginRedirect);
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
       setError(errorMessage);
+      setIsRedirecting(false);
     }
   };
 
-  const isFormLoading = isLoading || isSubmitting;
+  const isFormLoading = isLoading || isSubmitting || isRedirecting;
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -107,7 +111,7 @@ export function RegisterForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isLoading ? 'Creating account...' : isSubmitting ? 'Registering...' : 'Create Account'}
+            {isRedirecting ? 'Redirecting...' : isLoading ? 'Creating account...' : isSubmitting ? 'Registering...' : 'Create Account'}
           </Button>
 
           <div className="text-center text-sm text-gray-600">

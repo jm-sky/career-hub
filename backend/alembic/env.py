@@ -17,6 +17,8 @@ from app.core.database import Base
 
 # Import all models to ensure they're registered with Base.metadata
 from app.models.user import User
+from app.models.profile import Profile
+from app.models.experience import Experience
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
