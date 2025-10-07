@@ -1,19 +1,25 @@
 """Pydantic schemas for Experience model."""
 
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field, validator
 
 
+def to_camel(string: str) -> str:
+    return "".join(word.capitalize() if i > 0 else word for i, word in enumerate(string.split("_")))
+
+
 class ExperienceBase(BaseModel):
     """Base experience schema with common fields."""
-    
+
     company_name: str = Field(alias="companyName", max_length=200, description="Company name")
     company_website: Optional[str] = Field(None, alias="companyWebsite", max_length=500, description="Company website")
     company_size: Optional[str] = Field(None, alias="companySize", max_length=50, description="Company size")
     industry: Optional[str] = Field(None, max_length=100, description="Industry")
-    company_location: Optional[str] = Field(None, alias="companyLocation", max_length=100, description="Company location")
+    company_location: Optional[str] = Field(
+        None, alias="companyLocation", max_length=100, description="Company location"
+    )
     position: str = Field(max_length=200, description="Job position")
     employment_type: Optional[str] = Field(None, alias="employmentType", max_length=50, description="Employment type")
     start_date: date = Field(alias="startDate", description="Start date")
@@ -49,11 +55,11 @@ class ExperienceBase(BaseModel):
         """Validate that end_date is after start_date."""
         if v is None:
             return v
-        
+
         start_date = values.get("start_date")
         if start_date and v <= start_date:
             raise ValueError("End date must be after start date")
-        
+
         return v
 
     @validator("is_current")
@@ -65,21 +71,20 @@ class ExperienceBase(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ExperienceCreate(ExperienceBase):
     """Schema for creating an experience."""
+
     pass
 
 
 class ExperienceUpdate(BaseModel):
     """Schema for updating an experience."""
-    
+
     company_name: Optional[str] = Field(None, alias="companyName", max_length=200)
     company_website: Optional[str] = Field(None, alias="companyWebsite", max_length=500)
     company_size: Optional[str] = Field(None, alias="companySize", max_length=50)
@@ -117,16 +122,14 @@ class ExperienceUpdate(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ExperienceResponse(ExperienceBase):
     """Schema for experience responses."""
-    
+
     id: str = Field(description="Experience ID")
     profile_id: str = Field(alias="profileId", description="Profile ID")
     duration_months: Optional[int] = Field(alias="durationMonths", description="Duration in months")
@@ -136,17 +139,15 @@ class ExperienceResponse(ExperienceBase):
 
     class Config:
         """Pydantic config."""
+
         from_attributes = True
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ExperienceSummaryResponse(BaseModel):
     """Schema for experience summary (for lists)."""
-    
+
     id: str = Field(description="Experience ID")
     company_name: str = Field(alias="companyName", description="Company name")
     position: str = Field(description="Job position")
@@ -158,19 +159,18 @@ class ExperienceSummaryResponse(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         from_attributes = True
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ExperienceReorderRequest(BaseModel):
     """Schema for reordering experiences."""
-    
+
     experience_ids: List[str] = Field(alias="experienceIds", description="Ordered list of experience IDs")
 
     class Config:
         """Pydantic config."""
+
         populate_by_name = True

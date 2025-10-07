@@ -33,8 +33,8 @@ limiter = Limiter(
     key_func=get_client_ip,
     default_limits=[
         f"{settings.rate_limit.default_per_day} per day",
-        f"{settings.rate_limit.default_per_hour} per hour"
-    ]
+        f"{settings.rate_limit.default_per_hour} per hour",
+    ],
 )
 
 
@@ -45,13 +45,9 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded) -> JSONRe
     headers = {}
 
     # Safely handle retry_after
-    if hasattr(exc, 'retry_after') and exc.retry_after is not None:
+    if hasattr(exc, "retry_after") and exc.retry_after is not None:
         content["retry_after"] = exc.retry_after
         headers["Retry-After"] = str(exc.retry_after)
 
-    response = JSONResponse(
-        status_code=429,
-        content=content,
-        headers=headers
-    )
+    response = JSONResponse(status_code=429, content=content, headers=headers)
     return response

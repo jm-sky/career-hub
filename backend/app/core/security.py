@@ -32,11 +32,7 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     else:
         expire = datetime.now(timezone.utc) + timedelta(minutes=settings.security.access_token_expires_minutes)
 
-    to_encode.update({
-        "exp": expire,
-        "type": "access",
-        "iat": datetime.now(timezone.utc)
-    })
+    to_encode.update({"exp": expire, "type": "access", "iat": datetime.now(timezone.utc)})
     encoded_jwt = jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.jwt_algorithm)
     return encoded_jwt
 
@@ -45,11 +41,7 @@ def create_refresh_token(data: Dict[str, Any]) -> str:
     """Create a JWT refresh token with longer expiration."""
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=settings.security.refresh_token_expires_days)
-    to_encode.update({
-        "exp": expire,
-        "type": "refresh",
-        "iat": datetime.now(timezone.utc)
-    })
+    to_encode.update({"exp": expire, "type": "refresh", "iat": datetime.now(timezone.utc)})
     encoded_jwt = jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.jwt_algorithm)
     return encoded_jwt
 
@@ -58,11 +50,7 @@ def create_password_reset_token(data: Dict[str, Any]) -> str:
     """Create a JWT password reset token with 1-hour expiration."""
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(hours=1)
-    to_encode.update({
-        "exp": expire,
-        "type": "password_reset",
-        "iat": datetime.now(timezone.utc)
-    })
+    to_encode.update({"exp": expire, "type": "password_reset", "iat": datetime.now(timezone.utc)})
     encoded_jwt = jwt.encode(to_encode, settings.security.secret_key, algorithm=settings.security.jwt_algorithm)
     return encoded_jwt
 
@@ -88,6 +76,7 @@ def verify_token(token: str) -> Dict[str, Any]:
 # Redis Token Blacklist
 # ============================================================================
 
+
 class RedisTokenBlacklist:
     """Redis-based token blacklist with automatic expiration."""
 
@@ -97,11 +86,7 @@ class RedisTokenBlacklist:
     def _get_redis(self) -> redis.Redis:
         """Get or create Redis connection."""
         if self._redis is None:
-            self._redis = redis.from_url(
-                settings.redis.url,
-                decode_responses=True,
-                socket_connect_timeout=5
-            )
+            self._redis = redis.from_url(settings.redis.url, decode_responses=True, socket_connect_timeout=5)
         return self._redis
 
     def add(self, token: str) -> None:
@@ -115,7 +100,7 @@ class RedisTokenBlacklist:
                     token,
                     settings.security.secret_key,
                     algorithms=[settings.security.jwt_algorithm],
-                    options={"verify_signature": False, "verify_exp": False}
+                    options={"verify_signature": False, "verify_exp": False},
                 )
                 exp_timestamp = payload.get("exp", 0)
                 current_timestamp = datetime.now(timezone.utc).timestamp()

@@ -13,16 +13,19 @@ from app.schemas.profile import ProfileCreate, ProfileUpdate
 
 class ProfileNotFoundError(Exception):
     """Raised when profile is not found."""
+
     pass
 
 
 class ProfileAlreadyExistsError(Exception):
     """Raised when user already has a profile."""
+
     pass
 
 
 class SlugAlreadyExistsError(Exception):
     """Raised when slug is already taken."""
+
     pass
 
 
@@ -36,14 +39,14 @@ class ProfileService:
     def create_profile(self, user_id: str, profile_data: ProfileCreate) -> Profile:
         """
         Create a new profile for a user.
-        
+
         Args:
             user_id: User ID
             profile_data: Profile creation data
-            
+
         Returns:
             Created profile
-            
+
         Raises:
             ProfileAlreadyExistsError: If user already has a profile
             SlugAlreadyExistsError: If slug is already taken
@@ -94,11 +97,11 @@ class ProfileService:
             self.db.add(profile)
             self.db.commit()
             self.db.refresh(profile)
-            
+
             # Update completeness score
             profile.update_completeness()
             self.db.commit()
-            
+
             return profile
         except IntegrityError:
             self.db.rollback()
@@ -107,16 +110,16 @@ class ProfileService:
     def get_profile_by_id(self, profile_id: str, include_relations: bool = False) -> Optional[Profile]:
         """
         Get profile by ID.
-        
+
         Args:
             profile_id: Profile ID
             include_relations: Whether to include related data
-            
+
         Returns:
             Profile or None if not found
         """
         query = self.db.query(Profile)
-        
+
         if include_relations:
             query = query.options(
                 joinedload(Profile.experiences),
@@ -127,22 +130,22 @@ class ProfileService:
                 # joinedload(Profile.certifications),
                 # joinedload(Profile.achievements),
             )
-        
+
         return query.filter(Profile.id == profile_id).first()
 
     def get_profile_by_user_id(self, user_id: str, include_relations: bool = False) -> Optional[Profile]:
         """
         Get profile by user ID.
-        
+
         Args:
             user_id: User ID
             include_relations: Whether to include related data
-            
+
         Returns:
             Profile or None if not found
         """
         query = self.db.query(Profile)
-        
+
         if include_relations:
             query = query.options(
                 joinedload(Profile.experiences),
@@ -153,22 +156,22 @@ class ProfileService:
                 # joinedload(Profile.certifications),
                 # joinedload(Profile.achievements),
             )
-        
+
         return query.filter(Profile.user_id == user_id).first()
 
     def get_profile_by_slug(self, slug: str, include_relations: bool = False) -> Optional[Profile]:
         """
         Get profile by slug.
-        
+
         Args:
             slug: Profile slug
             include_relations: Whether to include related data
-            
+
         Returns:
             Profile or None if not found
         """
         query = self.db.query(Profile)
-        
+
         if include_relations:
             query = query.options(
                 joinedload(Profile.experiences),
@@ -179,21 +182,21 @@ class ProfileService:
                 # joinedload(Profile.certifications),
                 # joinedload(Profile.achievements),
             )
-        
+
         return query.filter(Profile.slug == slug).first()
 
     def update_profile(self, profile_id: str, user_id: str, profile_data: ProfileUpdate) -> Profile:
         """
         Update a profile.
-        
+
         Args:
             profile_id: Profile ID
             user_id: User ID (for authorization)
             profile_data: Profile update data
-            
+
         Returns:
             Updated profile
-            
+
         Raises:
             ProfileNotFoundError: If profile not found
             AuthenticationError: If user doesn't own the profile
@@ -209,7 +212,7 @@ class ProfileService:
 
         # Update fields
         update_data = profile_data.dict(exclude_unset=True)
-        
+
         for field, value in update_data.items():
             if hasattr(profile, field):
                 setattr(profile, field, value)
@@ -217,11 +220,11 @@ class ProfileService:
         try:
             self.db.commit()
             self.db.refresh(profile)
-            
+
             # Update completeness score
             profile.update_completeness()
             self.db.commit()
-            
+
             return profile
         except IntegrityError:
             self.db.rollback()
@@ -230,14 +233,14 @@ class ProfileService:
     def delete_profile(self, profile_id: str, user_id: str) -> bool:
         """
         Delete a profile.
-        
+
         Args:
             profile_id: Profile ID
             user_id: User ID (for authorization)
-            
+
         Returns:
             True if deleted, False if not found
-            
+
         Raises:
             AuthenticationError: If user doesn't own the profile
         """
@@ -256,11 +259,11 @@ class ProfileService:
     def get_public_profiles(self, limit: int = 20, offset: int = 0) -> List[Profile]:
         """
         Get public profiles.
-        
+
         Args:
             limit: Maximum number of profiles to return
             offset: Number of profiles to skip
-            
+
         Returns:
             List of public profiles
         """
@@ -276,26 +279,26 @@ class ProfileService:
     def search_profiles(self, query: str, limit: int = 20, offset: int = 0) -> List[Profile]:
         """
         Search public profiles by headline, summary, or location.
-        
+
         Args:
             query: Search query
             limit: Maximum number of profiles to return
             offset: Number of profiles to skip
-            
+
         Returns:
             List of matching profiles
         """
         search_term = f"%{query.lower()}%"
-        
+
         return (
             self.db.query(Profile)
             .filter(
                 Profile.visibility == "PUBLIC",
                 (
-                    Profile.headline.ilike(search_term) |
-                    Profile.summary.ilike(search_term) |
-                    Profile.location.ilike(search_term)
-                )
+                    Profile.headline.ilike(search_term)
+                    | Profile.summary.ilike(search_term)
+                    | Profile.location.ilike(search_term)
+                ),
             )
             .order_by(Profile.completeness_score.desc())
             .offset(offset)
@@ -306,13 +309,13 @@ class ProfileService:
     def update_completeness_score(self, profile_id: str) -> int:
         """
         Update and return profile completeness score.
-        
+
         Args:
             profile_id: Profile ID
-            
+
         Returns:
             Updated completeness score
-            
+
         Raises:
             ProfileNotFoundError: If profile not found
         """
@@ -322,34 +325,34 @@ class ProfileService:
 
         profile.update_completeness()
         self.db.commit()
-        
+
         return profile.completeness_score
 
     def is_slug_available(self, slug: str, exclude_profile_id: Optional[str] = None) -> bool:
         """
         Check if slug is available.
-        
+
         Args:
             slug: Slug to check
             exclude_profile_id: Profile ID to exclude from check (for updates)
-            
+
         Returns:
             True if slug is available
         """
         query = self.db.query(Profile).filter(Profile.slug == slug)
-        
+
         if exclude_profile_id:
             query = query.filter(Profile.id != exclude_profile_id)
-        
+
         return query.first() is None
 
     def generate_unique_slug(self, base_slug: str) -> str:
         """
         Generate a unique slug based on base slug.
-        
+
         Args:
             base_slug: Base slug to start with
-            
+
         Returns:
             Unique slug
         """

@@ -33,20 +33,14 @@ def create_profile(
 ):
     """Create a new profile for the current user."""
     service = ProfileService(db)
-    
+
     try:
         profile = service.create_profile(current_user.id, profile_data)
         return profile.to_dict(include_private=True)
     except ProfileAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User already has a profile"
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already has a profile")
     except SlugAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Slug is already taken"
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Slug is already taken")
 
 
 @router.get("/me", response_model=ProfileResponse)
@@ -56,14 +50,11 @@ def get_my_profile(
 ):
     """Get the current user's profile."""
     service = ProfileService(db)
-    
+
     profile = service.get_profile_by_user_id(current_user.id, include_relations=True)
     if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
     return profile.to_dict(include_private=True)
 
 
@@ -75,22 +66,18 @@ def get_profile(
 ):
     """Get a profile by ID."""
     service = ProfileService(db)
-    
+
     profile = service.get_profile_by_id(profile_id, include_relations=True)
     if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
     # Check if user can view this profile
     user_id = current_user.id if current_user else None
     if not profile.can_view(user_id):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to view this profile"
+            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to view this profile"
         )
-    
+
     # Return appropriate response based on ownership
     include_private = bool(current_user and profile.user_id == current_user.id)
     return profile.to_dict(include_private=include_private)
@@ -105,20 +92,14 @@ def update_profile(
 ):
     """Update a profile."""
     service = ProfileService(db)
-    
+
     try:
         profile = service.update_profile(profile_id, current_user.id, profile_data)
         return profile.to_dict(include_private=True)
     except ProfileNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
     except SlugAlreadyExistsError:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Slug is already taken"
-        )
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Slug is already taken")
 
 
 @router.delete("/{profile_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -129,13 +110,10 @@ def delete_profile(
 ):
     """Delete a profile."""
     service = ProfileService(db)
-    
+
     deleted = service.delete_profile(profile_id, current_user.id)
     if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
 
 
 @router.get("/", response_model=List[ProfileSummaryResponse])
@@ -146,7 +124,7 @@ def get_public_profiles(
 ):
     """Get public profiles."""
     service = ProfileService(db)
-    
+
     profiles = service.get_public_profiles(limit=limit, offset=offset)
     return [
         {
@@ -169,7 +147,7 @@ def search_profiles(
 ):
     """Search public profiles."""
     service = ProfileService(db)
-    
+
     profiles = service.search_profiles(q, limit=limit, offset=offset)
     return [
         {
@@ -190,20 +168,14 @@ def get_profile_by_slug(
 ):
     """Get a public profile by slug."""
     service = ProfileService(db)
-    
+
     profile = service.get_profile_by_slug(slug, include_relations=True)
     if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
     if not profile.is_public():
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
     return profile.to_public_dict()
 
 
@@ -215,29 +187,22 @@ def update_completeness_score(
 ):
     """Update profile completeness score."""
     service = ProfileService(db)
-    
+
     # Check if user owns the profile
     profile = service.get_profile_by_id(profile_id)
     if not profile:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+
     if profile.user_id != current_user.id:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to update this profile"
+            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to update this profile"
         )
-    
+
     try:
         score = service.update_completeness_score(profile_id)
         return {"completenessScore": score}
     except ProfileNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Profile not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
 
 
 @router.get("/slug-available/{slug}", response_model=dict)
@@ -248,6 +213,6 @@ def check_slug_availability(
 ):
     """Check if a slug is available."""
     service = ProfileService(db)
-    
+
     available = service.is_slug_available(slug, exclude_profile_id=profile_id)
     return {"available": available}

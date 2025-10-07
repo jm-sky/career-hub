@@ -53,7 +53,7 @@ class AuthService:
             user=UserResponse.model_validate(user),
             accessToken=access_token,
             refreshToken=refresh_token,
-            expiresIn=settings.security.access_token_expires_minutes * 60
+            expiresIn=settings.security.access_token_expires_minutes * 60,
         )
 
     @staticmethod
@@ -174,7 +174,7 @@ class AuthService:
         return TokenResponse(
             accessToken=new_access_token,
             refreshToken=new_refresh_token,
-            expiresIn=settings.security.access_token_expires_minutes * 60
+            expiresIn=settings.security.access_token_expires_minutes * 60,
         )
 
     @staticmethod
@@ -259,12 +259,7 @@ class AuthService:
         raise InvalidResetTokenError()
 
     @staticmethod
-    async def change_password(
-        user_id: str,
-        current_password: str,
-        new_password: str,
-        db: Session
-    ) -> bool:
+    async def change_password(user_id: str, current_password: str, new_password: str, db: Session) -> bool:
         """
         Change user password after verifying current password.
 
@@ -300,12 +295,7 @@ class AuthService:
         return True
 
     @staticmethod
-    async def authenticate_with_google(
-        email: str,
-        name: str,
-        google_id: str,
-        db: Session
-    ) -> LoginResponse:
+    async def authenticate_with_google(email: str, name: str, google_id: str, db: Session) -> LoginResponse:
         """
         Authenticate user with Google OAuth.
 

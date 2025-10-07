@@ -12,6 +12,7 @@ from app.schemas.experience import ExperienceCreate, ExperienceUpdate
 
 class ExperienceNotFoundError(Exception):
     """Raised when experience is not found."""
+
     pass
 
 
@@ -25,15 +26,15 @@ class ExperienceService:
     def create_experience(self, profile_id: str, user_id: str, experience_data: ExperienceCreate) -> Experience:
         """
         Create a new experience for a profile.
-        
+
         Args:
             profile_id: Profile ID
             user_id: User ID (for authorization)
             experience_data: Experience creation data
-            
+
         Returns:
             Created experience
-            
+
         Raises:
             AuthenticationError: If user doesn't own the profile
         """
@@ -41,7 +42,7 @@ class ExperienceService:
         profile = self.db.query(Profile).filter(Profile.id == profile_id).first()
         if not profile:
             raise AuthenticationError("Profile not found")
-        
+
         if profile.user_id != user_id:
             raise AuthenticationError("You don't have permission to add experiences to this profile")
 
@@ -86,10 +87,10 @@ class ExperienceService:
     def get_experience_by_id(self, experience_id: str) -> Optional[Experience]:
         """
         Get experience by ID.
-        
+
         Args:
             experience_id: Experience ID
-            
+
         Returns:
             Experience or None if not found
         """
@@ -98,14 +99,14 @@ class ExperienceService:
     def get_experiences_by_profile(self, profile_id: str, user_id: Optional[str] = None) -> List[Experience]:
         """
         Get all experiences for a profile.
-        
+
         Args:
             profile_id: Profile ID
             user_id: User ID (for authorization check)
-            
+
         Returns:
             List of experiences ordered by display_order
-            
+
         Raises:
             AuthenticationError: If profile is private and user doesn't own it
         """
@@ -128,15 +129,15 @@ class ExperienceService:
     def update_experience(self, experience_id: str, user_id: str, experience_data: ExperienceUpdate) -> Experience:
         """
         Update an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
             experience_data: Experience update data
-            
+
         Returns:
             Updated experience
-            
+
         Raises:
             ExperienceNotFoundError: If experience not found
             AuthenticationError: If user doesn't own the experience
@@ -152,7 +153,7 @@ class ExperienceService:
 
         # Update fields
         update_data = experience_data.dict(exclude_unset=True)
-        
+
         for field, value in update_data.items():
             if hasattr(experience, field):
                 setattr(experience, field, value)
@@ -169,14 +170,14 @@ class ExperienceService:
     def delete_experience(self, experience_id: str, user_id: str) -> bool:
         """
         Delete an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
-            
+
         Returns:
             True if deleted, False if not found
-            
+
         Raises:
             AuthenticationError: If user doesn't own the experience
         """
@@ -201,15 +202,15 @@ class ExperienceService:
     def reorder_experiences(self, profile_id: str, user_id: str, experience_ids: List[str]) -> List[Experience]:
         """
         Reorder experiences for a profile.
-        
+
         Args:
             profile_id: Profile ID
             user_id: User ID (for authorization)
             experience_ids: List of experience IDs in desired order
-            
+
         Returns:
             List of reordered experiences
-            
+
         Raises:
             AuthenticationError: If user doesn't own the profile
         """
@@ -219,11 +220,7 @@ class ExperienceService:
             raise AuthenticationError("You don't have permission to reorder experiences for this profile")
 
         # Get all experiences for the profile
-        experiences = (
-            self.db.query(Experience)
-            .filter(Experience.profile_id == profile_id)
-            .all()
-        )
+        experiences = self.db.query(Experience).filter(Experience.profile_id == profile_id).all()
 
         # Create a mapping of experience ID to experience object
         experience_map = {exp.id: exp for exp in experiences}
@@ -246,15 +243,15 @@ class ExperienceService:
     def add_responsibility(self, experience_id: str, user_id: str, responsibility: str) -> Experience:
         """
         Add a responsibility to an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
             responsibility: Responsibility text
-            
+
         Returns:
             Updated experience
-            
+
         Raises:
             ExperienceNotFoundError: If experience not found
             AuthenticationError: If user doesn't own the experience
@@ -277,15 +274,15 @@ class ExperienceService:
     def remove_responsibility(self, experience_id: str, user_id: str, responsibility: str) -> Experience:
         """
         Remove a responsibility from an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
             responsibility: Responsibility text to remove
-            
+
         Returns:
             Updated experience
-            
+
         Raises:
             ExperienceNotFoundError: If experience not found
             AuthenticationError: If user doesn't own the experience
@@ -308,15 +305,15 @@ class ExperienceService:
     def add_technology(self, experience_id: str, user_id: str, technology: str) -> Experience:
         """
         Add a technology to an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
             technology: Technology name
-            
+
         Returns:
             Updated experience
-            
+
         Raises:
             ExperienceNotFoundError: If experience not found
             AuthenticationError: If user doesn't own the experience
@@ -339,15 +336,15 @@ class ExperienceService:
     def remove_technology(self, experience_id: str, user_id: str, technology: str) -> Experience:
         """
         Remove a technology from an experience.
-        
+
         Args:
             experience_id: Experience ID
             user_id: User ID (for authorization)
             technology: Technology name to remove
-            
+
         Returns:
             Updated experience
-            
+
         Raises:
             ExperienceNotFoundError: If experience not found
             AuthenticationError: If user doesn't own the experience
@@ -366,4 +363,3 @@ class ExperienceService:
         self.db.refresh(experience)
 
         return experience
-

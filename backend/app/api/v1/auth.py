@@ -31,11 +31,7 @@ logger = logging.getLogger(__name__)
 @router.post("/register", response_model=LoginResponse, status_code=status.HTTP_201_CREATED)
 @rate_limit(settings.rate_limit.auth_register)
 @recaptcha_protected("register")
-async def register(
-    request: Request,
-    user_data: UserRegister,
-    db: DBSession
-) -> LoginResponse:
+async def register(request: Request, user_data: UserRegister, db: DBSession) -> LoginResponse:
     """
     Register a new user.
 
@@ -46,21 +42,14 @@ async def register(
     Requires: reCAPTCHA token (if enabled)
     """
     return await AuthService.register_user(
-        email=user_data.email,
-        password=user_data.password,
-        name=user_data.name,
-        db=db
+        email=user_data.email, password=user_data.password, name=user_data.name, db=db
     )
 
 
 @router.post("/login", response_model=LoginResponse)
 @rate_limit(settings.rate_limit.auth_login)
 @recaptcha_protected("login")
-async def login(
-    request: Request,
-    user_credentials: UserLogin,
-    db: DBSession
-) -> LoginResponse:
+async def login(request: Request, user_credentials: UserLogin, db: DBSession) -> LoginResponse:
     """
     Authenticate user and return tokens.
 
@@ -69,20 +58,12 @@ async def login(
     Rate limit: 10 requests per minute per IP
     Requires: reCAPTCHA token (if enabled)
     """
-    return await AuthService.authenticate_user(
-        email=user_credentials.email,
-        password=user_credentials.password,
-        db=db
-    )
+    return await AuthService.authenticate_user(email=user_credentials.email, password=user_credentials.password, db=db)
 
 
 @router.post("/refresh", response_model=TokenResponse)
 @rate_limit(settings.rate_limit.auth_refresh)
-async def refresh_token(
-    request: Request,
-    token_data: TokenRefresh,
-    db: DBSession
-) -> TokenResponse:
+async def refresh_token(request: Request, token_data: TokenRefresh, db: DBSession) -> TokenResponse:
     """
     Refresh access token using refresh token.
 
@@ -95,10 +76,7 @@ async def refresh_token(
 
 
 @router.post("/logout", response_model=MessageResponse)
-async def logout(
-    credentials: BearerCredentials,
-    current_user: CurrentActiveUser
-) -> MessageResponse:
+async def logout(credentials: BearerCredentials, current_user: CurrentActiveUser) -> MessageResponse:
     """
     Logout user and blacklist their access token.
 
@@ -124,11 +102,7 @@ async def get_current_user_info(current_user: CurrentActiveUser) -> UserResponse
 @router.post("/forgot-password", response_model=MessageResponse)
 @rate_limit(settings.rate_limit.auth_register)
 @recaptcha_protected("forgot_password")
-async def forgot_password(
-    request: Request,
-    forgot_request: ForgotPasswordRequest,
-    db: DBSession
-) -> MessageResponse:
+async def forgot_password(request: Request, forgot_request: ForgotPasswordRequest, db: DBSession) -> MessageResponse:
     """
     Request password reset token.
 
@@ -159,11 +133,7 @@ async def forgot_password(
 
 @router.post("/reset-password", response_model=MessageResponse)
 @rate_limit(settings.rate_limit.auth_register)
-async def reset_password(
-    request: Request,
-    reset_request: ResetPasswordRequest,
-    db: DBSession
-) -> MessageResponse:
+async def reset_password(request: Request, reset_request: ResetPasswordRequest, db: DBSession) -> MessageResponse:
     """
     Reset password using token.
 
@@ -179,10 +149,7 @@ async def reset_password(
 @router.post("/change-password", response_model=MessageResponse)
 @rate_limit(settings.rate_limit.auth_password_change)
 async def change_password(
-    request: Request,
-    change_request: ChangePasswordRequest,
-    current_user: CurrentActiveUser,
-    db: DBSession
+    request: Request, change_request: ChangePasswordRequest, current_user: CurrentActiveUser, db: DBSession
 ) -> MessageResponse:
     """
     Change password for authenticated user.
@@ -197,7 +164,7 @@ async def change_password(
         user_id=str(current_user.id),
         current_password=change_request.currentPassword,
         new_password=change_request.newPassword,
-        db=db
+        db=db,
     )
 
     # TODO: Invalidate all user tokens after password change
@@ -224,7 +191,7 @@ async def google_login(request: Request):
     After authentication, Google will redirect back to the callback endpoint.
     """
     # Build redirect URI dynamically from request
-    redirect_uri = str(request.url_for('google_callback'))
+    redirect_uri = str(request.url_for("google_callback"))
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -247,13 +214,13 @@ async def google_callback(request: Request, db: DBSession) -> LoginResponse:
         raise InvalidCredentialsError(f"Google authentication failed: {error.error}")
 
     # Extract user info from token
-    user_info = token.get('userinfo')
+    user_info = token.get("userinfo")
     if not user_info:
         raise InvalidCredentialsError("Failed to get user information from Google")
 
-    email = user_info.get('email')
-    name = user_info.get('name', '')
-    google_id = user_info.get('sub')  # Google user ID
+    email = user_info.get("email")
+    name = user_info.get("name", "")
+    google_id = user_info.get("sub")  # Google user ID
 
     if not email or not google_id:
         raise InvalidCredentialsError("Incomplete user information from Google")

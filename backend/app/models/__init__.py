@@ -6,7 +6,6 @@ from app.models.experience import Experience
 
 __all__ = [
     "User",
-    "Profile", 
+    "Profile",
     "Experience",
 ]
-

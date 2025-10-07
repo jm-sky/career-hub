@@ -1,14 +1,18 @@
 """Pydantic schemas for Profile model."""
 
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from pydantic import BaseModel, Field, validator
 
 
+def to_camel(string: str) -> str:
+    return "".join(word.capitalize() if i > 0 else word for i, word in enumerate(string.split("_")))
+
+
 class ProfileBase(BaseModel):
     """Base profile schema with common fields."""
-    
+
     headline: Optional[str] = Field(None, max_length=200, description="Professional headline")
     summary: Optional[str] = Field(None, description="Professional summary")
     location: Optional[str] = Field(None, max_length=100, description="Location")
@@ -26,16 +30,14 @@ class ProfileBase(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ProfileCreate(ProfileBase):
     """Schema for creating a profile."""
-    
+
     slug: Optional[str] = Field(None, max_length=100, description="URL slug")
     draft_data: Optional[Dict[str, Any]] = Field(None, alias="draftData", description="Draft wizard data")
 
@@ -44,20 +46,21 @@ class ProfileCreate(ProfileBase):
         """Validate slug format."""
         if v is None:
             return v
-        
+
         import re
-        if not re.match(r'^[a-z0-9-]+$', v):
+
+        if not re.match(r"^[a-z0-9-]+$", v):
             raise ValueError("Slug must contain only lowercase letters, numbers, and hyphens")
-        
+
         if len(v) < 3:
             raise ValueError("Slug must be at least 3 characters long")
-            
+
         return v
 
 
 class ProfileUpdate(BaseModel):
     """Schema for updating a profile."""
-    
+
     headline: Optional[str] = Field(None, max_length=200)
     summary: Optional[str] = None
     location: Optional[str] = Field(None, max_length=100)
@@ -78,16 +81,14 @@ class ProfileUpdate(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ProfileResponse(ProfileBase):
     """Schema for profile responses."""
-    
+
     id: str = Field(description="Profile ID")
     user_id: str = Field(alias="userId", description="User ID")
     slug: Optional[str] = Field(description="URL slug")
@@ -97,17 +98,15 @@ class ProfileResponse(ProfileBase):
 
     class Config:
         """Pydantic config."""
+
         from_attributes = True
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ProfilePublicResponse(BaseModel):
     """Schema for public profile responses (limited fields)."""
-    
+
     id: str = Field(description="Profile ID")
     slug: Optional[str] = Field(description="URL slug")
     headline: Optional[str] = Field(description="Professional headline")
@@ -118,17 +117,15 @@ class ProfilePublicResponse(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         from_attributes = True
         populate_by_name = True
-        alias_generator = lambda field_name: ''.join(
-            word.capitalize() if i > 0 else word 
-            for i, word in enumerate(field_name.split('_'))
-        )
+        alias_generator = to_camel
 
 
 class ProfileSummaryResponse(BaseModel):
     """Schema for profile summary (for lists)."""
-    
+
     id: str = Field(description="Profile ID")
     headline: Optional[str] = Field(description="Professional headline")
     location: Optional[str] = Field(description="Location")
@@ -137,5 +134,6 @@ class ProfileSummaryResponse(BaseModel):
 
     class Config:
         """Pydantic config."""
+
         from_attributes = True
         populate_by_name = True

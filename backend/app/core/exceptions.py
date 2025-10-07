@@ -78,8 +78,4 @@ async def authentication_exception_handler(request: Request, exc: Authentication
     if exc.status_code == 401:
         headers["WWW-Authenticate"] = "Bearer"
 
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.message},
-        headers=headers
-    )
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.message}, headers=headers)

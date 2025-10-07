@@ -5,12 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 # Shared config for all nested settings
-_base_config = SettingsConfigDict(
-    env_file=".env",
-    env_file_encoding="utf-8",
-    case_sensitive=False,
-    extra="ignore"
-)
+_base_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", case_sensitive=False, extra="ignore")
 
 
 class AppSettings(BaseSettings):
@@ -18,25 +13,13 @@ class AppSettings(BaseSettings):
 
     model_config = _base_config
 
-    name: str = Field(
-        default="CareerHub API",
-        validation_alias="APP_NAME",
-        description="Application name"
-    )
-    version: str = Field(
-        default="1.0.0",
-        validation_alias="APP_VERSION",
-        description="Application version"
-    )
-    debug: bool = Field(
-        default=False,
-        validation_alias="DEBUG",
-        description="Debug mode"
-    )
+    name: str = Field(default="CareerHub API", validation_alias="APP_NAME", description="Application name")
+    version: str = Field(default="1.0.0", validation_alias="APP_VERSION", description="Application version")
+    debug: bool = Field(default=False, validation_alias="DEBUG", description="Debug mode")
     environment: str = Field(
         default="development",
         validation_alias="ENVIRONMENT",
-        description="Environment (development, staging, production)"
+        description="Environment (development, staging, production)",
     )
 
     @field_validator("environment")
@@ -54,20 +37,10 @@ class ServerSettings(BaseSettings):
 
     model_config = _base_config
 
-    host: str = Field(
-        default="0.0.0.0",
-        validation_alias="HOST",
-        description="Server host"
-    )
-    port: int = Field(
-        default=8000,
-        validation_alias="PORT",
-        description="Server port"
-    )
+    host: str = Field(default="0.0.0.0", validation_alias="HOST", description="Server host")
+    port: int = Field(default=8000, validation_alias="PORT", description="Server port")
     cors_origins: list[str] = Field(
-        default=["http://localhost:3000"],
-        validation_alias="CORS_ORIGINS",
-        description="Allowed CORS origins"
+        default=["http://localhost:3000"], validation_alias="CORS_ORIGINS", description="Allowed CORS origins"
     )
 
     @field_validator("port")
@@ -87,22 +60,18 @@ class SecuritySettings(BaseSettings):
     secret_key: str = Field(
         default="your-secret-key-change-this-in-production-min-32-chars",
         validation_alias="SECRET_KEY",
-        description="Secret key for JWT and other crypto operations"
+        description="Secret key for JWT and other crypto operations",
     )
-    jwt_algorithm: str = Field(
-        default="HS256",
-        validation_alias="JWT_ALGORITHM",
-        description="JWT signing algorithm"
-    )
+    jwt_algorithm: str = Field(default="HS256", validation_alias="JWT_ALGORITHM", description="JWT signing algorithm")
     access_token_expires_minutes: int = Field(
         default=15,
         validation_alias="ACCESS_TOKEN_EXPIRES_MINUTES",
-        description="Access token expiration in minutes (CareerHub: 15min)"
+        description="Access token expiration in minutes (CareerHub: 15min)",
     )
     refresh_token_expires_days: int = Field(
         default=30,
         validation_alias="REFRESH_TOKEN_EXPIRES_DAYS",
-        description="Refresh token expiration in days (CareerHub: 30 days)"
+        description="Refresh token expiration in days (CareerHub: 30 days)",
     )
 
     @field_validator("secret_key")
@@ -124,8 +93,7 @@ class SecuritySettings(BaseSettings):
         # Check for basic entropy (not all same character)
         if len(set(v)) < 8:
             raise ValueError(
-                "Secret key must have sufficient entropy. "
-                "Use a truly random string with varied characters."
+                "Secret key must have sufficient entropy. " "Use a truly random string with varied characters."
             )
 
         return v
@@ -137,34 +105,22 @@ class RateLimitSettings(BaseSettings):
     model_config = _base_config
 
     default_per_day: int = Field(
-        default=1000,
-        validation_alias="RATE_LIMIT_DEFAULT_PER_DAY",
-        description="Default rate limit per day"
+        default=1000, validation_alias="RATE_LIMIT_DEFAULT_PER_DAY", description="Default rate limit per day"
     )
     default_per_hour: int = Field(
-        default=100,
-        validation_alias="RATE_LIMIT_DEFAULT_PER_HOUR",
-        description="Default rate limit per hour"
+        default=100, validation_alias="RATE_LIMIT_DEFAULT_PER_HOUR", description="Default rate limit per hour"
     )
     auth_register: str = Field(
-        default="5/minute",
-        validation_alias="AUTH_REGISTER_RATE_LIMIT",
-        description="Registration rate limit"
+        default="5/minute", validation_alias="AUTH_REGISTER_RATE_LIMIT", description="Registration rate limit"
     )
     auth_login: str = Field(
-        default="10/minute",
-        validation_alias="AUTH_LOGIN_RATE_LIMIT",
-        description="Login rate limit"
+        default="10/minute", validation_alias="AUTH_LOGIN_RATE_LIMIT", description="Login rate limit"
     )
     auth_refresh: str = Field(
-        default="20/minute",
-        validation_alias="AUTH_REFRESH_RATE_LIMIT",
-        description="Token refresh rate limit"
+        default="20/minute", validation_alias="AUTH_REFRESH_RATE_LIMIT", description="Token refresh rate limit"
     )
     auth_password_change: str = Field(
-        default="3/minute",
-        validation_alias="AUTH_PASSWORD_CHANGE_RATE_LIMIT",
-        description="Password change rate limit"
+        default="3/minute", validation_alias="AUTH_PASSWORD_CHANGE_RATE_LIMIT", description="Password change rate limit"
     )
 
 
@@ -176,7 +132,7 @@ class DatabaseSettings(BaseSettings):
     url: str = Field(
         default="postgresql://careerhub:careerhub@localhost:5432/careerhub",
         validation_alias="DATABASE_URL",
-        description="Database connection URL"
+        description="Database connection URL",
     )
 
 
@@ -186,9 +142,7 @@ class RedisSettings(BaseSettings):
     model_config = _base_config
 
     url: str = Field(
-        default="redis://localhost:6379/0",
-        validation_alias="REDIS_URL",
-        description="Redis connection URL"
+        default="redis://localhost:6379/0", validation_alias="REDIS_URL", description="Redis connection URL"
     )
 
 
@@ -198,29 +152,19 @@ class RecaptchaSettings(BaseSettings):
     model_config = _base_config
 
     enabled: bool = Field(
-        default=False,
-        validation_alias="RECAPTCHA_ENABLED",
-        description="Enable reCAPTCHA verification"
+        default=False, validation_alias="RECAPTCHA_ENABLED", description="Enable reCAPTCHA verification"
     )
     secret_key: str = Field(
-        default="",
-        validation_alias="RECAPTCHA_SECRET_KEY",
-        description="Google reCAPTCHA v3 secret key"
+        default="", validation_alias="RECAPTCHA_SECRET_KEY", description="Google reCAPTCHA v3 secret key"
     )
-    site_key: str = Field(
-        default="",
-        validation_alias="RECAPTCHA_SITE_KEY",
-        description="Google reCAPTCHA v3 site key"
-    )
+    site_key: str = Field(default="", validation_alias="RECAPTCHA_SITE_KEY", description="Google reCAPTCHA v3 site key")
     min_score: float = Field(
-        default=0.5,
-        validation_alias="RECAPTCHA_MIN_SCORE",
-        description="Minimum reCAPTCHA score to accept (0.0-1.0)"
+        default=0.5, validation_alias="RECAPTCHA_MIN_SCORE", description="Minimum reCAPTCHA score to accept (0.0-1.0)"
     )
     verify_url: str = Field(
         default="https://www.google.com/recaptcha/api/siteverify",
         validation_alias="RECAPTCHA_VERIFY_URL",
-        description="reCAPTCHA verification endpoint"
+        description="reCAPTCHA verification endpoint",
     )
 
     @field_validator("min_score")
@@ -237,20 +181,14 @@ class GoogleOAuthSettings(BaseSettings):
 
     model_config = _base_config
 
-    client_id: str = Field(
-        default="",
-        validation_alias="GOOGLE_CLIENT_ID",
-        description="Google OAuth client ID"
-    )
+    client_id: str = Field(default="", validation_alias="GOOGLE_CLIENT_ID", description="Google OAuth client ID")
     client_secret: str = Field(
-        default="",
-        validation_alias="GOOGLE_CLIENT_SECRET",
-        description="Google OAuth client secret"
+        default="", validation_alias="GOOGLE_CLIENT_SECRET", description="Google OAuth client secret"
     )
     redirect_uri: str = Field(
         default="http://localhost:8000/api/v1/auth/google/callback",
         validation_alias="GOOGLE_REDIRECT_URI",
-        description="Google OAuth redirect URI"
+        description="Google OAuth redirect URI",
     )
 
 
@@ -273,7 +211,7 @@ class Settings(BaseSettings):
     frontend_url: str = Field(
         default="http://localhost:3000",
         validation_alias="FRONTEND_URL",
-        description="Frontend application URL for reset links and redirects"
+        description="Frontend application URL for reset links and redirects",
     )
 
 

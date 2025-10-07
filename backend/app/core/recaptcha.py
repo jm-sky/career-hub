@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class RecaptchaError(Exception):
     """Exception raised for reCAPTCHA verification errors."""
+
     pass
 
 
@@ -36,12 +37,7 @@ async def verify_recaptcha(token: str, action: str = "submit") -> Dict[str, Any]
     # Skip verification if reCAPTCHA is disabled (for development/testing)
     if not settings.recaptcha.enabled:
         logger.debug("reCAPTCHA verification skipped (disabled in settings)")
-        return {
-            "success": True,
-            "score": 1.0,
-            "action": action,
-            "skipped": True
-        }
+        return {"success": True, "score": 1.0, "action": action, "skipped": True}
 
     if not token:
         raise RecaptchaError("reCAPTCHA token is required")
@@ -54,7 +50,7 @@ async def verify_recaptcha(token: str, action: str = "submit") -> Dict[str, Any]
                     "secret": settings.recaptcha.secret_key,
                     "response": token,
                 },
-                timeout=10.0
+                timeout=10.0,
             )
             response.raise_for_status()
             result = response.json()
@@ -73,21 +69,14 @@ async def verify_recaptcha(token: str, action: str = "submit") -> Dict[str, Any]
 
         # Verify action matches (prevents token reuse across different forms)
         if result.get("action") != action:
-            logger.warning(
-                f"reCAPTCHA action mismatch: expected '{action}', "
-                f"got '{result.get('action')}'"
-            )
+            logger.warning(f"reCAPTCHA action mismatch: expected '{action}', " f"got '{result.get('action')}'")
             raise RecaptchaError("reCAPTCHA action mismatch")
 
         # Check score threshold
         score = result.get("score", 0.0)
         if score < settings.recaptcha.min_score:
-            logger.warning(
-                f"reCAPTCHA score too low: {score} < {settings.recaptcha.min_score}"
-            )
-            raise RecaptchaError(
-                f"reCAPTCHA verification failed: score too low ({score})"
-            )
+            logger.warning(f"reCAPTCHA score too low: {score} < {settings.recaptcha.min_score}")
+            raise RecaptchaError(f"reCAPTCHA verification failed: score too low ({score})")
 
         return result
 

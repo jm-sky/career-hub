@@ -12,13 +12,10 @@ from pathlib import Path
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from app.core.config import settings
-from app.core.database import Base
+from app.core.config import settings  # noqa: E402
+from app.core.database import Base  # noqa: E402
 
 # Import all models to ensure they're registered with Base.metadata
-from app.models.user import User
-from app.models.profile import Profile
-from app.models.experience import Experience
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -80,9 +77,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

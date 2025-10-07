@@ -16,8 +16,7 @@ security = HTTPBearer()
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
-    db: Session = Depends(get_db)
+    credentials: HTTPAuthorizationCredentials = Depends(security), db: Session = Depends(get_db)
 ) -> User:
     """
     Get current authenticated user from JWT token.
@@ -64,9 +63,7 @@ async def get_current_user(
     return user
 
 
-async def get_current_active_user(
-    current_user: User = Depends(get_current_user)
-) -> User:
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     """
     Get current active user (alias for clarity).
 
@@ -103,6 +100,7 @@ DBSession = Annotated[Session, Depends(get_db)]
 # ============================================================================
 # Dependency Registry (Optional - for advanced use cases)
 # ============================================================================
+
 
 class Dependencies:
     """

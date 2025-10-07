@@ -32,7 +32,7 @@ def create_experience(
 ):
     """Create a new experience for a profile."""
     service = ExperienceService(db)
-    
+
     experience = service.create_experience(profile_id, current_user.id, experience_data)
     return experience.to_dict()
 
@@ -45,25 +45,22 @@ def get_experience(
 ):
     """Get an experience by ID."""
     service = ExperienceService(db)
-    
+
     experience = service.get_experience_by_id(experience_id)
     if not experience:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
-    
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
+
     # Check if user can view this experience through profile ownership
     from app.services.profile_service import ProfileService
+
     profile_service = ProfileService(db)
     profile = profile_service.get_profile_by_id(experience.profile_id)
-    
+
     if not profile or not profile.can_view(current_user.id):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You don't have permission to view this experience"
+            status_code=status.HTTP_403_FORBIDDEN, detail="You don't have permission to view this experience"
         )
-    
+
     return experience.to_dict()
 
 
@@ -76,15 +73,12 @@ def update_experience(
 ):
     """Update an experience."""
     service = ExperienceService(db)
-    
+
     try:
         experience = service.update_experience(experience_id, current_user.id, experience_data)
         return experience.to_dict()
     except ExperienceNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
 
 @router.delete("/{experience_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -95,13 +89,10 @@ def delete_experience(
 ):
     """Delete an experience."""
     service = ExperienceService(db)
-    
+
     deleted = service.delete_experience(experience_id, current_user.id)
     if not deleted:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
 
 @router.get("/profile/{profile_id}", response_model=List[ExperienceSummaryResponse])
@@ -112,7 +103,7 @@ def get_profile_experiences(
 ):
     """Get all experiences for a profile."""
     service = ExperienceService(db)
-    
+
     experiences = service.get_experiences_by_profile(profile_id, current_user.id)
     return [experience.to_summary_dict() for experience in experiences]
 
@@ -126,12 +117,8 @@ def reorder_experiences(
 ):
     """Reorder experiences for a profile."""
     service = ExperienceService(db)
-    
-    experiences = service.reorder_experiences(
-        profile_id, 
-        current_user.id, 
-        reorder_data.experience_ids
-    )
+
+    experiences = service.reorder_experiences(profile_id, current_user.id, reorder_data.experience_ids)
     return [experience.to_summary_dict() for experience in experiences]
 
 
@@ -144,15 +131,12 @@ def add_responsibility(
 ):
     """Add a responsibility to an experience."""
     service = ExperienceService(db)
-    
+
     try:
         experience = service.add_responsibility(experience_id, current_user.id, responsibility)
         return experience.to_dict()
     except ExperienceNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
 
 @router.delete("/{experience_id}/responsibilities", response_model=ExperienceResponse)
@@ -164,15 +148,12 @@ def remove_responsibility(
 ):
     """Remove a responsibility from an experience."""
     service = ExperienceService(db)
-    
+
     try:
         experience = service.remove_responsibility(experience_id, current_user.id, responsibility)
         return experience.to_dict()
     except ExperienceNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
 
 @router.post("/{experience_id}/technologies", response_model=ExperienceResponse)
@@ -184,15 +165,12 @@ def add_technology(
 ):
     """Add a technology to an experience."""
     service = ExperienceService(db)
-    
+
     try:
         experience = service.add_technology(experience_id, current_user.id, technology)
         return experience.to_dict()
     except ExperienceNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")
 
 
 @router.delete("/{experience_id}/technologies", response_model=ExperienceResponse)
@@ -204,13 +182,9 @@ def remove_technology(
 ):
     """Remove a technology from an experience."""
     service = ExperienceService(db)
-    
+
     try:
         experience = service.remove_technology(experience_id, current_user.id, technology)
         return experience.to_dict()
     except ExperienceNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experience not found"
-        )
-
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Experience not found")

@@ -44,15 +44,11 @@ async def root():
         "message": "Welcome to CareerHub API",
         "version": settings.app.version,
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
 
 
 @app.get("/health")
 async def health():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "environment": settings.app.environment,
-        "version": settings.app.version
-    }
+    return {"status": "healthy", "environment": settings.app.environment, "version": settings.app.version}

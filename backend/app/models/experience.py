@@ -63,12 +63,12 @@ class Experience(Base):
         """Calculate duration in months."""
         if not self.start_date:
             return None
-        
+
         end = self.end_date or date.today()
-        
+
         # Calculate months between dates
         months = (end.year - self.start_date.year) * 12 + (end.month - self.start_date.month)
-        
+
         # Add 1 to include the current month
         return max(months + 1, 1)
 
@@ -78,23 +78,23 @@ class Experience(Base):
         months = self.duration_months
         if not months:
             return "Unknown duration"
-        
+
         if months < 12:
             return f"{months} {'month' if months == 1 else 'months'}"
-        
+
         years = months // 12
         remaining_months = months % 12
-        
+
         if remaining_months == 0:
             return f"{years} {'year' if years == 1 else 'years'}"
-        
+
         return f"{years} {'year' if years == 1 else 'years'} {remaining_months} {'month' if remaining_months == 1 else 'months'}"
 
     def add_responsibility(self, responsibility: str) -> None:
         """Add a responsibility to the list."""
         if not self.responsibilities:
             self.responsibilities = []
-        
+
         if responsibility.strip() and responsibility not in self.responsibilities:
             self.responsibilities = self.responsibilities + [responsibility.strip()]
 
@@ -107,7 +107,7 @@ class Experience(Base):
         """Add a technology to the list."""
         if not self.technologies:
             self.technologies = []
-        
+
         if technology.strip() and technology not in self.technologies:
             self.technologies = self.technologies + [technology.strip()]
 

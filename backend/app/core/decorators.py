@@ -22,9 +22,11 @@ def require_auth(func: Callable) -> Callable:
         async def get_me(current_user: User) -> UserResponse:
             return UserResponse.model_validate(current_user)
     """
+
     @wraps(func)
     async def wrapper(*args: Any, current_user: User = Depends(get_current_active_user), **kwargs: Any) -> Any:
         return await func(*args, current_user=current_user, **kwargs)
+
     return wrapper
 
 
@@ -45,9 +47,11 @@ def rate_limit(limit: str):
             # request parameter is required for rate limiting
             ...
     """
+
     def decorator(func: Callable) -> Callable:
         # Apply limiter.limit directly - it will handle the request parameter
         return limiter.limit(limit)(func)
+
     return decorator
 
 
@@ -67,6 +71,7 @@ def recaptcha_protected(action: str):
             # reCAPTCHA already verified
             ...
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -75,19 +80,21 @@ def recaptcha_protected(action: str):
             # Find the request data object in args or kwargs
             request_data = None
             for arg in args:
-                if hasattr(arg, 'recaptchaToken'):
+                if hasattr(arg, "recaptchaToken"):
                     request_data = arg
                     break
 
             for kwarg_value in kwargs.values():
-                if hasattr(kwarg_value, 'recaptchaToken'):
+                if hasattr(kwarg_value, "recaptchaToken"):
                     request_data = kwarg_value
                     break
 
             # Verify reCAPTCHA token
-            if request_data and hasattr(request_data, 'recaptchaToken'):
+            if request_data and hasattr(request_data, "recaptchaToken"):
                 await verify_recaptcha(request_data.recaptchaToken or "", action=action)
 
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
