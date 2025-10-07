@@ -1,7 +1,8 @@
 # FastAPI and ASGI
-fastapi==0.117.1
+fastapi==0.118.0
 uvicorn[standard]==0.24.0
 gunicorn==21.2.0
+starlette==0.48.0
 
 # Database
 sqlalchemy==2.0.23
@@ -17,12 +18,13 @@ passlib==1.7.4
 bcrypt==4.0.1
 PyJWT==2.10.1
 python-multipart==0.0.20
-Authlib==1.6.4
-limits==5.5.0
+Authlib==1.6.5
+limits==5.6.0
+itsdangerous==2.2.0
 
 # Validation and Settings
-pydantic==2.11.9
-pydantic-settings==2.10.0
+pydantic==2.11.10
+pydantic-settings==2.11.0
 email-validator==2.3.0
 
 # Utilities
@@ -43,10 +45,4 @@ minio==7.2.0
 slowapi==0.1.9
 
 # Monitoring and Logging
-sentry-sdk[fastapi]==1.38.0
-
-# Development dependencies
-pytest==7.4.3
-pytest-asyncio==0.21.1
-black==23.11.0
-ruff==0.1.6
+sentry-sdk[fastapi]==2.40.0
