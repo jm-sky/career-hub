@@ -2,8 +2,8 @@
 
 // Skills step of the profile wizard
 
-import { useState } from 'react';
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+import { useState, useCallback } from 'react';
+import { useFormContext, useFieldArray } from 'react-hook-form';
 import { Plus, Trash2, Code, Star, Clock } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,13 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Progress } from '@/components/ui/progress';
 
-interface SkillsStepProps {
-  register: UseFormRegister<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
-  errors: FieldErrors<any>;
-}
-
+// Modern 2025: No props needed - use FormProvider context
 interface Skill {
   id: string;
   name: string;
@@ -45,18 +39,28 @@ const SKILL_LEVELS = [
   { value: 'EXPERT', label: 'Expert', color: 'bg-purple-100 text-purple-800', progress: 100 },
 ] as const;
 
-export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProps) {
-  const skills = watch('skills') || [];
+export function SkillsStep() {
+  const { control, register, watch, formState: { errors } } = useFormContext();
+  
+  // Modern 2025: Use useFieldArray for dynamic arrays
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: 'skills'
+  });
+
+  // Watch skills to get real-time values for display
+  const watchedSkills = watch('skills') || [];
+
   const [editingSkill, setEditingSkill] = useState<string | null>(null);
   const [newSkillName, setNewSkillName] = useState('');
   const [newSkillCategory, setNewSkillCategory] = useState<Skill['category']>('LANGUAGE');
   const [newSkillLevel, setNewSkillLevel] = useState<Skill['level']>('INTERMEDIATE');
   const [newSkillYears, setNewSkillYears] = useState(1);
 
-  const addSkill = () => {
+  const addSkill = useCallback(() => {
     if (!newSkillName.trim()) return;
 
-    const newSkill: Skill = {
+    const newSkill = {
       id: Date.now().toString(),
       name: newSkillName.trim(),
       category: newSkillCategory,
@@ -64,27 +68,31 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
       yearsOfExperience: newSkillYears,
     };
     
-    setValue('skills', [...skills, newSkill]);
+    append(newSkill);
     setNewSkillName('');
     setNewSkillYears(1);
-  };
+  }, [newSkillName, newSkillCategory, newSkillLevel, newSkillYears, append]);
 
-  const removeSkill = (id: string) => {
-    setValue('skills', skills.filter((skill: Skill) => skill.id !== id));
-    if (editingSkill === id) {
-      setEditingSkill(null);
+  const removeSkill = useCallback((id: string) => {
+    const index = fields.findIndex(f => f.id === id);
+    if (index !== -1) {
+      remove(index);
+      if (editingSkill === id) {
+        setEditingSkill(null);
+      }
     }
-  };
+  }, [fields, remove, editingSkill]);
 
-  const updateSkill = (id: string, field: keyof Skill, value: any) => {
-    setValue('skills', skills.map((skill: Skill) => 
-      skill.id === id ? { ...skill, [field]: value } : skill
-    ));
-  };
+  const updateSkill = useCallback((id: string, field: string, value: any) => {
+    const index = fields.findIndex(f => f.id === id);
+    if (index !== -1) {
+      update(index, { ...fields[index], [field]: value });
+    }
+  }, [fields, update]);
 
-  const getSkillsByCategory = (category: string) => {
-    return skills.filter((skill: Skill) => skill.category === category);
-  };
+  const getSkillsByCategory = useCallback((category: string) => {
+    return watchedSkills.filter((skill: any) => skill.category === category);
+  }, [watchedSkills]);
 
   const getLevelInfo = (level: string) => {
     return SKILL_LEVELS.find(l => l.value === level) || SKILL_LEVELS[0];
@@ -120,7 +128,7 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="skill-name">Skill Name *</Label>
+              <Label htmlFor="skill-name" required>Skill Name</Label>
               <Input
                 id="skill-name"
                 placeholder="e.g., React, Python, AWS"
@@ -184,7 +192,7 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
           </div>
           <div className="mt-4">
             <Button onClick={addSkill} disabled={!newSkillName.trim()}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="size-4 mr-2" />
               Add Skill
             </Button>
           </div>
@@ -192,7 +200,7 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
       </Card>
 
       {/* Skills by Category */}
-      {skills.length === 0 ? (
+      {watchedSkills.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Code className="h-12 w-12 text-gray-400 mb-4" />
@@ -236,10 +244,9 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
                               </div>
                             </div>
                             <Button
-                              variant="ghost"
+                              variant="ghost-destructive"
                               size="sm"
                               onClick={() => removeSkill(skill.id)}
-                              className="text-red-600 hover:text-red-700"
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>
@@ -264,35 +271,35 @@ export function SkillsStep({ register, setValue, watch, errors }: SkillsStepProp
       )}
 
       {/* Skills Summary */}
-      {skills.length > 0 && (
+      {watchedSkills.length > 0 && (
         <Card className="bg-gradient-to-r from-blue-50 to-purple-50">
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Star className="h-4 w-4" />
+              <Star className="size-4" />
               Skills Summary
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-blue-600">{skills.length}</div>
+                <div className="text-2xl font-bold text-blue-600">{watchedSkills.length}</div>
                 <div className="text-sm text-gray-600">Total Skills</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-green-600">
-                  {skills.filter((s: Skill) => s.level === 'EXPERT').length}
+                  {watchedSkills.filter((s: any) => s.level === 'EXPERT').length}
                 </div>
                 <div className="text-sm text-gray-600">Expert Level</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-purple-600">
-                  {skills.filter((s: Skill) => s.level === 'ADVANCED').length}
+                  {watchedSkills.filter((s: any) => s.level === 'ADVANCED').length}
                 </div>
                 <div className="text-sm text-gray-600">Advanced</div>
               </div>
               <div>
                 <div className="text-2xl font-bold text-orange-600">
-                  {Math.round(skills.reduce((sum: number, s: Skill) => sum + s.yearsOfExperience, 0) / skills.length * 10) / 10}
+                  {Math.round(watchedSkills.reduce((sum: number, s: any) => sum + s.yearsOfExperience, 0) / watchedSkills.length * 10) / 10}
                 </div>
                 <div className="text-sm text-gray-600">Avg. Experience</div>
               </div>

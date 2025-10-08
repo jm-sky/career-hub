@@ -1,0 +1,65 @@
+# Cursor AI Rules for CareerHub Project
+
+## 🎯 **Project Context**
+This is CareerHub - a modern professional profile management platform built with Next.js 15, React Hook Form, and FastAPI.
+
+## 📚 **CRITICAL: Form Handling Best Practices**
+**ALWAYS REFER TO**: `docs/frontend/REACT_FORM_RESEARCH.md` for React form handling patterns.
+
+### **2025 React Form Rules - MANDATORY**
+1. **ALWAYS** use FormProvider architecture instead of prop drilling
+2. **ALWAYS** use `triggerMode: "onChange"` in useForm configuration
+3. **ALWAYS** use useFieldArray for dynamic arrays
+4. **ALWAYS** use Controller for complex components
+5. **NEVER** use manual setValue without proper configuration
+
+### **Form Component Pattern**
+```typescript
+// ✅ CORRECT - Modern 2025 pattern
+export function StepComponent() {
+  const { control, register, formState: { errors } } = useFormContext();
+  const { fields, append, remove } = useFieldArray({ control, name: 'items' });
+  // implementation
+}
+
+// ❌ WRONG - Legacy pattern (avoid)
+export function StepComponent({ register, setValue, watch, errors }) {
+  // implementation
+}
+```
+
+## 🏗️ **Architecture Guidelines**
+- Frontend: Next.js 15 + TypeScript + Tailwind CSS v4 + shadcn/ui
+- Forms: React Hook Form with FormProvider (see REACT_FORM_RESEARCH.md)
+- State: Zustand + TanStack Query
+- Backend: FastAPI + PostgreSQL + Redis
+
+## 🚨 **Common Issues & Solutions**
+- **Checkbox not working**: Use `triggerMode: "onChange"` in useForm config
+- **Form not re-rendering**: Use FormProvider + Controller components
+- **Prop drilling**: Use FormProvider context instead of passing props
+
+## 📁 **Key Files to Reference**
+1. `docs/frontend/REACT_FORM_RESEARCH.md` - Form best practices (READ FIRST)
+2. `frontend/src/components/profile/ProfileWizardSteps.tsx` - Main wizard
+3. `frontend/src/contexts/auth-context.tsx` - Auth state
+4. `CLAUDE.md` - Project overview and guidelines
+
+## 🤖 **AI Instructions**
+- **ALWAYS** check REACT_FORM_RESEARCH.md before working on forms
+- **ALWAYS** use modern 2025 patterns established in the project
+- **ALWAYS** follow FormProvider architecture
+- **NEVER** use legacy form patterns or prop drilling
+
+## ✅ **Code Quality Checklist**
+- [ ] Uses FormProvider instead of prop drilling
+- [ ] Uses useFieldArray for dynamic arrays  
+- [ ] Uses Controller for complex components
+- [ ] Has triggerMode: "onChange" in useForm config
+- [ ] Follows 2025 best practices from REACT_FORM_RESEARCH.md
+- [ ] No prop drilling in form components
+- [ ] Proper TypeScript types
+- [ ] Modern React patterns (useCallback, useMemo where appropriate)
+
+---
+*CareerHub - Modern 2025 React Form Patterns*

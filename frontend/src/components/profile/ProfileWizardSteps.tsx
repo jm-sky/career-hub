@@ -2,11 +2,12 @@
 
 // Multi-step Profile Wizard for comprehensive professional profile creation
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useForm, FormProvider, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { z } from 'zod';
+import { useDebouncedCallback } from 'use-debounce';
 import { ChevronLeft, ChevronRight, Save, Check } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -91,18 +92,19 @@ export function ProfileWizardSteps() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    trigger,
-    formState: { errors, isValid },
-    reset,
-  } = useForm<ProfileWizardData>({
+  // Modern 2025 React Hook Form configuration with optimal performance
+  const methods = useForm<ProfileWizardData>({
     resolver: zodResolver(ProfileWizardSchema),
-    mode: 'onBlur',
+    mode: 'onChange', // Real-time validation (2025 best practice)
+    triggerMode: 'onChange', // Force re-renders on setValue (fixes checkbox issue)
+    reValidateMode: 'onChange', // Re-validate on change
+    shouldFocusError: true, // Auto-focus on first error
+    shouldUnregister: false, // Keep values when navigating between steps
+    criteriaMode: 'firstError', // Show only first error per field
     defaultValues: {
+      headline: '',
+      summary: '',
+      location: '',
       visibility: 'PRIVATE',
       contact: {},
       experiences: [],
@@ -111,16 +113,32 @@ export function ProfileWizardSteps() {
     },
   });
 
-  // Auto-save draft every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (isValid && currentStep > 0) {
-        saveDraft();
-      }
-    }, 30000);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    trigger,
+    formState: { errors, isValid },
+    reset,
+  } = methods;
 
-    return () => clearInterval(interval);
-  }, [isValid, currentStep]);
+  // Modern 2025: Debounced auto-save for better performance
+  const debouncedSave = useDebouncedCallback(
+    async () => {
+      if (isValid && currentStep > 0) {
+        await saveDraft();
+      }
+    },
+    2000, // 2 second delay
+    { leading: false, trailing: true }
+  );
+
+  // Auto-save on form changes (2025 best practice)
+  useEffect(() => {
+    const subscription = watch(debouncedSave);
+    return () => subscription.unsubscribe();
+  }, [watch, debouncedSave]);
 
   // Load draft on mount
   useEffect(() => {
@@ -223,7 +241,7 @@ export function ProfileWizardSteps() {
     }
   };
 
-  const onSubmit = async (data: ProfileWizardData) => {
+  const onSubmit = async (data: any) => {
     try {
       // Here you would call the API to create the complete profile
       console.log('Creating profile with data:', data);
@@ -243,55 +261,23 @@ export function ProfileWizardSteps() {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <PersonalInfoStep
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            errors={errors}
-          />
-        );
+        return <PersonalInfoStep />;
       case 1:
-        return (
-          <ExperienceStep
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            errors={errors}
-          />
-        );
+        return <ExperienceStep />;
       case 2:
-        return (
-          <ProjectsStep
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            errors={errors}
-          />
-        );
+        return <ProjectsStep />;
       case 3:
-        return (
-          <SkillsStep
-            register={register}
-            setValue={setValue}
-            watch={watch}
-            errors={errors}
-          />
-        );
+        return <SkillsStep />;
       case 4:
-        return (
-          <SummaryStep
-            watch={watch}
-            onSubmit={() => handleSubmit(onSubmit)()}
-          />
-        );
+        return <SummaryStep onSubmit={() => handleSubmit(onSubmit)()} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="container mx-auto p-8 max-w-4xl">
+    <FormProvider {...methods}>
+      <div className="container mx-auto p-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Create Your Professional Profile</h1>
@@ -324,12 +310,12 @@ export function ProfileWizardSteps() {
         <Progress value={progress} className="mb-4" />
         
         {/* Step Navigation */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4 md:gap-8">
           {STEPS.map((step, index) => (
             <button
               key={step.id}
               onClick={() => goToStep(index)}
-              className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
+              className={`flex flex-1 flex-col items-center p-2 rounded-lg transition-colors ${
                 index === currentStep
                   ? 'bg-primary text-primary-foreground'
                   : completedSteps.has(index)
@@ -340,7 +326,7 @@ export function ProfileWizardSteps() {
             >
               <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium mb-1">
                 {completedSteps.has(index) ? (
-                  <Check className="h-4 w-4" />
+                  <Check className="size-4" />
                 ) : (
                   index + 1
                 )}
@@ -369,7 +355,7 @@ export function ProfileWizardSteps() {
           onClick={prevStep}
           disabled={currentStep === 0}
         >
-          <ChevronLeft className="h-4 w-4 mr-2" />
+          <ChevronLeft className="size-4 mr-2" />
           Previous
         </Button>
 
@@ -379,7 +365,7 @@ export function ProfileWizardSteps() {
             onClick={saveDraft}
             disabled={isSaving}
           >
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="size-4 mr-2" />
             Save Draft
           </Button>
 
@@ -390,11 +376,12 @@ export function ProfileWizardSteps() {
           ) : (
             <Button onClick={nextStep}>
               Next
-              <ChevronRight className="h-4 w-4 ml-2" />
+              <ChevronRight className="size-4 ml-2" />
             </Button>
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </FormProvider>
   );
 }

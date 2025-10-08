@@ -1,9 +1,9 @@
 'use client';
 
-// Work Experience step of the profile wizard
+// Modern 2025 Work Experience step with best practices
 
-import { useState } from 'react';
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+import { useState, useCallback } from 'react';
+import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
 import { Plus, Trash2, Calendar, Building, MapPin } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -14,35 +14,25 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 
-interface ExperienceStepProps {
-  register: UseFormRegister<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
-  errors: FieldErrors<any>;
-}
+// Modern 2025: No props needed - use FormProvider context
+export function ExperienceStep() {
+  const { control, register, watch, formState: { errors } } = useFormContext();
+  
+  // Modern 2025: Use useFieldArray for dynamic arrays
+  const { fields, append, remove, update } = useFieldArray({
+    control,
+    name: 'experiences'
+  });
 
-interface Experience {
-  id: string;
-  company: string;
-  position: string;
-  startDate: string;
-  endDate?: string;
-  isCurrent: boolean;
-  description?: string;
-  responsibilities: string[];
-  achievements: string[];
-  technologies: string[];
-}
+  // Watch experiences to get real-time values for display
+  const watchedExperiences = watch('experiences') || [];
 
-export function ExperienceStep({ register, setValue, watch, errors }: ExperienceStepProps) {
-  const experiences = watch('experiences') || [];
-  const [editingExperience, setEditingExperience] = useState<string | null>(null);
-  const [newResponsibility, setNewResponsibility] = useState('');
-  const [newAchievement, setNewAchievement] = useState('');
-  const [newTechnology, setNewTechnology] = useState('');
+  // Modern 2025: Local state for UI interactions only
+  const [editingExperience, setEditingExperience] = useState<number | null>(null);
 
-  const addExperience = () => {
-    const newExp: Experience = {
+  // Modern 2025: Memoized callbacks for performance
+  const addExperience = useCallback(() => {
+    const newExperience = {
       id: Date.now().toString(),
       company: '',
       position: '',
@@ -54,91 +44,31 @@ export function ExperienceStep({ register, setValue, watch, errors }: Experience
       achievements: [],
       technologies: [],
     };
-    
-    setValue('experiences', [...experiences, newExp]);
-    setEditingExperience(newExp.id);
-  };
+    append(newExperience);
+    setEditingExperience(fields.length); // Edit the newly added item
+  }, [append, fields.length]);
 
-  const removeExperience = (id: string) => {
-    setValue('experiences', experiences.filter((exp: Experience) => exp.id !== id));
-    if (editingExperience === id) {
+  const removeExperience = useCallback((index: number) => {
+    remove(index);
+    if (editingExperience === index) {
       setEditingExperience(null);
     }
-  };
-
-  const updateExperience = (id: string, field: keyof Experience, value: any) => {
-    setValue('experiences', experiences.map((exp: Experience) => 
-      exp.id === id ? { ...exp, [field]: value } : exp
-    ));
-  };
-
-  const addResponsibility = (expId: string) => {
-    if (!newResponsibility.trim()) return;
-    
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'responsibilities', [...exp.responsibilities, newResponsibility]);
-      setNewResponsibility('');
-    }
-  };
-
-  const removeResponsibility = (expId: string, index: number) => {
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'responsibilities', exp.responsibilities.filter((_, i) => i !== index));
-    }
-  };
-
-  const addAchievement = (expId: string) => {
-    if (!newAchievement.trim()) return;
-    
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'achievements', [...exp.achievements, newAchievement]);
-      setNewAchievement('');
-    }
-  };
-
-  const removeAchievement = (expId: string, index: number) => {
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'achievements', exp.achievements.filter((_, i) => i !== index));
-    }
-  };
-
-  const addTechnology = (expId: string) => {
-    if (!newTechnology.trim()) return;
-    
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'technologies', [...exp.technologies, newTechnology]);
-      setNewTechnology('');
-    }
-  };
-
-  const removeTechnology = (expId: string, index: number) => {
-    const exp = experiences.find((e: Experience) => e.id === expId);
-    if (exp) {
-      updateExperience(expId, 'technologies', exp.technologies.filter((_, i) => i !== index));
-    }
-  };
+  }, [remove, editingExperience]);
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="text-lg font-medium">Work Experience</h3>
-          <p className="text-sm text-gray-600">
-            Add your professional work experience, starting with the most recent
-          </p>
-        </div>
-        <Button onClick={addExperience} size="sm">
-          <Plus className="h-4 w-4 mr-2" />
+      <div>
+        <h3 className="text-lg font-semibold mb-2">Work Experience</h3>
+        <p className="text-gray-600 mb-4">
+          Add your professional work experience to showcase your career journey
+        </p>
+        <Button onClick={addExperience} variant="outline">
+          <Plus className="size-4 mr-2" />
           Add Experience
         </Button>
       </div>
 
-      {experiences.length === 0 ? (
+      {fields.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Building className="h-12 w-12 text-gray-400 mb-4" />
@@ -147,28 +77,37 @@ export function ExperienceStep({ register, setValue, watch, errors }: Experience
               Start building your professional profile by adding your work experience
             </p>
             <Button onClick={addExperience}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Plus className="size-4 mr-2" />
               Add Your First Experience
             </Button>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {experiences.map((exp: Experience, index: number) => (
-            <Card key={exp.id} className={editingExperience === exp.id ? 'ring-2 ring-primary' : ''}>
+          {fields.map((field, index) => {
+            const experience = watchedExperiences[index] || field;
+            return (
+            <Card key={field.id} className={editingExperience === index ? 'ring-2 ring-primary' : ''}>
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-base">
-                      {exp.position || `Experience ${index + 1}`}
-                      {exp.company && ` at ${exp.company}`}
+                      {experience.position || `Experience ${index + 1}`}
+                      {experience.company && ` at ${experience.company}`}
                     </CardTitle>
                     <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                      {exp.startDate && (
+                      {experience.startDate && (
                         <div className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {exp.startDate} - {exp.isCurrent ? 'Present' : exp.endDate || 'Present'}
+                          <span>{experience.startDate}</span>
+                          {experience.endDate && !experience.isCurrent && <span> - {experience.endDate}</span>}
+                          {experience.isCurrent && <span> - Present</span>}
                         </div>
+                      )}
+                      {experience.isCurrent && (
+                        <Badge variant="secondary" className="text-xs">
+                          Current
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -176,204 +115,116 @@ export function ExperienceStep({ register, setValue, watch, errors }: Experience
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => setEditingExperience(editingExperience === exp.id ? null : exp.id)}
+                      onClick={() => setEditingExperience(editingExperience === index ? null : index)}
                     >
-                      {editingExperience === exp.id ? 'Done' : 'Edit'}
+                      {editingExperience === index ? 'Done' : 'Edit'}
                     </Button>
                     <Button
-                      variant="ghost"
+                      variant="ghost-destructive"
                       size="sm"
-                      onClick={() => removeExperience(exp.id)}
-                      className="text-red-600 hover:text-red-700"
+                      onClick={() => removeExperience(index)}
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="size-4" />
                     </Button>
                   </div>
                 </div>
               </CardHeader>
               
-              {editingExperience === exp.id && (
+              {editingExperience === index && (
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor={`exp-${exp.id}-position`}>Position *</Label>
+                      <Label htmlFor={`exp-${index}-position`} required>Position</Label>
                       <Input
-                        id={`exp-${exp.id}-position`}
+                        id={`exp-${index}-position`}
                         placeholder="e.g., Senior Software Engineer"
-                        value={exp.position}
-                        onChange={(e) => updateExperience(exp.id, 'position', e.target.value)}
+                        {...register(`experiences.${index}.position`)}
                       />
+                      {(errors.experiences as any)?.[index]?.position && (
+                        <p className="text-sm text-destructive">
+                          {String((errors.experiences as any)[index]?.position?.message || '')}
+                        </p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`exp-${exp.id}-company`}>Company *</Label>
+                      <Label htmlFor={`exp-${index}-company`} required>Company</Label>
                       <Input
-                        id={`exp-${exp.id}-company`}
+                        id={`exp-${index}-company`}
                         placeholder="e.g., Tech Corp"
-                        value={exp.company}
-                        onChange={(e) => updateExperience(exp.id, 'company', e.target.value)}
+                        {...register(`experiences.${index}.company`)}
                       />
+                      {(errors.experiences as any)?.[index]?.company && (
+                        <p className="text-sm text-destructive">
+                          {String((errors.experiences as any)[index]?.company?.message || '')}
+                        </p>
+                      )}
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor={`exp-${exp.id}-start`}>Start Date *</Label>
+                      <Label htmlFor={`exp-${index}-start`} required>Start Date</Label>
                       <Input
-                        id={`exp-${exp.id}-start`}
+                        id={`exp-${index}-start`}
                         type="month"
-                        value={exp.startDate}
-                        onChange={(e) => updateExperience(exp.id, 'startDate', e.target.value)}
+                        {...register(`experiences.${index}.startDate`)}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`exp-${exp.id}-end`}>End Date</Label>
+                      <Label htmlFor={`exp-${index}-end`}>End Date</Label>
                       <div className="flex items-center gap-2">
-                        <Input
-                          id={`exp-${exp.id}-end`}
-                          type="month"
-                          value={exp.endDate || ''}
-                          onChange={(e) => updateExperience(exp.id, 'endDate', e.target.value)}
-                          disabled={exp.isCurrent}
+                        <Controller
+                          name={`experiences.${index}.isCurrent`}
+                          control={control}
+                          render={({ field: checkboxField }) => (
+                            <>
+                              <Input
+                                id={`exp-${index}-end`}
+                                type="month"
+                                {...register(`experiences.${index}.endDate`)}
+                                disabled={checkboxField.value}
+                              />
+                              <div className="flex items-center space-x-2">
+                                <Checkbox
+                                  id={`exp-${index}-current`}
+                                  checked={checkboxField.value}
+                                  onCheckedChange={(checked) => {
+                                    const isChecked = checked === true;
+                                    checkboxField.onChange(isChecked);
+                                    if (isChecked) {
+                                      // Clear end date when current is checked
+                                      update(index, {
+                                        ...field,
+                                        endDate: '',
+                                        isCurrent: isChecked
+                                      });
+                                    }
+                                  }}
+                                />
+                                <Label htmlFor={`exp-${index}-current`} className="text-sm">
+                                  Currently working here
+                                </Label>
+                              </div>
+                            </>
+                          )}
                         />
-                        <div className="flex items-center space-x-2">
-                          <Checkbox
-                            id={`exp-${exp.id}-current`}
-                            checked={exp.isCurrent}
-                            onCheckedChange={(checked) => {
-                              const isChecked = checked === true;
-                              updateExperience(exp.id, 'isCurrent', isChecked);
-                              if (isChecked) {
-                                updateExperience(exp.id, 'endDate', '');
-                              }
-                            }}
-                          />
-                          <Label htmlFor={`exp-${exp.id}-current`} className="text-sm">
-                            Currently working here
-                          </Label>
-                        </div>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor={`exp-${exp.id}-description`}>Description</Label>
+                    <Label htmlFor={`exp-${index}-description`}>Description</Label>
                     <Textarea
-                      id={`exp-${exp.id}-description`}
+                      id={`exp-${index}-description`}
                       placeholder="Brief description of your role and responsibilities..."
-                      value={exp.description || ''}
-                      onChange={(e) => updateExperience(exp.id, 'description', e.target.value)}
+                      {...register(`experiences.${index}.description`)}
                       rows={3}
                     />
-                  </div>
-
-                  {/* Responsibilities */}
-                  <div className="space-y-2">
-                    <Label>Key Responsibilities</Label>
-                    <div className="space-y-2">
-                      {exp.responsibilities.map((resp, respIndex) => (
-                        <div key={respIndex} className="flex items-center gap-2">
-                          <div className="flex-1 p-2 bg-gray-50 rounded text-sm">{resp}</div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeResponsibility(exp.id, respIndex)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add a responsibility..."
-                          value={newResponsibility}
-                          onChange={(e) => setNewResponsibility(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && addResponsibility(exp.id)}
-                        />
-                        <Button size="sm" onClick={() => addResponsibility(exp.id)}>
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Achievements */}
-                  <div className="space-y-2">
-                    <Label>Key Achievements</Label>
-                    <div className="space-y-2">
-                      {exp.achievements.map((ach, achIndex) => (
-                        <div key={achIndex} className="flex items-center gap-2">
-                          <div className="flex-1 p-2 bg-green-50 rounded text-sm">{ach}</div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeAchievement(exp.id, achIndex)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ))}
-                      <div className="flex gap-2">
-                        <Input
-                          placeholder="Add an achievement..."
-                          value={newAchievement}
-                          onChange={(e) => setNewAchievement(e.target.value)}
-                          onKeyPress={(e) => e.key === 'Enter' && addAchievement(exp.id)}
-                        />
-                        <Button size="sm" onClick={() => addAchievement(exp.id)}>
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Technologies */}
-                  <div className="space-y-2">
-                    <Label>Technologies Used</Label>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {exp.technologies.map((tech, techIndex) => (
-                        <Badge key={techIndex} variant="secondary" className="flex items-center gap-1">
-                          {tech}
-                          <button
-                            onClick={() => removeTechnology(exp.id, techIndex)}
-                            className="ml-1 text-red-600 hover:text-red-800"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Add a technology..."
-                        value={newTechnology}
-                        onChange={(e) => setNewTechnology(e.target.value)}
-                        onKeyPress={(e) => e.key === 'Enter' && addTechnology(exp.id)}
-                      />
-                      <Button size="sm" onClick={() => addTechnology(exp.id)}>
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                    </div>
                   </div>
                 </CardContent>
               )}
             </Card>
-          ))}
+            );
+          })}
         </div>
       )}
-
-      {/* Tips */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-medium text-blue-900 mb-2">💡 Tips for great experience entries:</h4>
-        <ul className="text-sm text-blue-800 space-y-1">
-          <li>• Start with action verbs (Led, Developed, Implemented, etc.)</li>
-          <li>• Quantify your achievements with numbers and percentages</li>
-          <li>• Focus on results and impact, not just responsibilities</li>
-          <li>• Include relevant technologies and tools you used</li>
-          <li>• Keep descriptions concise but impactful</li>
-        </ul>
-      </div>
     </div>
   );
 }

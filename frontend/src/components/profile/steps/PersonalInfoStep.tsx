@@ -2,28 +2,23 @@
 
 // Personal Information step of the profile wizard
 
-import { UseFormRegister, UseFormSetValue, UseFormWatch, FieldErrors } from 'react-hook-form';
+// Modern 2025: Use FormProvider context instead of props
+import { useFormContext, Controller } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-interface PersonalInfoStepProps {
-  register: UseFormRegister<any>;
-  setValue: UseFormSetValue<any>;
-  watch: UseFormWatch<any>;
-  errors: FieldErrors<any>;
-}
-
-export function PersonalInfoStep({ register, setValue, watch, errors }: PersonalInfoStepProps) {
-  const visibility = watch('visibility');
+// Modern 2025: No props needed - use FormProvider context
+export function PersonalInfoStep() {
+  const { control, register, formState: { errors } } = useFormContext();
 
   return (
     <div className="space-y-6">
       {/* Headline */}
       <div className="space-y-2">
-        <Label htmlFor="headline" className="text-sm font-medium">
-          Professional Headline <span className="text-red-500">*</span>
+        <Label htmlFor="headline" className="text-sm font-medium" required>
+          Professional Headline
         </Label>
         <Input
           id="headline"
@@ -31,7 +26,7 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
           {...register('headline')}
         />
         {errors.headline && (
-          <p className="text-sm text-red-600">{errors.headline.message}</p>
+          <p className="text-sm text-destructive">{String(errors.headline.message || '')}</p>
         )}
         <p className="text-xs text-gray-500">
           A compelling headline that describes your professional role and expertise
@@ -50,7 +45,7 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
           {...register('summary')}
         />
         {errors.summary && (
-          <p className="text-sm text-red-600">{errors.summary.message}</p>
+          <p className="text-sm text-destructive">{String(errors.summary.message || '')}</p>
         )}
         <p className="text-xs text-gray-500">
           Optional. A comprehensive summary of your professional journey and expertise.
@@ -59,8 +54,8 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
 
       {/* Location */}
       <div className="space-y-2">
-        <Label htmlFor="location" className="text-sm font-medium">
-          Location <span className="text-red-500">*</span>
+        <Label htmlFor="location" className="text-sm font-medium" required>
+          Location
         </Label>
         <Input
           id="location"
@@ -68,7 +63,7 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
           {...register('location')}
         />
         {errors.location && (
-          <p className="text-sm text-red-600">{errors.location.message}</p>
+          <p className="text-sm text-destructive">{String(errors.location.message || '')}</p>
         )}
       </div>
 
@@ -77,34 +72,37 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
         <Label htmlFor="visibility" className="text-sm font-medium">
           Profile Visibility
         </Label>
-        <Select
-          value={visibility}
-          onValueChange={(value) => setValue('visibility', value)}
-        >
-          <SelectTrigger>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="PRIVATE">
-              <div className="flex flex-col">
-                <span className="font-medium">Private</span>
-                <span className="text-xs text-gray-500">Only you can see this profile</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="FRIENDS">
-              <div className="flex flex-col">
-                <span className="font-medium">Friends</span>
-                <span className="text-xs text-gray-500">People you connect with can view</span>
-              </div>
-            </SelectItem>
-            <SelectItem value="PUBLIC">
-              <div className="flex flex-col">
-                <span className="font-medium">Public</span>
-                <span className="text-xs text-gray-500">Anyone can view this profile</span>
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
+        <Controller
+          name="visibility"
+          control={control}
+          render={({ field }) => (
+            <Select value={field.value} onValueChange={field.onChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PRIVATE">
+                  <div className="flex flex-row items-center gap-4">
+                    <div className="min-w-20 font-medium">Private</div>
+                    <span className="text-xs text-gray-500">Only you can see this profile</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="FRIENDS">
+                  <div className="flex flex-row items-center gap-4">
+                    <div className="min-w-20 font-medium">Friends</div>
+                    <span className="text-xs text-gray-500">People you connect with can view</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="PUBLIC">
+                  <div className="flex flex-row items-center gap-4">
+                    <div className="min-w-20 font-medium">Public</div>
+                    <span className="text-xs text-gray-500">Anyone can view this profile</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
         <p className="text-xs text-gray-500">
           You can change this later in your profile settings
         </p>
@@ -126,8 +124,8 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
               placeholder="your@email.com"
               {...register('contact.email')}
             />
-            {errors.contact?.email && (
-              <p className="text-sm text-red-600">{errors.contact.email.message}</p>
+            {(errors.contact as any)?.email?.message && (
+              <p className="text-sm text-destructive">{String((errors.contact as any).email.message)}</p>
             )}
           </div>
 
@@ -147,8 +145,8 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
               placeholder="https://linkedin.com/in/yourname"
               {...register('contact.linkedin')}
             />
-            {errors.contact?.linkedin && (
-              <p className="text-sm text-red-600">{errors.contact.linkedin.message}</p>
+            {(errors.contact as any)?.linkedin?.message && (
+              <p className="text-sm text-destructive">{String((errors.contact as any).linkedin.message)}</p>
             )}
           </div>
 
@@ -159,8 +157,8 @@ export function PersonalInfoStep({ register, setValue, watch, errors }: Personal
               placeholder="https://yourwebsite.com"
               {...register('contact.website')}
             />
-            {errors.contact?.website && (
-              <p className="text-sm text-red-600">{errors.contact.website.message}</p>
+            {(errors.contact as any)?.website?.message && (
+              <p className="text-sm text-destructive">{String((errors.contact as any).website.message)}</p>
             )}
           </div>
         </div>

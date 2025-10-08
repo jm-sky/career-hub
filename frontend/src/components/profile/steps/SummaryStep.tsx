@@ -2,7 +2,7 @@
 
 // Summary and review step of the profile wizard
 
-import { UseFormWatch } from 'react-hook-form';
+import { useFormContext } from 'react-hook-form';
 import { CheckCircle, User, Briefcase, FolderOpen, Code, MapPin, Calendar } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,12 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 
 interface SummaryStepProps {
-  watch: UseFormWatch<any>;
   onSubmit: () => void;
 }
 
-export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
+// Modern 2025: Minimal props - use FormProvider context
+export function SummaryStep({ onSubmit }: SummaryStepProps) {
+  const { watch } = useFormContext();
   const formData = watch();
   const { headline, summary, location, visibility, contact, experiences, projects, skills } = formData;
 
@@ -78,7 +79,7 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <CheckCircle className="h-4 w-4" />
+            <CheckCircle className="size-4" />
             Profile Completion
           </CardTitle>
         </CardHeader>
@@ -96,22 +97,22 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div className={`p-3 rounded-lg ${headline && location ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
-                <User className="h-6 w-6 mx-auto mb-2" />
+                <User className="size-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Personal Info</div>
                 <div className="text-xs">{headline && location ? 'Complete' : 'Incomplete'}</div>
               </div>
               <div className={`p-3 rounded-lg ${experiences && experiences.length > 0 ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
-                <Briefcase className="h-6 w-6 mx-auto mb-2" />
+                <Briefcase className="size-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Experience</div>
                 <div className="text-xs">{experiences?.length || 0} entries</div>
               </div>
               <div className={`p-3 rounded-lg ${projects && projects.length > 0 ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
-                <FolderOpen className="h-6 w-6 mx-auto mb-2" />
+                <FolderOpen className="size-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Projects</div>
                 <div className="text-xs">{projects?.length || 0} entries</div>
               </div>
               <div className={`p-3 rounded-lg ${skills && skills.length > 0 ? 'bg-green-50 text-green-700' : 'bg-gray-50 text-gray-500'}`}>
-                <Code className="h-6 w-6 mx-auto mb-2" />
+                <Code className="size-6 mx-auto mb-2" />
                 <div className="text-sm font-medium">Skills</div>
                 <div className="text-xs">{skills?.length || 0} skills</div>
               </div>
@@ -124,7 +125,7 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <User className="h-4 w-4" />
+            <User className="size-4" />
             Personal Information
           </CardTitle>
         </CardHeader>
@@ -164,7 +165,7 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
+              <Briefcase className="size-4" />
               Work Experience ({experiences.length} {experiences.length === 1 ? 'entry' : 'entries'})
             </CardTitle>
           </CardHeader>
@@ -201,7 +202,7 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <FolderOpen className="h-4 w-4" />
+              <FolderOpen className="size-4" />
               Projects ({projects.length} {projects.length === 1 ? 'project' : 'projects'})
             </CardTitle>
           </CardHeader>
@@ -244,7 +245,7 @@ export function SummaryStep({ watch, onSubmit }: SummaryStepProps) {
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Code className="h-4 w-4" />
+              <Code className="size-4" />
               Technical Skills ({skills.length} {skills.length === 1 ? 'skill' : 'skills'})
             </CardTitle>
           </CardHeader>

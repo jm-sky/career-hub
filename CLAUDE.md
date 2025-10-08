@@ -1,179 +1,140 @@
-# CLAUDE.md
+# Claude AI Assistant - CareerHub Project
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+## 📋 **Project Overview**
+CareerHub is a modern professional profile management platform built with Next.js 15, React Hook Form, and FastAPI. This document serves as a guide for Claude AI assistants working on this project.
 
-## Development Commands
+## 🎯 **Key Project Files & Resources**
 
-### Backend (FastAPI)
-```bash
-# Development server
-cd backend
-source .venv/bin/activate
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+### **📚 Documentation & Best Practices**
+- **`docs/frontend/REACT_FORM_RESEARCH.md`** - **CRITICAL**: Contains 2025 React Form handling best practices, solutions to common issues, and implementation patterns. **ALWAYS REFER TO THIS FILE** when working with forms.
 
-# Code quality
-black .
-ruff check . --fix
-mypy .
+### **🏗️ Architecture**
+- **Frontend**: Next.js 15 with App Router, TypeScript, Tailwind CSS v4, shadcn/ui
+- **Backend**: FastAPI with PostgreSQL, Redis, JWT authentication
+- **Form Handling**: React Hook Form with FormProvider architecture (2025 best practices)
 
-# Testing
-pytest
-pytest -v tests/specific_test.py
-pytest --cov=app
+## 🚀 **Modern 2025 Patterns Implemented**
 
-# Database migrations
-alembic upgrade head
-alembic revision --autogenerate -m "Description"
+### **✅ Form Handling Best Practices**
+Based on `docs/frontend/REACT_FORM_RESEARCH.md`, we use:
+
+```typescript
+// ✅ WORKING: Modern 2025 React Hook Form configuration
+const methods = useForm({
+  mode: 'onChange',
+  triggerMode: 'onChange', // ✅ FIXES re-render issues
+  reValidateMode: 'onChange',
+  shouldFocusError: true,
+  shouldUnregister: false,
+  criteriaMode: 'firstError'
+});
+
+// ✅ FormProvider architecture (eliminates prop drilling)
+<FormProvider {...methods}>
+  <StepComponents /> {/* No props needed */}
+</FormProvider>
+
+// ✅ useFieldArray for dynamic arrays
+const { fields, append, remove, update } = useFieldArray({
+  control,
+  name: 'experiences'
+});
 ```
 
-### Frontend (Next.js)
-```bash
-# Development server
-cd frontend
-pnpm dev
-
-# Build and type checking
-pnpm build
-pnpm run type-check
+## 📁 **Key Directory Structure**
 ```
-
-### Services
-```bash
-# Start all services (PostgreSQL, Redis, MinIO)
-docker-compose up -d
-
-# Individual services
-docker-compose up -d db redis minio
-
-# Logs and cleanup
-docker-compose logs -f
-docker-compose down
-```
-
-## Architecture Overview
-
-### Tech Stack
-- **Backend**: FastAPI + SQLAlchemy + PostgreSQL + Redis + MinIO
-- **Frontend**: Next.js 15 + TypeScript + Tailwind CSS v4 + shadcn/ui
-- **State**: TanStack Query (server) + Zustand (client)
-- **Forms**: React Hook Form + Zod validation
-- **IDs**: ULID (lexicographically sortable)
-
-### Service Architecture
-The backend follows a service layer pattern with clear boundaries:
-
-```
-Auth Service      → User management, JWT tokens, sessions
-Profile Service   → Core profile data, experiences, skills
-Project Service   → Project management and relationships
-CV Service        → CV generation, templates, versions
-Import Service    → LinkedIn data import and mapping
-Export Service    → PDF generation, public profiles
-AI Service        → Text optimization, suggestions
-```
-
-### Key Design Patterns
-- **API-First**: Complete frontend/backend decoupling via REST APIs
-- **Service Layer**: Business logic isolated in service classes
-- **Repository Pattern**: Data access through SQLAlchemy models
-- **Component Architecture**: Reusable UI with shadcn/ui components
-- **Event-Driven**: Async processing with Celery + Redis
-
-### Database Strategy
-- **Primary Storage**: PostgreSQL with ULID primary keys
-- **Flexible Data**: JSONB for responsibilities, configurations
-- **Caching**: Redis for sessions, public profiles, generated PDFs
-- **Files**: MinIO (S3-compatible) for uploads and generated documents
-- **Search**: GIN indexes for JSONB full-text search
-
-### Authentication Flow
-- JWT access tokens (15min) + refresh tokens (30 days)
-- Token rotation on refresh
-- httpOnly cookies for refresh tokens
-- Rate limiting on auth endpoints
-
-### Performance Optimizations
-- **Caching Layers**: Browser → CDN → Redis → Database
-- **Query Optimization**: Eager loading, proper indexing, pagination
-- **Background Jobs**: PDF generation, imports, AI processing via Celery
-
-## Development Environment
-
-### Quick Setup
-```bash
-# Automated setup
-chmod +x scripts/setup.sh && ./scripts/setup.sh
-
-# Manual setup
-docker-compose up -d
-cd backend && source .venv/bin/activate && pip install -r requirements.txt
-cd frontend && pnpm install
-```
-
-### Environment Configuration
-- **Backend**: `.env` (database, security, storage, AI API keys)
-- **Frontend**: `.env.local` (API URLs, feature flags)
-
-### Project Structure
-```
-backend/app/
-├── api/v1/          # REST API endpoints
-├── core/            # Configuration, database, security
-├── models/          # SQLAlchemy database models
-├── schemas/         # Pydantic request/response schemas
-├── services/        # Business logic layer
-└── middleware/      # Custom middleware
-
 frontend/src/
-├── app/             # Next.js App Router pages
-├── components/ui/   # shadcn/ui base components
-├── components/      # Feature components
-└── lib/             # Utilities, hooks, API clients
+├── components/
+│   ├── profile/
+│   │   ├── ProfileWizardSteps.tsx    # Main wizard with FormProvider
+│   │   └── steps/                    # Individual wizard steps
+│   ├── layout/
+│   │   ├── TopBar.tsx               # Navigation with ProfileDropdown
+│   │   └── ProfileDropdown.tsx      # User profile menu
+│   └── ui/                          # shadcn/ui components
+├── contexts/
+│   └── auth-context.tsx             # Authentication state
+└── hooks/
+    └── use-profile.ts               # Profile management hooks
 ```
 
-## API Design
+## 🔧 **Development Guidelines**
 
-### RESTful Conventions
-```
-GET    /api/v1/profiles/{id}    # Single resource
-GET    /api/v1/profiles         # List with pagination
-POST   /api/v1/profiles         # Create
-PUT    /api/v1/profiles/{id}    # Full update
-PATCH  /api/v1/profiles/{id}    # Partial update
-DELETE /api/v1/profiles/{id}    # Delete
-```
+### **Form Development Rules**
+1. **ALWAYS** use FormProvider architecture (see REACT_FORM_RESEARCH.md)
+2. **NEVER** use prop drilling for form data
+3. **ALWAYS** use useFieldArray for dynamic arrays
+4. **ALWAYS** use Controller for complex components
+5. **ALWAYS** use triggerMode: "onChange" for proper re-renders
 
-### Response Patterns
-- Consistent error format with RFC 7807 problem details
-- Pagination with cursor-based (infinite scroll) or offset-based (pages)
-- ISO 8601 timestamps with timezone information
+### **Component Patterns**
+```typescript
+// ✅ CORRECT: Modern 2025 pattern
+export function StepComponent() {
+  const { control, register, formState: { errors } } = useFormContext();
+  const { fields, append, remove } = useFieldArray({ control, name: 'items' });
+  // ... implementation
+}
 
-## Testing Strategy
-
-### Backend Testing
-```bash
-# Unit tests for services and models
-pytest tests/unit/
-
-# Integration tests for API endpoints
-pytest tests/integration/
-
-# Single test file or function
-pytest tests/test_auth.py::test_login_success
+// ❌ WRONG: Legacy pattern (don't use)
+export function StepComponent({ register, setValue, watch, errors }) {
+  // ... implementation
+}
 ```
 
-### Test Database
-- Separate test database automatically created/cleaned
-- Fixtures for common test data
-- AI services mocked in tests
+## 🎯 **Current Status**
 
-## Business Model Context
+### **✅ Completed Features**
+- ✅ Authentication system (JWT + Refresh tokens)
+- ✅ Profile creation wizard (5 steps)
+- ✅ Modern form handling with React Hook Form 2025 patterns
+- ✅ Profile dropdown in TopBar
+- ✅ Auto-save with debouncing
+- ✅ Real-time validation with Zod
 
-CareerHub targets senior professionals (10+ years experience) with a freemium model:
-- **FREE**: Basic profile, 2 CV versions, PDF with watermark
-- **PRO** (19 PLN/month): Unlimited CVs, no watermark, AI suggestions
-- **EXPERT** (50 PLN/month): Advanced AI, custom domain, API access
+### **🔄 In Progress**
+- 🔄 Experience management CRUD interface
+- 🔄 Project management interface
+- 🔄 Skills management interface
 
-This context drives feature prioritization and user experience decisions.
-- API responses should use camelCase
-- API requests should expect camelCase params
+### **📋 TODO**
+- ⏳ CV generation and PDF export
+- ⏳ Public profile viewing interface
+- ⏳ Advanced profile features
+
+## 🚨 **Important Notes**
+
+### **Critical Files to Reference**
+1. **`docs/frontend/REACT_FORM_RESEARCH.md`** - Form handling best practices
+2. **`frontend/src/components/profile/ProfileWizardSteps.tsx`** - Main wizard implementation
+3. **`frontend/src/contexts/auth-context.tsx`** - Authentication state management
+
+### **Common Issues & Solutions**
+- **Checkbox not working**: Use `triggerMode: "onChange"` in useForm config
+- **Form not re-rendering**: Use FormProvider + Controller components
+- **Prop drilling**: Use FormProvider context instead of passing props
+- **Dynamic arrays**: Use useFieldArray instead of manual state management
+
+## 🤖 **AI Assistant Instructions**
+
+### **When Working on Forms**
+1. **ALWAYS** check `docs/frontend/REACT_FORM_RESEARCH.md` first
+2. **ALWAYS** use FormProvider architecture
+3. **ALWAYS** use useFieldArray for dynamic arrays
+4. **ALWAYS** use Controller for complex components
+5. **ALWAYS** test checkbox functionality (common issue)
+
+### **Code Review Checklist**
+- [ ] Uses FormProvider instead of prop drilling
+- [ ] Uses useFieldArray for dynamic arrays
+- [ ] Uses Controller for complex components
+- [ ] Has triggerMode: "onChange" in useForm config
+- [ ] Follows 2025 best practices from REACT_FORM_RESEARCH.md
+
+## 📞 **Support**
+- Check `docs/frontend/REACT_FORM_RESEARCH.md` for form issues
+- Refer to existing components for patterns
+- Follow the modern 2025 architecture established in ProfileWizardSteps
+
+---
+*Last updated: 2025 - CareerHub Profile Wizard Implementation*
