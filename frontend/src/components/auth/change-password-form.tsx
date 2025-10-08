@@ -13,8 +13,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getErrorMessage } from '@/lib/error-guards';
 import { ChangePasswordSchema, type ChangePasswordFormData } from '@/lib/validations';
 import { useChangePassword } from '@/hooks/use-auth';
+import { useTranslations } from '@/hooks/use-translations';
 
 export function ChangePasswordForm() {
+  const t = useTranslations('changePassword');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const changePasswordMutation = useChangePassword();
@@ -48,27 +50,27 @@ export function ChangePasswordForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Update your password to keep your account secure
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && (
-            <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
+            <div className="p-3 text-sm text-destructive bg-red-50 border border-red-200 rounded-md">
               {error}
             </div>
           )}
 
           {success && (
             <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
-              Password changed successfully! Please log out and log back in.
+              {t('success')}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="currentPassword">Current Password</Label>
+            <Label htmlFor="currentPassword">{t('currentPassword')}</Label>
             <Input
               id="currentPassword"
               type="password"
@@ -77,12 +79,12 @@ export function ChangePasswordForm() {
               {...register('currentPassword')}
             />
             {errors.currentPassword && (
-              <p className="text-sm text-red-600">{errors.currentPassword.message}</p>
+              <p className="text-sm text-destructive">{errors.currentPassword.message}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">{t('newPassword')}</Label>
             <Input
               id="newPassword"
               type="password"
@@ -91,15 +93,15 @@ export function ChangePasswordForm() {
               {...register('newPassword')}
             />
             {errors.newPassword && (
-              <p className="text-sm text-red-600">{errors.newPassword.message}</p>
+              <p className="text-sm text-destructive">{errors.newPassword.message}</p>
             )}
-            <p className="text-xs text-gray-500">
-              Must be at least 8 characters with uppercase, lowercase, number, and special character
+            <p className="text-xs text-muted-foreground">
+              {t('passwordRequirements')}
             </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isFormLoading ? 'Changing Password...' : 'Change Password'}
+            {isFormLoading ? t('submitting') : t('submit')}
           </Button>
         </form>
       </CardContent>

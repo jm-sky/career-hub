@@ -24,10 +24,10 @@ const ProfileEditSchema = z.object({
   location: z.string().min(1, 'Location is required').max(100, 'Location too long'),
   visibility: z.enum(['PRIVATE', 'FRIENDS', 'PUBLIC']).default('PRIVATE'),
   contact: z.object({
-    email: z.string().transform(val => val === '' ? undefined : val).pipe(z.string().email('Invalid email').optional()),
-    phone: z.string().transform(val => val === '' ? undefined : val).optional(),
-    linkedin: z.string().transform(val => val === '' ? undefined : val).pipe(z.string().url('Invalid LinkedIn URL').optional()),
-    website: z.string().transform(val => val === '' ? undefined : val).pipe(z.string().url('Invalid website URL').optional()),
+    email: z.string().email('Invalid email').optional().or(z.literal('')),
+    phone: z.string().optional(),
+    linkedin: z.string().url('Invalid LinkedIn URL').optional().or(z.literal('')),
+    website: z.string().url('Invalid website URL').optional().or(z.literal('')),
   }).optional(),
 });
 

@@ -70,9 +70,10 @@
       "location": "Lokalizacja",
       "completeness": "Kompletność",
       "visibility": "Widoczność",
-      "editProfile": "Edytuj profil",
-      "createProfile": "Utwórz profil",
-      "notSet": "Nie ustawiono"
+      "editProfile": "Edytuj profil zawodowy",
+      "createProfile": "Utwórz profil zawodowy",
+      "notSet": "Nie ustawiono",
+      "loading": "Ładowanie Twojego profilu..."
     },
     "account": {
       "title": "Konto",

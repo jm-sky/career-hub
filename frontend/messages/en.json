@@ -70,9 +70,10 @@
       "location": "Location",
       "completeness": "Completeness",
       "visibility": "Visibility",
-      "editProfile": "Edit Profile",
-      "createProfile": "Create Profile",
-      "notSet": "Not set"
+      "editProfile": "Edit Professional Profile",
+      "createProfile": "Create Professional Profile",
+      "notSet": "Not set",
+      "loading": "Loading your profile..."
     },
     "account": {
       "title": "Account",

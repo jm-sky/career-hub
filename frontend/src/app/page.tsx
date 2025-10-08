@@ -38,7 +38,7 @@ export default function HomePage() {
     <div className="flex min-h-screen flex-col">
       <header className="border-b">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <LogoTextLink />
+          <LogoTextLink href="/" />
           <div className="space-x-2">
             <Button variant="ghost" asChild>
               <Link href="/login">Sign In</Link>

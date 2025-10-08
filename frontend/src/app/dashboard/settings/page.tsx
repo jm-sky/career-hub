@@ -17,7 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 function SettingsContent() {
   const t = useTranslations('settings');
   const { theme, changeTheme } = useTheme();
-  const { locale, changeLanguage } = useLanguage();
+  const { locale, languages, changeLanguage } = useLanguage();
 
   return (
     <div className="container mx-auto p-8 max-w-4xl space-y-6">
@@ -48,8 +48,12 @@ function SettingsContent() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="en">🇬🇧 {t('language.english')}</SelectItem>
-                <SelectItem value="pl">🇵🇱 {t('language.polish')}</SelectItem>
+                {languages.map((language) => (
+                  <SelectItem key={language.code} value={language.code}>
+                     <span className="mr-3 font-semibold text-muted-foreground font-mono">{language.flag}</span>
+                     {language.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -124,7 +128,7 @@ function SettingsContent() {
           </div>
           <Alert variant="info">
             <AlertTitle>
-              {t('common.comingSoon')}
+              {t('common.comingSoon', undefined, true)}
             </AlertTitle>
             <AlertDescription>
               {t('notifications.comingSoon')}
@@ -159,7 +163,7 @@ function SettingsContent() {
           </div>
           <Alert variant="info">
             <AlertTitle>
-              {t('common.comingSoon')}
+              {t('common.comingSoon', undefined, true)}
             </AlertTitle>
             <AlertDescription>
               {t('privacy.comingSoon')}

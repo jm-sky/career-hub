@@ -5,14 +5,17 @@
 import { useState } from 'react';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslations } from '@/hooks/use-translations';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ChangePasswordForm } from '@/components/auth/change-password-form';
-import { User, Mail, Lock, Shield } from 'lucide-react';
+import { User, Shield } from 'lucide-react';
 
 function UserProfileContent() {
+  const t = useTranslations('userProfile');
   const { user } = useAuth();
   const [isEditingName, setIsEditingName] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -27,9 +30,9 @@ function UserProfileContent() {
     <div className="container mx-auto p-8 max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold mb-2">User Profile</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
         <p className="text-muted-foreground">
-          Manage your account information and security settings
+          {t('description')}
         </p>
       </div>
 
@@ -38,16 +41,16 @@ function UserProfileContent() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="size-5" />
-            Personal Information
+            {t('personalInfo.title')}
           </CardTitle>
           <CardDescription>
-            Your basic account information
+            {t('personalInfo.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t('personalInfo.fullName')}</Label>
             <div className="flex gap-2">
               <Input
                 id="name"
@@ -57,7 +60,7 @@ function UserProfileContent() {
               />
               {isEditingName ? (
                 <div className="flex gap-2">
-                  <Button onClick={handleSaveName}>Save</Button>
+                  <Button onClick={handleSaveName}>{t('personalInfo.save')}</Button>
                   <Button 
                     variant="outline" 
                     onClick={() => {
@@ -65,12 +68,12 @@ function UserProfileContent() {
                       setIsEditingName(false);
                     }}
                   >
-                    Cancel
+                    {t('personalInfo.cancel')}
                   </Button>
                 </div>
               ) : (
                 <Button variant="outline" onClick={() => setIsEditingName(true)}>
-                  Edit
+                  {t('personalInfo.edit')}
                 </Button>
               )}
             </div>
@@ -78,7 +81,7 @@ function UserProfileContent() {
 
           {/* Email */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t('personalInfo.email')}</Label>
             <div className="flex gap-2">
               <Input
                 id="email"
@@ -87,17 +90,17 @@ function UserProfileContent() {
                 disabled
               />
               <Button variant="outline" disabled>
-                Change
+                {t('common.edit', undefined, true)}
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Contact support to change your email address.
+              {t('personalInfo.emailNote')}
             </p>
           </div>
 
           {/* Account Tier */}
           <div className="space-y-2">
-            <Label>Account Tier</Label>
+            <Label>{t('personalInfo.accountTier')}</Label>
             <div className="flex items-center gap-2">
               <span className="px-3 py-1 bg-primary/10 text-primary rounded-md font-medium capitalize">
                 {user?.tier || 'free'}
@@ -107,15 +110,15 @@ function UserProfileContent() {
 
           {/* Account Status */}
           <div className="space-y-2">
-            <Label>Account Status</Label>
+            <Label>{t('personalInfo.accountStatus')}</Label>
             <div className="flex items-center gap-2">
               {user?.isActive ? (
                 <span className="px-3 py-1 bg-green-100 text-green-800 rounded-md font-medium">
-                  Active
+                  {t('personalInfo.active')}
                 </span>
               ) : (
                 <span className="px-3 py-1 bg-red-100 text-red-800 rounded-md font-medium">
-                  Inactive
+                  {t('personalInfo.inactive')}
                 </span>
               )}
             </div>
@@ -133,38 +136,41 @@ function UserProfileContent() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="size-5" />
-            Two-Factor Authentication
+            {t('twoFactor.title')}
           </CardTitle>
           <CardDescription>
-            Add an extra layer of security to your account
+            {t('twoFactor.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button variant="outline" disabled>
-            Enable 2FA
+            {t('twoFactor.enable')}
           </Button>
-          <p className="text-sm text-muted-foreground mt-2">
-            Coming soon: Protect your account with two-factor authentication.
-          </p>
+          <Alert variant="info" className="mt-4">
+            <AlertTitle>{t('common.comingSoon', undefined, true)}</AlertTitle>
+            <AlertDescription>
+              {t('twoFactor.comingSoon')}
+            </AlertDescription>
+          </Alert>
         </CardContent>
       </Card>
 
       {/* Danger Zone */}
       <Card className="border-destructive">
         <CardHeader>
-          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardTitle className="text-destructive">{t('dangerZone.title')}</CardTitle>
           <CardDescription>
-            Irreversible and destructive actions
+            {t('dangerZone.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <h4 className="font-medium mb-2">Delete Account</h4>
+            <h4 className="font-medium mb-2">{t('dangerZone.deleteAccount')}</h4>
             <p className="text-sm text-muted-foreground mb-4">
-              Once you delete your account, there is no going back. Please be certain.
+              {t('dangerZone.deleteAccountDescription')}
             </p>
             <Button variant="destructive" disabled>
-              Delete My Account
+              {t('dangerZone.deleteMyAccount')}
             </Button>
           </div>
         </CardContent>

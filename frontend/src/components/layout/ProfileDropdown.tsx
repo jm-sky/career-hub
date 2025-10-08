@@ -3,6 +3,7 @@
 import { User, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslations } from '@/hooks/use-translations';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export function ProfileDropdown() {
+  const t = useTranslations('nav');
   const { user, logout } = useAuth();
 
   if (!user) {
@@ -56,25 +58,25 @@ export function ProfileDropdown() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild clickable>
           <Link href="/dashboard/profile" className="flex items-center">
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <User className="mr-2 size-4" />
+            <span>{t('profile')}</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild clickable>
           <Link href="/dashboard/settings" className="flex items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
+            <Settings className="mr-2 size-4" />
+            <span>{t('settings')}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={handleLogout}
-          className="text-red-600 focus:text-red-600 focus:bg-red-50"
+          className="text-destructive focus:text-destructive focus:bg-red-50"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <LogOut className="mr-2 size-4" />
+          <span>{t('logout')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

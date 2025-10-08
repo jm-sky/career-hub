@@ -10,20 +10,25 @@ const messages = {
 export function useTranslations(namespace: string) {
   const { locale } = useLanguage();
   
-  const t = (key: string, params?: Record<string, string>) => {
-    const keys = `${namespace}.${key}`.split('.');
+  const t = (key: string, params?: Record<string, string>, isRoot?: boolean) => {
+    // If isRoot is true, use key as-is (e.g., 'common.comingSoon')
+    // Otherwise, prepend namespace (e.g., 'settings' + 'title' = 'settings.title')
+    const fullPath = isRoot ? key : `${namespace}.${key}`;
+    
+    const keys = fullPath.split('.');
     let value: any = messages[locale];
     
     for (const k of keys) {
       if (value && typeof value === 'object') {
         value = value[k];
       } else {
-        return key; // Return key if not found
+        // Return the full path if not found for debugging
+        return fullPath;
       }
     }
     
     if (typeof value !== 'string') {
-      return key;
+      return fullPath;
     }
     
     // Replace params like {name}
