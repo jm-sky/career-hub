@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDeleteExperience } from '@/hooks/use-experience';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface ExperienceListProps {
   experiences: any[];
@@ -15,10 +16,11 @@ interface ExperienceListProps {
 }
 
 export function ExperienceList({ experiences, isLoading, onEdit }: ExperienceListProps) {
+  const t = useTranslations('experience');
   const deleteExperience = useDeleteExperience();
 
   const handleDelete = async (experienceId: string) => {
-    if (confirm('Are you sure you want to delete this experience?')) {
+    if (confirm(t('deleteConfirm'))) {
       try {
         await deleteExperience.mutateAsync(experienceId);
       } catch (error) {
@@ -32,7 +34,7 @@ export function ExperienceList({ experiences, isLoading, onEdit }: ExperienceLis
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-center">
           <div className="animate-spin size-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading experiences...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -43,9 +45,9 @@ export function ExperienceList({ experiences, isLoading, onEdit }: ExperienceLis
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <Briefcase className="size-12 text-muted-foreground mb-4" />
-          <h4 className="font-medium text-foreground mb-2">No experience added yet</h4>
+          <h4 className="font-medium text-foreground mb-2">{t('noExperiences')}</h4>
           <p className="text-sm text-muted-foreground text-center">
-            Start building your professional profile by adding your work experience
+            {t('noExperiencesDescription')}
           </p>
         </CardContent>
       </Card>
@@ -65,21 +67,21 @@ export function ExperienceList({ experiences, isLoading, onEdit }: ExperienceLis
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                   <div className="flex items-center gap-1">
                     <Briefcase className="size-4" />
-                    {experience.company}
+                    {experience.companyName}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="size-4" />
                     {experience.startDate}
                     {experience.isCurrent ? (
-                      <Badge variant="secondary" className="ml-2">Current</Badge>
+                      <Badge variant="secondary" className="ml-2">{t('current')}</Badge>
                     ) : (
                       experience.endDate && ` - ${experience.endDate}`
                     )}
                   </div>
-                  {experience.location && (
+                  {experience.companyLocation && (
                     <div className="flex items-center gap-1">
                       <MapPin className="size-4" />
-                      {experience.location}
+                      {experience.companyLocation}
                     </div>
                   )}
                 </div>
@@ -91,7 +93,7 @@ export function ExperienceList({ experiences, isLoading, onEdit }: ExperienceLis
                   onClick={() => onEdit(experience)}
                 >
                   <Edit className="size-4 mr-2" />
-                  Edit
+                  {t('edit')}
                 </Button>
                 <Button
                   variant="ghost-destructive"

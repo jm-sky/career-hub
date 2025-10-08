@@ -60,7 +60,7 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<ExperienceFormData>({
-    resolver: zodResolver(ExperienceSchema),
+    resolver: zodResolver(ExperienceSchema) as any,
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true,
@@ -83,12 +83,12 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
   useEffect(() => {
     if (experience) {
       reset({
-        company: experience.company || '',
+        company: experience.companyName || experience.company || '',
         position: experience.position || '',
         startDate: experience.startDate || '',
         endDate: experience.endDate || '',
         isCurrent: experience.isCurrent || false,
-        location: experience.location || '',
+        location: experience.companyLocation || experience.location || '',
         description: experience.description || '',
         responsibilities: experience.responsibilities || [],
         technologies: experience.technologies || [],
@@ -110,15 +110,28 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
 
   const onSubmit = async (data: ExperienceFormData) => {
     try {
+      // Map form data to API format (company -> companyName)
+      const apiData = {
+        companyName: data.company,
+        position: data.position,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        isCurrent: data.isCurrent,
+        companyLocation: data.location,
+        description: data.description,
+        responsibilities: data.responsibilities,
+        technologies: data.technologies,
+      };
+
       if (isEditing) {
         await updateExperience.mutateAsync({
           experienceId: experience.id,
-          experienceData: data,
+          experienceData: apiData,
         });
       } else {
         await createExperience.mutateAsync({
           profileId,
-          experienceData: data,
+          experienceData: apiData,
         });
       }
       onClose();

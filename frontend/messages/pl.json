@@ -121,9 +121,11 @@
     "description": "Zarządzaj swoim profesjonalnym doświadczeniem zawodowym i historią kariery",
     "addExperience": "Dodaj doświadczenie",
     "editExperience": "Edytuj doświadczenie",
+    "edit": "Edytuj",
     "noExperiences": "Nie dodano jeszcze żadnego doświadczenia",
     "noExperiencesDescription": "Zacznij budować swój profesjonalny profil dodając swoje doświadczenie zawodowe",
     "addFirst": "Dodaj swoje pierwsze doświadczenie",
+    "loading": "Ładowanie doświadczeń...",
     "form": {
       "company": "Firma",
       "position": "Stanowisko",
@@ -146,9 +148,11 @@
     "description": "Zarządzaj swoimi znaczącymi projektami i osiągnięciami technicznymi",
     "addProject": "Dodaj projekt",
     "editProject": "Edytuj projekt",
+    "edit": "Edytuj",
     "noProjects": "Nie dodano jeszcze żadnych projektów",
     "noProjectsDescription": "Pokaż swoje projekty techniczne, wkład w open source i osiągnięcia",
     "addFirst": "Dodaj swój pierwszy projekt",
+    "loading": "Ładowanie projektów...",
     "form": {
       "name": "Nazwa projektu",
       "client": "Klient/Firma",
@@ -167,20 +171,20 @@
       "challengesPlaceholder": "np. Zaimplementowano synchronizację w czasie rzeczywistym między urządzeniami"
     },
     "status": {
-      "active": "Aktywny",
-      "staging": "Testowy",
-      "archived": "Zarchiwizowany"
+      "ACTIVE": "Aktywny",
+      "STAGING": "Testowy",
+      "ARCHIVED": "Zarchiwizowany"
     },
     "category": {
-      "production": "Produkcyjny",
-      "demo": "Demo",
-      "internal": "Wewnętrzny"
+      "PRODUCTION": "Produkcyjny",
+      "DEMO": "Demo",
+      "INTERNAL": "Wewnętrzny"
     },
     "scale": {
-      "small": "Mały",
-      "medium": "Średni",
-      "large": "Duży",
-      "enterprise": "Korporacyjny"
+      "SMALL": "Mały",
+      "MEDIUM": "Średni",
+      "LARGE": "Duży",
+      "ENTERPRISE": "Korporacyjny"
     },
     "deleteConfirm": "Czy na pewno chcesz usunąć ten projekt?"
   },

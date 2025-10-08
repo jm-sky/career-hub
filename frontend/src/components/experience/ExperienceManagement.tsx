@@ -5,13 +5,15 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { useMyProfile } from '@/hooks/use-profile';
 import { useProfileExperiences } from '@/hooks/use-experience';
+import { useTranslations } from '@/hooks/use-translations';
 import { ExperienceList } from './ExperienceList';
 import { ExperienceDialog } from './ExperienceDialog';
 
 export function ExperienceManagement() {
+  const t = useTranslations('experience');
   const { data: profile, isLoading: profileLoading } = useMyProfile();
   const { data: experiences, isLoading: experiencesLoading } = useProfileExperiences(profile?.id || '');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -37,7 +39,7 @@ export function ExperienceManagement() {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin size-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
+          <p className="text-muted-foreground">{t('common.loading', undefined, true)}</p>
         </div>
       </div>
     );
@@ -47,7 +49,7 @@ export function ExperienceManagement() {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <p className="text-muted-foreground">Please create a profile first.</p>
+          <p className="text-muted-foreground">{t('dashboard.profile.notSet', undefined, true)}</p>
         </CardContent>
       </Card>
     );
@@ -58,14 +60,14 @@ export function ExperienceManagement() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Work Experience</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
           <p className="text-muted-foreground">
-            Manage your professional work experience and career history
+            {t('description')}
           </p>
         </div>
         <Button onClick={handleAdd} size="sm">
           <Plus className="size-4 mr-2" />
-          Add Experience
+          {t('addExperience')}
         </Button>
       </div>
 

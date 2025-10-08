@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDeleteProject } from '@/hooks/use-project';
+import { useTranslations } from '@/hooks/use-translations';
 
 interface ProjectListProps {
   projects: any[];
@@ -33,10 +34,11 @@ const getCategoryColor = (category: string) => {
 };
 
 export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
+  const t = useTranslations('projects');
   const deleteProject = useDeleteProject();
 
   const handleDelete = async (projectId: string) => {
-    if (confirm('Are you sure you want to delete this project?')) {
+    if (confirm(t('deleteConfirm'))) {
       try {
         await deleteProject.mutateAsync(projectId);
       } catch (error) {
@@ -50,7 +52,7 @@ export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="text-center">
           <div className="animate-spin size-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading projects...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -61,9 +63,9 @@ export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-12">
           <FolderOpen className="size-12 text-muted-foreground mb-4" />
-          <h4 className="font-medium text-foreground mb-2">No projects added yet</h4>
+          <h4 className="font-medium text-foreground mb-2">{t('noProjects')}</h4>
           <p className="text-sm text-muted-foreground text-center">
-            Highlight your technical projects, open source contributions, and achievements
+            {t('noProjectsDescription')}
           </p>
         </CardContent>
       </Card>
@@ -82,10 +84,10 @@ export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
                     {project.name}
                   </CardTitle>
                   <Badge className={getStatusColor(project.status)}>
-                    {project.status}
+                    {t(`status.${project.status}`)}
                   </Badge>
                   <Badge variant="secondary" className={getCategoryColor(project.category)}>
-                    {project.category}
+                    {t(`category.${project.category}`)}
                   </Badge>
                 </div>
                 
@@ -104,7 +106,7 @@ export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
                   )}
                   <div className="flex items-center gap-1">
                     <TrendingUp className="size-4" />
-                    {project.scale}
+                    {t(`scale.${project.scale}`)}
                   </div>
                 </div>
               </div>
@@ -115,7 +117,7 @@ export function ProjectList({ projects, isLoading, onEdit }: ProjectListProps) {
                   onClick={() => onEdit(project)}
                 >
                   <Edit className="size-4 mr-2" />
-                  Edit
+                  {t('edit')}
                 </Button>
                 <Button
                   variant="ghost-destructive"

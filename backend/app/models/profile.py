@@ -52,8 +52,8 @@ class Profile(Base):
     # Relationships
     user = relationship("User", back_populates="profile")
     experiences = relationship("Experience", back_populates="profile", cascade="all, delete-orphan")
+    projects = relationship("Project", back_populates="profile", cascade="all, delete-orphan")
     # TODO: Add relationships when models are implemented:
-    # projects = relationship("Project", back_populates="profile", cascade="all, delete-orphan")
     # skills = relationship("Skill", back_populates="profile", cascade="all, delete-orphan")
     # education = relationship("Education", back_populates="profile", cascade="all, delete-orphan")
     # certifications = relationship("Certification", back_populates="profile", cascade="all, delete-orphan")

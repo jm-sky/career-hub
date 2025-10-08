@@ -8,7 +8,7 @@ export const projectAPI = {
    * Get all projects for a profile
    */
   getProfileProjects: async (profileId: string): Promise<Project[]> => {
-    const response = await apiClient.get(`/profiles/${profileId}/projects`);
+    const response = await apiClient.get(`/projects/profile/${profileId}`);
     return response.data;
   },
 
@@ -24,7 +24,7 @@ export const projectAPI = {
    * Create a new project
    */
   createProject: async (profileId: string, projectData: ProjectCreate): Promise<Project> => {
-    const response = await apiClient.post(`/profiles/${profileId}/projects`, projectData);
+    const response = await apiClient.post(`/projects/?profile_id=${profileId}`, projectData);
     return response.data;
   },
 
@@ -47,8 +47,8 @@ export const projectAPI = {
    * Reorder projects
    */
   reorderProjects: async (profileId: string, projectIds: string[]): Promise<Project[]> => {
-    const response = await apiClient.post(`/profiles/${profileId}/projects/reorder`, {
-      projectIds,
+    const response = await apiClient.post(`/projects/profile/${profileId}/reorder`, {
+      project_ids: projectIds,
     });
     return response.data;
   },

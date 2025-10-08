@@ -27,7 +27,7 @@ import { getErrorMessage } from '@/lib/error-guards';
 // Modern 2025: Zod schema for validation
 const ProjectSchema = z.object({
   name: z.string().min(1, 'Project name is required').max(200, 'Project name too long'),
-  description: z.string().min(1, 'Description is required').max(2000, 'Description too long'),
+  description: z.string().max(2000, 'Description too long').optional(),
   status: z.enum(['ACTIVE', 'STAGING', 'ARCHIVED']).default('ACTIVE'),
   category: z.enum(['DEMO', 'INTERNAL', 'PRODUCTION']).default('PRODUCTION'),
   startDate: z.string().optional(),
@@ -67,7 +67,7 @@ export function ProjectDialog({ isOpen, onClose, project, profileId }: ProjectDi
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProjectFormData>({
-    resolver: zodResolver(ProjectSchema),
+    resolver: zodResolver(ProjectSchema) as any,
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true,
@@ -220,7 +220,7 @@ export function ProjectDialog({ isOpen, onClose, project, profileId }: ProjectDi
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description" required>
+            <Label htmlFor="description">
               Description
             </Label>
             <Textarea

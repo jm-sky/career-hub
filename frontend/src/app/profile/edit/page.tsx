@@ -22,12 +22,12 @@ const ProfileEditSchema = z.object({
   headline: z.string().min(1, 'Headline is required').max(200, 'Headline too long'),
   summary: z.string().max(2000, 'Summary too long').optional(),
   location: z.string().min(1, 'Location is required').max(100, 'Location too long'),
-  visibility: z.enum(['PRIVATE', 'FRIENDS', 'PUBLIC']).default('PRIVATE'),
+  visibility: z.enum(['PRIVATE', 'FRIENDS', 'PUBLIC']),
   contact: z.object({
-    email: z.string().email('Invalid email').optional().or(z.literal('')),
+    email: z.string().optional(),
     phone: z.string().optional(),
-    linkedin: z.string().url('Invalid LinkedIn URL').optional().or(z.literal('')),
-    website: z.string().url('Invalid website URL').optional().or(z.literal('')),
+    linkedin: z.string().optional(),
+    website: z.string().optional(),
   }).optional(),
 });
 
@@ -46,7 +46,7 @@ function EditProfileContent() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<ProfileEditData>({
-    resolver: zodResolver(ProfileEditSchema),
+    resolver: zodResolver(ProfileEditSchema) as any,
     mode: 'onChange',
     reValidateMode: 'onChange',
     shouldFocusError: true,
