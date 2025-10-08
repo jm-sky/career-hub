@@ -80,16 +80,19 @@ function DashboardContent() {
                 </div>
               </dl>
               <div className="mt-4 flex gap-2">
-                <Button asChild variant="outline" size="sm" className="flex-1">
-                  <Link href="/profile/edit">
-                    Edit Profile
-                  </Link>
-                </Button>
-                <Button asChild size="sm" className="flex-1">
-                  <Link href="/profile/create">
-                    Create Profile
-                  </Link>
-                </Button>
+                {profile ? (
+                  <Button asChild variant="outline" size="sm" className="w-full">
+                    <Link href="/profile/edit">
+                      Edit Professional Profile
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button asChild size="sm" className="w-full">
+                    <Link href="/profile/create">
+                      Create Professional Profile
+                    </Link>
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

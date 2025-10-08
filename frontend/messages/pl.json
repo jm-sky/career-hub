@@ -1,0 +1,288 @@
+{
+  "common": {
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "edit": "Edytuj",
+    "delete": "Usuń",
+    "add": "Dodaj",
+    "create": "Utwórz",
+    "update": "Zaktualizuj",
+    "loading": "Ładowanie...",
+    "error": "Błąd",
+    "success": "Sukces",
+    "confirm": "Potwierdź",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "previous": "Poprzedni",
+    "done": "Gotowe",
+    "close": "Zamknij",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "sort": "Sortuj",
+    "comingSoon": "Wkrótce",
+    "actions": "Akcje",
+    "required": "Wymagane"
+  },
+  "nav": {
+    "home": "Strona główna",
+    "dashboard": "Panel",
+    "profile": "Profil",
+    "experiences": "Doświadczenie",
+    "projects": "Projekty",
+    "skills": "Umiejętności",
+    "cvs": "CV",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj",
+    "signIn": "Zaloguj się",
+    "signUp": "Rozpocznij"
+  },
+  "auth": {
+    "login": {
+      "title": "Witaj ponownie",
+      "subtitle": "Zaloguj się do swojego konta",
+      "email": "Email",
+      "password": "Hasło",
+      "rememberMe": "Zapamiętaj mnie",
+      "forgotPassword": "Zapomniałeś hasła?",
+      "submit": "Zaloguj się",
+      "noAccount": "Nie masz konta?",
+      "signUp": "Zarejestruj się"
+    },
+    "register": {
+      "title": "Utwórz konto",
+      "subtitle": "Zacznij budować swój profesjonalny profil",
+      "name": "Imię i nazwisko",
+      "email": "Email",
+      "password": "Hasło",
+      "confirmPassword": "Potwierdź hasło",
+      "submit": "Utwórz konto",
+      "hasAccount": "Masz już konto?",
+      "signIn": "Zaloguj się"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "welcome": "Witaj ponownie, {name}!",
+    "profile": {
+      "title": "Profil",
+      "description": "Twój profesjonalny profil",
+      "headline": "Nagłówek",
+      "location": "Lokalizacja",
+      "completeness": "Kompletność",
+      "visibility": "Widoczność",
+      "editProfile": "Edytuj profil",
+      "createProfile": "Utwórz profil",
+      "notSet": "Nie ustawiono"
+    },
+    "account": {
+      "title": "Konto",
+      "description": "Informacje o Twoim koncie",
+      "email": "Email",
+      "tier": "Plan konta",
+      "status": "Status",
+      "active": "Aktywne",
+      "inactive": "Nieaktywne"
+    },
+    "experience": {
+      "title": "Doświadczenie",
+      "description": "Zarządzaj swoim doświadczeniem zawodowym",
+      "content": "Dodawaj i zarządzaj swoim profesjonalnym doświadczeniem zawodowym i historią kariery.",
+      "manage": "Zarządzaj doświadczeniem"
+    },
+    "projects": {
+      "title": "Projekty",
+      "description": "Zarządzaj swoimi projektami",
+      "content": "Pokaż swoje znaczące projekty i osiągnięcia techniczne.",
+      "manage": "Zarządzaj projektami"
+    },
+    "cvs": {
+      "title": "CV",
+      "description": "Zarządzaj swoimi CV",
+      "comingSoon": "Twórz i zarządzaj wieloma wersjami swojego CV dostosowanymi do różnych stanowisk."
+    },
+    "settings": {
+      "title": "Ustawienia",
+      "description": "Ustawienia konta",
+      "comingSoon": "Aktualizuj swój profil, zmieniaj hasło i zarządzaj preferencjami."
+    },
+    "quickStart": {
+      "title": "Przewodnik szybkiego startu",
+      "description": "Rozpocznij pracę z CareerHub",
+      "step1": "Uzupełnij swój profesjonalny profil o doświadczenie i umiejętności",
+      "step2": "Utwórz swoje pierwsze CV używając naszych szablonów",
+      "step3": "Dostosuj swoje CV do konkretnych aplikacji o pracę",
+      "step4": "Eksportuj do PDF i udostępnij pracodawcom",
+      "cta": "🚀 Utwórz swój profil"
+    }
+  },
+  "experience": {
+    "title": "Doświadczenie zawodowe",
+    "description": "Zarządzaj swoim profesjonalnym doświadczeniem zawodowym i historią kariery",
+    "addExperience": "Dodaj doświadczenie",
+    "editExperience": "Edytuj doświadczenie",
+    "noExperiences": "Nie dodano jeszcze żadnego doświadczenia",
+    "noExperiencesDescription": "Zacznij budować swój profesjonalny profil dodając swoje doświadczenie zawodowe",
+    "addFirst": "Dodaj swoje pierwsze doświadczenie",
+    "form": {
+      "company": "Firma",
+      "position": "Stanowisko",
+      "location": "Lokalizacja",
+      "startDate": "Data rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "isCurrent": "Obecnie pracuję tutaj",
+      "description": "Opis",
+      "descriptionPlaceholder": "Krótki opis Twojej roli i obowiązków...",
+      "descriptionHelp": "Opisz swoją rolę, kluczowe obowiązki i osiągnięcia",
+      "responsibilities": "Kluczowe obowiązki",
+      "technologies": "Technologie"
+    },
+    "deleteConfirm": "Czy na pewno chcesz usunąć to doświadczenie?",
+    "current": "Obecnie",
+    "present": "Obecnie"
+  },
+  "projects": {
+    "title": "Projekty",
+    "description": "Zarządzaj swoimi znaczącymi projektami i osiągnięciami technicznymi",
+    "addProject": "Dodaj projekt",
+    "editProject": "Edytuj projekt",
+    "noProjects": "Nie dodano jeszcze żadnych projektów",
+    "noProjectsDescription": "Pokaż swoje projekty techniczne, wkład w open source i osiągnięcia",
+    "addFirst": "Dodaj swój pierwszy projekt",
+    "form": {
+      "name": "Nazwa projektu",
+      "client": "Klient/Firma",
+      "description": "Opis",
+      "descriptionPlaceholder": "Opisz co robi projekt, jego cel i kluczowe funkcje...",
+      "status": "Status",
+      "category": "Kategoria",
+      "scale": "Skala",
+      "startDate": "Data rozpoczęcia",
+      "endDate": "Data zakończenia",
+      "technologies": "Użyte technologie",
+      "technologiesPlaceholder": "np. React, Node.js, PostgreSQL",
+      "achievements": "Kluczowe osiągnięcia",
+      "achievementsPlaceholder": "np. Zredukowano czas ładowania o 50%",
+      "challenges": "Wyzwania techniczne",
+      "challengesPlaceholder": "np. Zaimplementowano synchronizację w czasie rzeczywistym między urządzeniami"
+    },
+    "status": {
+      "active": "Aktywny",
+      "staging": "Testowy",
+      "archived": "Zarchiwizowany"
+    },
+    "category": {
+      "production": "Produkcyjny",
+      "demo": "Demo",
+      "internal": "Wewnętrzny"
+    },
+    "scale": {
+      "small": "Mały",
+      "medium": "Średni",
+      "large": "Duży",
+      "enterprise": "Korporacyjny"
+    },
+    "deleteConfirm": "Czy na pewno chcesz usunąć ten projekt?"
+  },
+  "profile": {
+    "title": "Profil",
+    "editTitle": "Edytuj profil",
+    "publicProfile": "Profil publiczny",
+    "notFound": "Profil nie znaleziony",
+    "notFoundDescription": "Profil, którego szukasz nie istnieje lub nie jest publiczny.",
+    "sections": {
+      "personalInfo": "Informacje osobiste",
+      "experience": "Doświadczenie zawodowe",
+      "projects": "Znaczące projekty",
+      "skills": "Umiejętności techniczne"
+    }
+  },
+  "settings": {
+    "title": "Ustawienia",
+    "description": "Zarządzaj preferencjami aplikacji",
+    "sections": {
+      "general": "Ogólne",
+      "account": "Konto",
+      "privacy": "Prywatność",
+      "notifications": "Powiadomienia",
+      "language": "Język"
+    },
+    "language": {
+      "title": "Język",
+      "description": "Wybierz preferowany język",
+      "english": "English",
+      "polish": "Polski"
+    },
+    "theme": {
+      "title": "Motyw",
+      "description": "Wybierz preferowany motyw kolorystyczny",
+      "light": "Jasny",
+      "dark": "Ciemny",
+      "system": "Systemowy"
+    },
+    "notifications": {
+      "title": "Powiadomienia",
+      "description": "Zarządzaj preferencjami powiadomień",
+      "email": "Powiadomienia email",
+      "emailDescription": "Otrzymuj aktualizacje email o swoim koncie",
+      "push": "Powiadomienia push",
+      "pushDescription": "Otrzymuj powiadomienia push w przeglądarce",
+      "configure": "Konfiguruj",
+      "comingSoon": "Konfiguruj powiadomienia email i push."
+    },
+    "privacy": {
+      "title": "Prywatność",
+      "description": "Zarządzaj ustawieniami prywatności",
+      "dataSharing": "Udostępnianie danych",
+      "dataSharingDescription": "Kontroluj jak Twoje dane są udostępniane stronom trzecim",
+      "analytics": "Analityka",
+      "analyticsDescription": "Pomóż nam się rozwijać udostępniając anonimowe dane użytkowania",
+      "comingSoon": "Kontroluj kto może zobaczyć Twój profil i informacje."
+    }
+  },
+  "userProfile": {
+    "title": "Profil użytkownika",
+    "description": "Zarządzaj informacjami o koncie i ustawieniami bezpieczeństwa",
+    "personalInfo": {
+      "title": "Informacje osobiste",
+      "description": "Podstawowe informacje o Twoim koncie",
+      "fullName": "Imię i nazwisko",
+      "email": "Adres email",
+      "emailNote": "Skontaktuj się z supportem aby zmienić adres email.",
+      "accountTier": "Plan konta",
+      "accountStatus": "Status konta",
+      "active": "Aktywne",
+      "inactive": "Nieaktywne",
+      "edit": "Edytuj",
+      "save": "Zapisz",
+      "cancel": "Anuluj"
+    },
+    "security": {
+      "title": "Bezpieczeństwo",
+      "description": "Zarządzaj hasłem i ustawieniami bezpieczeństwa"
+    },
+    "twoFactor": {
+      "title": "Uwierzytelnianie dwuskładnikowe",
+      "description": "Dodaj dodatkową warstwę bezpieczeństwa do swojego konta",
+      "enable": "Włącz 2FA",
+      "comingSoon": "Chroń swoje konto uwierzytelnianiem dwuskładnikowym."
+    },
+    "dangerZone": {
+      "title": "Strefa niebezpieczna",
+      "description": "Nieodwracalne i destrukcyjne akcje",
+      "deleteAccount": "Usuń konto",
+      "deleteAccountDescription": "Po usunięciu konta nie ma odwrotu. Upewnij się.",
+      "deleteMyAccount": "Usuń moje konto"
+    }
+  },
+  "changePassword": {
+    "title": "Zmień hasło",
+    "description": "Zaktualizuj swoje hasło aby zachować bezpieczeństwo konta",
+    "currentPassword": "Obecne hasło",
+    "newPassword": "Nowe hasło",
+    "passwordRequirements": "Musi mieć co najmniej 8 znaków z wielką literą, małą literą, cyfrą i znakiem specjalnym",
+    "submit": "Zmień hasło",
+    "submitting": "Zmiana hasła...",
+    "success": "Hasło zmienione pomyślnie! Wyloguj się i zaloguj ponownie.",
+    "error": "Nie udało się zmienić hasła. Spróbuj ponownie."
+  }
+}
