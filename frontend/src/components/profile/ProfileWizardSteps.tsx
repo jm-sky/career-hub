@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { useAuth } from '@/contexts/auth-context';
 import { getErrorMessage } from '@/lib/error-guards';
+import { useCreateProfile } from '@/hooks/use-profile';
 
 // Import step components
 import { PersonalInfoStep } from './steps/PersonalInfoStep';
@@ -87,16 +88,17 @@ const STEPS = [
 export function ProfileWizardSteps() {
   const router = useRouter();
   const { user } = useAuth();
+  const createProfile = useCreateProfile();
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Modern 2025 React Hook Form configuration with optimal performance
   const methods = useForm<ProfileWizardData>({
-    resolver: zodResolver(ProfileWizardSchema),
+    resolver: zodResolver(ProfileWizardSchema) as any,
     mode: 'onChange', // Real-time validation (2025 best practice)
-    triggerMode: 'onChange', // Force re-renders on setValue (fixes checkbox issue)
     reValidateMode: 'onChange', // Re-validate on change
     shouldFocusError: true, // Auto-focus on first error
     shouldUnregister: false, // Keep values when navigating between steps
@@ -242,9 +244,26 @@ export function ProfileWizardSteps() {
   };
 
   const onSubmit = async (data: any) => {
+    setSubmitError(null);
+    setIsSaving(true);
+    
     try {
-      // Here you would call the API to create the complete profile
-      console.log('Creating profile with data:', data);
+      // Create profile with basic info
+      const profile = await createProfile.mutateAsync({
+        headline: data.headline,
+        summary: data.summary,
+        location: data.location,
+        visibility: data.visibility,
+        contact: data.contact || {},
+        draftData: {
+          experiences: data.experiences || [],
+          projects: data.projects || [],
+          skills: data.skills || [],
+        },
+      });
+      
+      // TODO: After profile is created, save experiences, projects, and skills via their respective endpoints
+      // For now, they're stored in draftData
       
       // Clear draft after successful creation
       clearDraft();
@@ -253,6 +272,8 @@ export function ProfileWizardSteps() {
       router.push('/dashboard');
     } catch (error) {
       console.error('Failed to create profile:', error);
+      setSubmitError(getErrorMessage(error));
+      setIsSaving(false);
     }
   };
 
@@ -337,6 +358,13 @@ export function ProfileWizardSteps() {
         </div>
       </div>
 
+      {/* Error Display */}
+      {submitError && (
+        <div className="p-4 mb-4 text-sm text-destructive bg-red-50 border border-red-200 rounded-lg">
+          {submitError}
+        </div>
+      )}
+
       {/* Current Step */}
       <Card>
         <CardHeader>
@@ -370,8 +398,12 @@ export function ProfileWizardSteps() {
           </Button>
 
           {currentStep === STEPS.length - 1 ? (
-            <Button onClick={handleSubmit(onSubmit)} className="bg-green-600 hover:bg-green-700">
-              Complete Profile
+            <Button 
+              onClick={handleSubmit(onSubmit)} 
+              className="bg-green-600 hover:bg-green-700"
+              disabled={isSaving || createProfile.isPending}
+            >
+              {isSaving || createProfile.isPending ? 'Creating Profile...' : 'Complete Profile'}
             </Button>
           ) : (
             <Button onClick={nextStep}>
