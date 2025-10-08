@@ -125,6 +125,40 @@ function DashboardContent() {
 
           <Card>
             <CardHeader>
+              <CardTitle>Experience</CardTitle>
+              <CardDescription>Manage your work experience</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Add and manage your professional work experience and career history.
+              </p>
+              <Button asChild variant="outline" size="sm" className="w-full">
+                <Link href="/dashboard/experiences">
+                  Manage Experience
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Projects</CardTitle>
+              <CardDescription>Manage your projects</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 mb-4">
+                Showcase your notable projects and technical achievements.
+              </p>
+              <Button asChild variant="outline" size="sm" className="w-full">
+                <Link href="/dashboard/projects">
+                  Manage Projects
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
               <CardTitle>CVs</CardTitle>
               <CardDescription>Manage your CVs</CardDescription>
             </CardHeader>
