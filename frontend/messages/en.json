@@ -44,20 +44,60 @@
       "password": "Password",
       "rememberMe": "Remember me",
       "forgotPassword": "Forgot password?",
-      "submit": "Sign in",
+      "submit": "Sign In",
       "noAccount": "Don't have an account?",
-      "signUp": "Sign up"
+      "signUp": "Sign up",
+      "submitting": "Signing in...",
+      "authenticating": "Authenticating...",
+      "redirecting": "Redirecting...",
+      "successMessage": "Login successful! Redirecting...",
+      "emailPlaceholder": "you@example.com",
+      "passwordPlaceholder": "••••••••"
     },
     "register": {
-      "title": "Create your account",
-      "subtitle": "Start building your professional profile",
-      "name": "Full name",
+      "title": "Create Account",
+      "subtitle": "Enter your information to create a new account",
+      "name": "Full Name",
       "email": "Email",
       "password": "Password",
       "confirmPassword": "Confirm password",
-      "submit": "Create account",
+      "submit": "Create Account",
       "hasAccount": "Already have an account?",
-      "signIn": "Sign in"
+      "signIn": "Sign in",
+      "submitting": "Registering...",
+      "creating": "Creating account...",
+      "redirecting": "Redirecting...",
+      "emailPlaceholder": "you@example.com",
+      "passwordPlaceholder": "••••••••",
+      "namePlaceholder": "John Doe",
+      "passwordRequirements": "Must be at least 8 characters with uppercase, lowercase, number, and special character"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "email": "Email",
+      "submit": "Send Reset Link",
+      "submitting": "Sending...",
+      "rememberPassword": "Remember your password?",
+      "signIn": "Sign in",
+      "emailPlaceholder": "you@example.com",
+      "successTitle": "Check Your Email",
+      "successSubtitle": "If an account exists with this email, you will receive password reset instructions",
+      "successMessage": "Password reset link has been sent to your email address.",
+      "backToSignIn": "Back to Sign In"
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your new password below",
+      "newPassword": "New Password",
+      "submit": "Reset Password",
+      "submitting": "Resetting...",
+      "backToSignIn": "Back to Sign In",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequirements": "Must be at least 8 characters with uppercase, lowercase, number, and special character",
+      "successTitle": "Password Reset Successful",
+      "successSubtitle": "Your password has been successfully reset",
+      "successMessage": "Redirecting to login page..."
     }
   },
   "dashboard": {
@@ -289,5 +329,28 @@
     "submitting": "Changing Password...",
     "success": "Password changed successfully! Please log out and log back in.",
     "error": "Failed to change password. Please try again."
+  },
+  "homepage": {
+    "title": "Professional Profile Management",
+    "subtitle": "Create tailored CVs, manage your experience, and showcase your professional journey with CareerHub",
+    "createAccount": "Create Account",
+    "signIn": "Sign In",
+    "features": {
+      "smartProfiles": {
+        "title": "Smart Profiles",
+        "description": "Build comprehensive professional profiles with your experience, skills, and projects"
+      },
+      "multipleCvs": {
+        "title": "Multiple CVs",
+        "description": "Create unlimited CV versions tailored for different positions and industries"
+      },
+      "aiPowered": {
+        "title": "AI-Powered",
+        "description": "Get intelligent suggestions to improve your profile and CV content"
+      }
+    },
+    "footer": {
+      "copyright": "© 2025 DEV Made IT. All rights reserved."
+    }
   }
 }

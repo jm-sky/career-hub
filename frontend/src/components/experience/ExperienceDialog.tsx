@@ -83,15 +83,15 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
   useEffect(() => {
     if (experience) {
       reset({
-        company: experience.companyName || experience.company || '',
-        position: experience.position || '',
-        startDate: experience.startDate || '',
-        endDate: experience.endDate || '',
-        isCurrent: experience.isCurrent || false,
-        location: experience.companyLocation || experience.location || '',
-        description: experience.description || '',
-        responsibilities: experience.responsibilities || [],
-        technologies: experience.technologies || [],
+        company: experience.companyName ?? experience.company ?? '',
+        position: experience.position ?? '',
+        startDate: experience.startDate ?? '',
+        endDate: experience.endDate ?? '',
+        isCurrent: experience.isCurrent ?? false,
+        location: experience.companyLocation ?? experience.location ?? '',
+        description: experience.description ?? '',
+        responsibilities: experience.responsibilities ?? [],
+        technologies: experience.technologies ?? [],
       });
     } else {
       reset({
@@ -206,7 +206,7 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
               </Label>
               <Input
                 id="startDate"
-                type="month"
+                type="date"
                 {...register('startDate')}
               />
               {errors.startDate && (
@@ -219,7 +219,7 @@ export function ExperienceDialog({ isOpen, onClose, experience, profileId }: Exp
               <div className="space-y-2">
                 <Input
                   id="endDate"
-                  type="month"
+                  type="date"
                   {...register('endDate')}
                   disabled={isCurrent}
                 />

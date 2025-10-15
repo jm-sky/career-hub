@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslations } from '@/hooks/use-translations';
 import { getErrorMessage } from '@/lib/error-guards';
 import { ResetPasswordSchema, type ResetPasswordFormData } from '@/lib/validations';
 import { useResetPassword } from '@/hooks/use-auth';
@@ -22,6 +23,7 @@ interface ResetPasswordFormProps {
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const router = useRouter();
+  const t = useTranslations('auth.resetPassword');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const resetPasswordMutation = useResetPassword();
@@ -58,15 +60,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Password Reset Successful</CardTitle>
+          <CardTitle>{t('successTitle')}</CardTitle>
           <CardDescription>
-            Your password has been successfully reset
+            {t('successSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="p-4 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
-              Redirecting to login page...
+              {t('successMessage')}
             </div>
           </div>
         </CardContent>
@@ -77,9 +79,9 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Reset Password</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Enter your new password below
+          {t('subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -93,11 +95,11 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
           <input type="hidden" {...register('token')} />
 
           <div className="space-y-2">
-            <Label htmlFor="newPassword">New Password</Label>
+            <Label htmlFor="newPassword">{t('newPassword')}</Label>
             <Input
               id="newPassword"
               type="password"
-              placeholder="••••••••"
+              placeholder={t('passwordPlaceholder')}
               disabled={isFormLoading}
               {...register('newPassword')}
             />
@@ -105,12 +107,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               <p className="text-sm text-red-600">{errors.newPassword.message}</p>
             )}
             <p className="text-xs text-gray-500">
-              Must be at least 8 characters with uppercase, lowercase, number, and special character
+              {t('passwordRequirements')}
             </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isFormLoading ? 'Resetting...' : 'Reset Password'}
+            {isFormLoading ? t('submitting') : t('submit')}
           </Button>
 
           <div className="text-center text-sm text-gray-600">
@@ -120,7 +122,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
               disabled={isFormLoading}
               asChild
             >
-              <Link href="/login">Back to Sign In</Link>
+              <Link href="/login">{t('backToSignIn')}</Link>
             </Button>
           </div>
         </form>

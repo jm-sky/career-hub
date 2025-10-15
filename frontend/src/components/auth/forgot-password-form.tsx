@@ -11,11 +11,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTranslations } from '@/hooks/use-translations';
 import { getErrorMessage } from '@/lib/error-guards';
 import { ForgotPasswordSchema, type ForgotPasswordFormData } from '@/lib/validations';
 import { useForgotPassword } from '@/hooks/use-auth';
 
 export function ForgotPasswordForm() {
+  const t = useTranslations('auth.forgotPassword');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const forgotPasswordMutation = useForgotPassword();
@@ -48,18 +50,18 @@ export function ForgotPasswordForm() {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
-          <CardTitle>Check Your Email</CardTitle>
+          <CardTitle>{t('successTitle')}</CardTitle>
           <CardDescription>
-            If an account exists with this email, you will receive password reset instructions
+            {t('successSubtitle')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="p-4 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
-              Password reset link has been sent to your email address.
+              {t('successMessage')}
             </div>
             <Button variant="outline" className="w-full" asChild>
-              <Link href="/login">Back to Sign In</Link>
+              <Link href="/login">{t('backToSignIn')}</Link>
             </Button>
           </div>
         </CardContent>
@@ -70,9 +72,9 @@ export function ForgotPasswordForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Forgot Password</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Enter your email address and we&apos;ll send you a link to reset your password
+          {t('subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -84,11 +86,11 @@ export function ForgotPasswordForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('emailPlaceholder')}
               disabled={isFormLoading}
               {...register('email')}
             />
@@ -98,18 +100,18 @@ export function ForgotPasswordForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isFormLoading ? 'Sending...' : 'Send Reset Link'}
+            {isFormLoading ? t('submitting') : t('submit')}
           </Button>
 
           <div className="text-center text-sm text-gray-600">
-            Remember your password?{' '}
+            {t('rememberPassword')}{' '}
             <Button
               variant="link"
               className="p-0 h-auto"
               disabled={isFormLoading}
               asChild
             >
-              <Link href="/login">Sign in</Link>
+              <Link href="/login">{t('signIn')}</Link>
             </Button>
           </div>
         </form>

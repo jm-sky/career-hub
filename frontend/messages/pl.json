@@ -46,18 +46,58 @@
       "forgotPassword": "Zapomniałeś hasła?",
       "submit": "Zaloguj się",
       "noAccount": "Nie masz konta?",
-      "signUp": "Zarejestruj się"
+      "signUp": "Zarejestruj się",
+      "submitting": "Logowanie...",
+      "authenticating": "Uwierzytelnianie...",
+      "redirecting": "Przekierowywanie...",
+      "successMessage": "Logowanie pomyślne! Przekierowywanie...",
+      "emailPlaceholder": "ty@przykład.com",
+      "passwordPlaceholder": "••••••••"
     },
     "register": {
-      "title": "Utwórz konto",
-      "subtitle": "Zacznij budować swój profesjonalny profil",
+      "title": "Utwórz Konto",
+      "subtitle": "Wprowadź swoje dane aby utworzyć nowe konto",
       "name": "Imię i nazwisko",
       "email": "Email",
       "password": "Hasło",
       "confirmPassword": "Potwierdź hasło",
-      "submit": "Utwórz konto",
+      "submit": "Utwórz Konto",
       "hasAccount": "Masz już konto?",
-      "signIn": "Zaloguj się"
+      "signIn": "Zaloguj się",
+      "submitting": "Rejestracja...",
+      "creating": "Tworzenie konta...",
+      "redirecting": "Przekierowywanie...",
+      "emailPlaceholder": "ty@przykład.com",
+      "passwordPlaceholder": "••••••••",
+      "namePlaceholder": "Jan Kowalski",
+      "passwordRequirements": "Musi mieć co najmniej 8 znaków z wielką literą, małą literą, cyfrą i znakiem specjalnym"
+    },
+    "forgotPassword": {
+      "title": "Zapomniałeś hasła",
+      "subtitle": "Wprowadź swój adres email a wyślemy Ci link do resetowania hasła",
+      "email": "Email",
+      "submit": "Wyślij link resetujący",
+      "submitting": "Wysyłanie...",
+      "rememberPassword": "Pamiętasz hasło?",
+      "signIn": "Zaloguj się",
+      "emailPlaceholder": "ty@przykład.com",
+      "successTitle": "Sprawdź swój email",
+      "successSubtitle": "Jeśli konto z tym emailem istnieje, otrzymasz instrukcje resetowania hasła",
+      "successMessage": "Link do resetowania hasła został wysłany na Twój adres email.",
+      "backToSignIn": "Powrót do logowania"
+    },
+    "resetPassword": {
+      "title": "Resetuj hasło",
+      "subtitle": "Wprowadź swoje nowe hasło poniżej",
+      "newPassword": "Nowe hasło",
+      "submit": "Resetuj hasło",
+      "submitting": "Resetowanie...",
+      "backToSignIn": "Powrót do logowania",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequirements": "Musi mieć co najmniej 8 znaków z wielką literą, małą literą, cyfrą i znakiem specjalnym",
+      "successTitle": "Hasło zostało zresetowane",
+      "successSubtitle": "Twoje hasło zostało pomyślnie zresetowane",
+      "successMessage": "Przekierowywanie do strony logowania..."
     }
   },
   "dashboard": {
@@ -289,5 +329,28 @@
     "submitting": "Zmiana hasła...",
     "success": "Hasło zmienione pomyślnie! Wyloguj się i zaloguj ponownie.",
     "error": "Nie udało się zmienić hasła. Spróbuj ponownie."
+  },
+  "homepage": {
+    "title": "Zarządzanie Profesjonalnym Profilem",
+    "subtitle": "Twórz dopasowane CV, zarządzaj swoim doświadczeniem i prezentuj swoją ścieżkę zawodową z CareerHub",
+    "createAccount": "Utwórz Konto",
+    "signIn": "Zaloguj się",
+    "features": {
+      "smartProfiles": {
+        "title": "Inteligentne Profile",
+        "description": "Buduj kompleksowe profile zawodowe z Twoim doświadczeniem, umiejętnościami i projektami"
+      },
+      "multipleCvs": {
+        "title": "Wiele CV",
+        "description": "Twórz nieograniczoną liczbę wersji CV dostosowanych do różnych stanowisk i branż"
+      },
+      "aiPowered": {
+        "title": "Napędzane przez AI",
+        "description": "Otrzymuj inteligentne sugestie do poprawy swojego profilu i treści CV"
+      }
+    },
+    "footer": {
+      "copyright": "© 2025 DEV Made IT. Wszystkie prawa zastrzeżone."
+    }
   }
 }

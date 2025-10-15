@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslations } from '@/hooks/use-translations';
 import { getErrorMessage } from '@/lib/error-guards';
 import { RegisterSchema, type RegisterFormData } from '@/lib/validations';
 import { AUTH_CONFIG } from '@/lib/auth-config';
@@ -20,6 +21,7 @@ import { AUTH_CONFIG } from '@/lib/auth-config';
 export function RegisterForm() {
   const router = useRouter();
   const { register: registerUser, isLoading } = useAuth();
+  const t = useTranslations('auth.register');
   const [error, setError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -52,9 +54,9 @@ export function RegisterForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Enter your information to create a new account
+          {t('subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -66,11 +68,11 @@ export function RegisterForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">{t('name')}</Label>
             <Input
               id="name"
               type="text"
-              placeholder="John Doe"
+              placeholder={t('namePlaceholder')}
               disabled={isFormLoading}
               {...register('name')}
             />
@@ -80,11 +82,11 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('emailPlaceholder')}
               disabled={isFormLoading}
               {...register('email')}
             />
@@ -94,11 +96,11 @@ export function RegisterForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('password')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t('passwordPlaceholder')}
               disabled={isFormLoading}
               {...register('password')}
             />
@@ -106,23 +108,23 @@ export function RegisterForm() {
               <p className="text-sm text-red-600">{errors.password.message}</p>
             )}
             <p className="text-xs text-gray-500">
-              Must be at least 8 characters with uppercase, lowercase, number, and special character
+              {t('passwordRequirements')}
             </p>
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isRedirecting ? 'Redirecting...' : isLoading ? 'Creating account...' : isSubmitting ? 'Registering...' : 'Create Account'}
+            {isRedirecting ? t('redirecting') : isLoading ? t('creating') : isSubmitting ? t('submitting') : t('submit')}
           </Button>
 
           <div className="text-center text-sm text-gray-600">
-            Already have an account?{' '}
+            {t('hasAccount')}{' '}
             <Button
               variant="link"
               className="p-0 h-auto"
               disabled={isFormLoading}
               asChild
             >
-              <Link href="/login">Sign in</Link>
+              <Link href="/login">{t('signIn')}</Link>
             </Button>
           </div>
         </form>

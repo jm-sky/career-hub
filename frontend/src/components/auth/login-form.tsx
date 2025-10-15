@@ -13,13 +13,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/auth-context';
+import { useTranslations } from '@/hooks/use-translations';
 import { getErrorMessage } from '@/lib/error-guards';
 import { LoginSchema, type LoginFormData } from '@/lib/validations';
 import { AUTH_CONFIG } from '@/lib/auth-config';
 
+const REDIRECT_DELAY = 500;
+
 export function LoginForm() {
   const router = useRouter();
   const { login, isLoading } = useAuth();
+  const t = useTranslations('auth.login');
   const [error, setError] = useState<string | null>(null);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -29,6 +33,10 @@ export function LoginForm() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
+    defaultValues: {
+      email: process.env.NEXT_PUBLIC_DEFAULT_USER_EMAIL ?? '',
+      password: process.env.NEXT_PUBLIC_DEFAULT_USER_PASSWORD ?? '',
+    },
     resolver: zodResolver(LoginSchema),
     mode: 'onBlur',
   });
@@ -39,13 +47,13 @@ export function LoginForm() {
 
     try {
       await login(data);
-      setSuccessMessage('Login successful! Redirecting...');
+      setSuccessMessage(t('successMessage'));
       setIsRedirecting(true);
       
       // Small delay to show success message
       setTimeout(() => {
         router.push(AUTH_CONFIG.loginRedirect);
-      }, 500);
+      }, REDIRECT_DELAY);
     } catch (error: unknown) {
       const errorMessage = getErrorMessage(error);
       setError(errorMessage);
@@ -58,9 +66,9 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <CardDescription>
-          Enter your email and password to access your account
+          {t('subtitle')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -78,11 +86,11 @@ export function LoginForm() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="you@example.com"
+              placeholder={t('emailPlaceholder')}
               disabled={isFormLoading}
               {...register('email')}
             />
@@ -93,20 +101,20 @@ export function LoginForm() {
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('password')}</Label>
               <Button
                 variant="link"
                 className="p-0 h-auto text-sm"
                 disabled={isFormLoading}
                 asChild
               >
-                <Link href="/forgot-password">Forgot password?</Link>
+                <Link href="/forgot-password">{t('forgotPassword')}</Link>
               </Button>
             </div>
             <Input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder={t('passwordPlaceholder')}
               disabled={isFormLoading}
               {...register('password')}
             />
@@ -116,18 +124,18 @@ export function LoginForm() {
           </div>
 
           <Button type="submit" className="w-full" disabled={isFormLoading}>
-            {isRedirecting ? 'Redirecting...' : isLoading ? 'Authenticating...' : isSubmitting ? 'Signing in...' : 'Sign In'}
+            {isRedirecting ? t('redirecting') : isLoading ? t('authenticating') : isSubmitting ? t('submitting') : t('submit')}
           </Button>
 
           <div className="text-center text-sm text-gray-600">
-            Don&apos;t have an account?{' '}
+            {t('noAccount')}{' '}
             <Button
               variant="link"
               className="p-0 h-auto"
               disabled={isFormLoading}
               asChild
             >
-              <Link href="/register">Sign up</Link>
+              <Link href="/register">{t('signUp')}</Link>
             </Button>
           </div>
         </form>
