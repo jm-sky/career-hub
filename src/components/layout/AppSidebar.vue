@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Info } from 'lucide-vue-next'
+import { Info, UserRound } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import {
@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
+import { CareerRoutePaths } from '@/modules/career/routes'
 import { PublicRoutePaths } from '@/router/publicRoutes'
 
 const { t } = useI18n()
@@ -18,7 +19,23 @@ const { t } = useI18n()
 
 <template>
   <Sidebar collapsible="icon">
-    <SidebarContent class="overflow-x-hidden max-h-[90vh] overflow-y-auto" />
+    <SidebarContent class="overflow-x-hidden max-h-[90vh] overflow-y-auto">
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.profileEdit" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <UserRound class="size-4" />
+              <span>{{ t('career.profile.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarContent>
 
     <SidebarFooter>
       <SidebarMenu>

@@ -45,6 +45,7 @@ MODEL_MODULES = [
     "app.modules.billing.db_models",
     "app.modules.feature_limits.db_models",
     "app.modules.ai.db_models",
+    "app.modules.career.db_models",
 ]
 
 

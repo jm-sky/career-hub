@@ -9,6 +9,7 @@ from app.modules.admin.router import router as admin_router
 from app.modules.ai.router import router as ai_router
 from app.modules.auth.router import router as auth_router
 from app.modules.billing.router import router as billing_router
+from app.modules.career.router import router as career_router
 from app.modules.feature_limits.router import router as feature_limits_router
 from app.modules.logs.router import router as logs_router
 from app.modules.settings.router import router as settings_router
@@ -36,6 +37,7 @@ api_router.include_router(admin_router)
 api_router.include_router(ai_router)
 api_router.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 api_router.include_router(billing_router)
+api_router.include_router(career_router)
 api_router.include_router(feature_limits_router)
 api_router.include_router(logs_router, prefix="/logs", tags=["Logs", "Monitoring"])
 api_router.include_router(users_router, prefix="/users", tags=["Users"])
