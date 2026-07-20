@@ -193,26 +193,10 @@ class ChatService:
         messages = []
 
         # System message with instructions
-        system_prompt = f"""You are a helpful AI assistant for a gear management application {settings.app.name}.
-You help users manage their survival gear, bug-out bags, and equipment.
-
-When the user asks you to perform actions (like adding items, updating quantities, etc.),
-respond in a conversational way AND include structured output in JSON format at the end of your message.
-
-Format your structured output as:
-```json
-{{
-  "action": "action_name",
-  "data": {{...}}
-}}
-```
-
-Available actions:
-- create_item: Create a new gear item
-- update_item: Update existing item
-- delete_item: Delete an item
-- create_container: Create a new container
-- None: Just conversation, no action needed
+        # NOTE: structured-output actions are currently unsupported (no domain object
+        # exists to act on since the gear-strip; see useAiActions.ts on the frontend).
+        # Rewire this to describe real `career` module actions once it lands.
+        system_prompt = f"""You are a helpful AI assistant for {settings.app.name}.
 
 Keep your responses concise and helpful."""
 

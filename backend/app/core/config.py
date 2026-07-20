@@ -33,7 +33,7 @@ class AppSettings(BaseSettings):
         default="backend", validation_alias="APP_NAME", description="Application name"
     )
     display_name: str = Field(
-        default="Gear Stack",
+        default="CareerHub",
         validation_alias="APP_DISPLAY_NAME",
         description="Application display name for emails and UI",
     )
@@ -182,12 +182,12 @@ class SecuritySettings(BaseSettings):
         description="JWT signing algorithm",
     )
     jwt_issuer: str = Field(
-        default="gear-stack",
+        default="career-hub",
         validation_alias="JWT_ISSUER",
         description="JWT 'iss' claim; verified on decode to bind tokens to this deployment",
     )
     jwt_audience: str = Field(
-        default="gear-stack",
+        default="career-hub",
         validation_alias="JWT_AUDIENCE",
         description="JWT 'aud' claim; verified on decode to bind tokens to this deployment",
     )
@@ -495,7 +495,7 @@ class StorageSettings(BaseSettings):
     base_url: str | None = Field(
         default=None,
         validation_alias="STORAGE_BASE_URL",
-        description="Base URL for serving uploaded files (e.g., https://api.gear-stack.com or http://localhost:8000). If not set, uses relative paths.",
+        description="Base URL for serving uploaded files (e.g., https://api.careerhub.com or http://localhost:8000). If not set, uses relative paths.",
     )
 
     # S3 storage
@@ -729,7 +729,7 @@ class WebAuthnSettings(BaseSettings):
         description="WebAuthn Relying Party ID (domain)",
     )
     rp_name: str = Field(
-        default="Gear Stack",
+        default="CareerHub",
         validation_alias="WEBAUTHN_RP_NAME",
         description="WebAuthn Relying Party Name",
     )

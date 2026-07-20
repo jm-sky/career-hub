@@ -53,7 +53,7 @@ export const en = {
         description: 'Get started with basic features',
         fullName: 'Free Plan',
         features: {
-          basicGearManagement: 'Basic gear management',
+          basicGearManagement: 'Basic profile management',
           dataExport: 'Data export (JSON/Markdown)',
           byok: 'BYOK: Bring Your Own API Key (OpenRouter)',
           storage: '100 MB storage',
@@ -67,7 +67,7 @@ export const en = {
         fullName: 'Pro Plan',
         features: {
           everythingInFree: 'Everything in Free',
-          aiRecommendations: 'AI-powered gear recommendations',
+          aiRecommendations: 'AI-powered suggestions',
           aiTokens: '~$1 worth of AI tokens/month',
           advancedFeatures: 'Advanced features',
           storage: '5 GB storage',

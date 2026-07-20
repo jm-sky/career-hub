@@ -53,7 +53,7 @@ export const pl = {
         description: 'Zacznij z podstawowymi funkcjami',
         fullName: 'Plan Darmowy',
         features: {
-          basicGearManagement: 'Podstawowe zarządzanie sprzętem',
+          basicGearManagement: 'Podstawowe zarządzanie profilem',
           dataExport: 'Eksport danych (JSON/Markdown)',
           byok: 'BYOK: Użyj własnego klucza API (OpenRouter)',
           storage: '100 MB przestrzeni',
@@ -67,7 +67,7 @@ export const pl = {
         fullName: 'Plan Pro',
         features: {
           everythingInFree: 'Wszystko z planu Darmowy',
-          aiRecommendations: 'Rekomendacje sprzętu wspierane przez AI',
+          aiRecommendations: 'Sugestie wspierane przez AI',
           aiTokens: '~$1 w tokenach AI/miesiąc',
           advancedFeatures: 'Zaawansowane funkcje',
           storage: '5 GB przestrzeni',

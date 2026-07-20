@@ -114,7 +114,7 @@ async def _users_create_async(
     if not no_input and not sys.stdin.isatty():
         console.print("[red]Interactive mode requires a TTY.[/red]")
         console.print(
-            "Run with [cyan]-it[/cyan]: docker exec -it gear-stack-app python -m cli users create"
+            "Run with [cyan]-it[/cyan]: docker exec -it career-hub-app python -m cli users create"
         )
         console.print(
             "Or use [cyan]--no-input[/cyan] with all options: "

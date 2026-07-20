@@ -20,9 +20,9 @@ export const pwaPlugin = VitePWA({
     'icons/icon-180x180.png',
   ],
   manifest: {
-    name: 'Gear Stack',
-    short_name: 'Gear Stack',
-    description: 'Gear Stack for managing survival gear and bug-out bag equipment.',
+    name: 'CareerHub',
+    short_name: 'CareerHub',
+    description: 'CareerHub — build your professional profile and generate tailored CVs.',
     theme_color: '#18181b',
     background_color: '#ffffff',
     display: 'standalone',

@@ -2,7 +2,6 @@
 
 // Supported locales type (defined here to avoid cyclic dependencies)
 export type SupportedLocale = 'en' | 'pl'
-export type TGearWeightUnit = 'g' | 'kg' | 'oz' | 'lb'
 
 export interface IAiModelPricing {
   input: number // per 1M tokens
@@ -22,9 +21,9 @@ export interface IAiModel {
 
 export const config = {
   app: {
-    id: import.meta.env.VITE_APP_ID ?? 'gear-stack',
-    name: import.meta.env.VITE_APP_NAME ?? 'Gear Stack',
-    description: import.meta.env.VITE_APP_DESCRIPTION ?? 'Gear Stack for managing survival gear and bug-out bag equipment.',
+    id: import.meta.env.VITE_APP_ID ?? 'career-hub',
+    name: import.meta.env.VITE_APP_NAME ?? 'CareerHub',
+    description: import.meta.env.VITE_APP_DESCRIPTION ?? 'CareerHub — build your professional profile and generate tailored CVs.',
   },
   i18n: {
     defaultLocale: (import.meta.env.VITE_DEFAULT_LOCALE ?? 'en') as SupportedLocale,
@@ -70,9 +69,6 @@ export const config = {
       enabled: !(import.meta.env.VITE_ENABLE_INLINE_EDITING === 'false'),
     },
   },
-  defaults: {
-    preferredWeightUnit: 'g' as TGearWeightUnit,
-  },
   storage: {
     // Maximum file size for regular users (20 MB)
     maxFileSize: import.meta.env.VITE_MAX_FILE_SIZE ? parseInt(import.meta.env.VITE_MAX_FILE_SIZE) : 20 * 1024 * 1024,
@@ -95,16 +91,4 @@ export const JWT_STORE_KEY = `${config.app.id}:token`
 export const LOCALE_STORAGE_KEY = `${config.app.id}:locale`
 export const SETTINGS_STORAGE_KEY = `${config.app.id}:settings`
 export const CORE_SETTINGS_STORAGE_KEY = `${config.app.id}:core-settings`
-export const GEAR_SETTINGS_STORAGE_KEY = `${config.app.id}:gear-settings`
 export const USER_STORAGE_KEY = `${config.app.id}:user`
-export const ITEMS_TABLE_COLUMN_VISIBILITY_KEY = `${config.app.id}:items-table-column-visibility`
-export const ITEMS_TABLE_EDIT_MODE_KEY = `${config.app.id}:items-table-edit-mode`
-export const ALL_ITEMS_TABLE_COLUMN_VISIBILITY_KEY = `${config.app.id}:all-items-table-column-visibility`
-export const ALL_ITEMS_PAGE_FILTERS_KEY = `${config.app.id}:all-items-page:filters`
-export const SHOPPING_PLANNING_PAGE_FILTERS_KEY = `${config.app.id}:shopping-planning-page:filters`
-export const SHOPPING_PLANNING_PAGE_FILTERS_COLLAPSED_KEY = `${config.app.id}:shopping-planning-page:filters-collapsed`
-export const CONTAINERS_STORAGE_KEY = `${config.app.id}:containers`
-export const CONTAINERS_LIST_PAGE_FILTERS_KEY = `${config.app.id}:containers-list-page:filters`
-export const PUBLIC_CONTAINERS_BROWSER_PAGE_FILTERS_KEY = `${config.app.id}:public-containers-browser-page:filters`
-export const CATALOGUE_BROWSER_PAGE_FILTERS_KEY = `${config.app.id}:catalogue-browser-page:filters`
-export const UPDATE_FROM_CATALOGUE_FIELDS_KEY = `${config.app.id}:update-from-catalogue-fields`

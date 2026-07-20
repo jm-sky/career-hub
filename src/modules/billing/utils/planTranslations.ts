@@ -11,7 +11,7 @@ type TranslateFunction = (key: string, ...args: unknown[]) => string
  */
 const featureKeyMap: Record<PlanTier, Record<string, string>> = {
   free: {
-    'Basic gear management': 'billing.plans.free.features.basicGearManagement',
+    'Basic profile management': 'billing.plans.free.features.basicGearManagement',
     'Data export (JSON/Markdown)': 'billing.plans.free.features.dataExport',
     'BYOK: Bring Your Own API Key (OpenRouter)': 'billing.plans.free.features.byok',
     '100 MB storage': 'billing.plans.free.features.storage',
@@ -20,7 +20,7 @@ const featureKeyMap: Record<PlanTier, Record<string, string>> = {
   },
   pro: {
     'Everything in Free': 'billing.plans.pro.features.everythingInFree',
-    'AI-powered gear recommendations': 'billing.plans.pro.features.aiRecommendations',
+    'AI-powered suggestions': 'billing.plans.pro.features.aiRecommendations',
     '~$1 worth of AI tokens/month': 'billing.plans.pro.features.aiTokens',
     'Advanced features': 'billing.plans.pro.features.advancedFeatures',
     '5 GB storage': 'billing.plans.pro.features.storage',

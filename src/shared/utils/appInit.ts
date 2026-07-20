@@ -7,7 +7,6 @@
  * - Other initialization utilities
  */
 
-import { useGearStoreV2 } from '@/modules/gear/store/useGearStoreV2'
 import type { I18n } from 'vue-i18n'
 
 /**
@@ -37,14 +36,10 @@ export function setHtmlLangAttribute(i18n: I18n): void {
 }
 
 /**
- * H5 FIX: Initialize stores asynchronously to avoid blocking main thread
- * This should be called during app initialization to load data from localStorage
- * without blocking the initial render
+ * Initialize stores asynchronously to avoid blocking main thread.
+ * Currently a no-op — kept as a hook point for future stores (e.g. the
+ * `career` module) that need early initialization on app startup.
  */
-export async function initializeStores(): Promise<void> {
-  // Touch the V2 gear store so its init runs early (transparent V1->V2 localStorage
-  // migration + load from storage happen on first access).
-  useGearStoreV2()
-}
+export async function initializeStores(): Promise<void> {}
 
 

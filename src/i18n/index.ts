@@ -10,7 +10,6 @@ import { adminEn, adminPl } from '@/modules/admin/i18n'
 import { aiEn, aiPl } from '@/modules/ai/i18n'
 import { authEn, authPl } from '@/modules/auth/i18n'
 import { billingTranslations } from '@/modules/billing/i18n'
-import { gearEn, gearPl } from '@/modules/gear/i18n'
 import { settingsEn, settingsPl } from '@/modules/settings/i18n'
 import { userEn, userPl } from '@/modules/user/i18n'
 import { createI18nInstance } from '@/shared/i18n'
@@ -29,7 +28,6 @@ const en = {
   ...aiEn,
   ...authEn,
   ...billingTranslations.en,
-  ...gearEn,
   ...settingsEn,
   ...userEn,
 }
@@ -39,7 +37,6 @@ const pl = {
   ...aiPl,
   ...authPl,
   ...billingTranslations.pl,
-  ...gearPl,
   ...settingsPl,
   ...userPl,
 }

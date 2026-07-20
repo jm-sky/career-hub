@@ -85,7 +85,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
       annualMonthly: 0,
     },
     features: [
-      'Basic gear management',
+      'Basic profile management',
       'Data export (JSON/Markdown)',
       'BYOK: Bring Your Own API Key (OpenRouter)',
       '100 MB storage',
@@ -109,7 +109,7 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
     },
     features: [
       'Everything in Free',
-      'AI-powered gear recommendations',
+      'AI-powered suggestions',
       '~$1 worth of AI tokens/month',
       'Advanced features',
       '5 GB storage',

@@ -4,18 +4,18 @@
  */
 
 import { computed, ref } from 'vue'
-import { useGearStoreV2 } from '@/modules/gear/store/useGearStoreV2'
 import { useAiStore } from '../store/useAiStore'
-import type { IGearItemV2 } from '@/modules/gear/types/gear.types.v2'
 
 export interface IAiContext {
   container_ids?: string[]
   fields?: string[]
 }
 
+// TODO: `containerIds`/`getContainerData`/`getItemsData` are placeholders left over
+// from stripping the gear domain — there's no context data source yet. Rewire this
+// to the `career` module's own context (profile/experience/project data) once it lands.
 export function useAiContext() {
   const aiStore = useAiStore()
-  const gearStore = useGearStoreV2()
 
   const selectedContainerIds = ref<string[]>([])
   const selectedFields = ref<string[]>(['name', 'category', 'weight'])
@@ -55,57 +55,18 @@ export function useAiContext() {
     }
   }
 
-  const getContainerData = (containerId: string): IGearItemV2 | undefined => {
-    const item = gearStore.getItemById(containerId)
-    return item && item.itemType === 'container' ? item : undefined
+  const getContainerData = (_containerId: string): Record<string, unknown> | undefined => {
+    return undefined
   }
 
-  const getItemsData = (containerId: string): IGearItemV2[] => {
-    return gearStore.getChildrenOfItem(containerId).filter(child => child.itemType === 'item')
+  const getItemsData = (_containerId: string): Record<string, unknown>[] => {
+    return []
   }
 
-  const buildContextData = (containerIds?: string[]): Record<string, unknown> => {
-    const data: Record<string, unknown> = {}
-
-    const ids = containerIds && containerIds.length > 0 ? containerIds : selectedContainerIds.value
-
-    if (ids.length === 0) {
-      return data
-    }
-
-    const fields = selectedFields.value
-
-    for (const containerId of ids) {
-      const container = getContainerData(containerId)
-      if (!container) continue
-
-      const containerData: Record<string, unknown> = {
-        id: container.id,
-        name: container.name,
-      }
-
-      // Always include items for context
-      const items = getItemsData(containerId)
-      containerData.items = items.map((item: IGearItemV2) => {
-        const itemData: Record<string, unknown> = { id: item.id }
-
-        if (fields.includes('name')) itemData.name = item.name
-        if (fields.includes('notes') && item.notes) itemData.notes = item.notes
-        if (fields.includes('category')) itemData.category = item.category
-        if (fields.includes('weight') && item.weight) itemData.weight = item.weight
-        if (fields.includes('quantity') && item.quantity) itemData.quantity = item.quantity
-        if (fields.includes('price') && item.price) itemData.price = item.price
-        if (fields.includes('url') && item.url) itemData.url = item.url
-        if (fields.includes('wearable')) itemData.wearable = item.wearable
-        if (fields.includes('consumable')) itemData.consumable = item.consumable
-
-        return itemData
-      })
-
-      data[containerId] = containerData
-    }
-
-    return data
+  // No context data source is wired up yet post gear-strip (see TODO above), so this
+  // always returns an empty context until the `career` module provides one.
+  const buildContextData = (_containerIds?: string[]): Record<string, unknown> => {
+    return {}
   }
 
   const setContainerIds = (ids: string[]): void => {

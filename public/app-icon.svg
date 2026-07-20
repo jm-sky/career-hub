@@ -2,10 +2,10 @@
   <!-- Background circle with primary/10 -->
   <circle cx="250" cy="250" r="240" fill="rgba(238, 97, 15, 0.1)"/>
 
-  <!-- Lucide Backpack Icon (scaled and centered) -->
+  <!-- Lucide File User Icon (scaled and centered) -->
   <g transform="translate(130, 130) scale(8.5)">
     <path
-      d="M4 10a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"
+      d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
       fill="none"
       stroke="rgb(238, 97, 15)"
       stroke-width="2"
@@ -13,7 +13,7 @@
       stroke-linejoin="round"
     />
     <path
-      d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"
+      d="M14 2v5a1 1 0 0 0 1 1h5"
       fill="none"
       stroke="rgb(238, 97, 15)"
       stroke-width="2"
@@ -21,28 +21,13 @@
       stroke-linejoin="round"
     />
     <path
-      d="M8 21v-5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v5"
+      d="M16 22a4 4 0 0 0-8 0"
       fill="none"
       stroke="rgb(238, 97, 15)"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
     />
-    <path
-      d="M8 10h8"
-      fill="none"
-      stroke="rgb(238, 97, 15)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M8 18h8"
-      fill="none"
-      stroke="rgb(238, 97, 15)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
+    <circle cx="12" cy="15" r="3" fill="none" stroke="rgb(238, 97, 15)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>

@@ -17,37 +17,6 @@ export interface IAdminUser {
   updatedAt: TDateTime
 }
 
-export interface IAdminContainer {
-  id: TUUID
-  name: string
-  description?: string | null
-  type: string
-  color?: string | null
-  isPublic: boolean
-  authorId?: TUUID | null
-  authorName?: string | null
-  createdAt: TDateTime
-  updatedAt: TDateTime
-  itemCount?: number
-}
-
-export interface IAdminItem {
-  id: TUUID
-  name: string
-  category: string
-  quantity: number
-  weight: number
-  weightUnit: string
-  status: string
-  priority: string
-  containerId: TUUID
-  containerName?: string
-  authorId?: TUUID | null
-  authorName?: string | null
-  createdAt: TDateTime
-  updatedAt: TDateTime
-}
-
 export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'unpaid' | 'incomplete'
 export type PlanTier = 'free' | 'pro' | 'pro_plus'
 export type BillingInterval = 'monthly' | 'annual'

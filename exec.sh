@@ -28,8 +28,8 @@ detect_compose_context() {
   local compose_file=""
   local compose_path=""
 
-  if docker ps --format '{{.Names}}' | grep -q "^gear-stack-app$"; then
-    container_name="gear-stack-app"
+  if docker ps --format '{{.Names}}' | grep -q "^career-hub-app$"; then
+    container_name="career-hub-app"
   elif docker ps --format '{{.Names}}' | grep -q "^backend$"; then
     container_name="backend"
   fi

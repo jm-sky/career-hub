@@ -11,59 +11,58 @@ const { t } = useI18n()
 const copied = ref(false)
 
 const aiContextMarkdown = computed(() => {
-  return `# Gear Stack - AI Context
+  return `# CareerHub - AI Context
 
 ## Overview
-Gear Stack is a full-stack web application for managing survival gear, bug-out bags, and outdoor equipment. It's designed for outdoor enthusiasts, preppers, and survival gear collectors.
+CareerHub is a full-stack web application for managing a professional profile and generating tailored CVs from it. Users build a single master profile — experiences, projects, skills, education, certifications, achievements — and curate named CV versions as selective views over that master data, rather than maintaining separate documents per application.
 
 ## Key Capabilities
 - **Multi-User Platform** - Secure user accounts with authentication and authorization
-- **Hybrid Architecture** - Works offline with localStorage, syncs with cloud when online
-- **Advanced Organization** - Hierarchical container system with nested items and weight tracking
-- **Rich Metadata** - Track weight, expiration dates, priorities, brands, and custom categories
-- **Data Portability** - Import/export functionality with AI-ready markdown format
+- **Freemium Tiers** - Free / Pro / Expert plans gate CV version limits, watermarking, AI features, and custom domain
+- **Curated CV Generation** - Named CV versions select which experiences/projects/skills/education/certs to include, with an optional custom summary override
+- **Public Profile** - Shareable profile page at a unique slug with Private/Friends/Public visibility
+- **Data Portability** - LinkedIn import, copy-paste text import fallback, full JSON export
 
 ## Core Features
 
-### Container System
-- Multiple container types (Bug-out bags, EDC kits, get-home bags, medical kits, camping gear, custom)
-- Hierarchical organization - containers can contain other containers (nested packs, pouches in bags)
-- Visual distinction - assign colors to containers (10+ colors)
-- Container metadata - type, description, base weight, color coding
-- Cycle detection - prevents circular references
+### Profile
+- Rich profile: headline, summary, location, contact info, profile photo
+- Multi-step wizard with per-step draft autosave
+- Completeness score to nudge users toward a fuller profile
+- Three-level visibility: Private, Friends, Public
 
-### Item Management
-- Rich item data: name, quantity, weight (g, kg, oz, lb), category, priority, status (owned/missing/to buy), brand, notes, expiration date
-- Smart categorization - automatic category recognition (water, fire, food, shelter, first aid, tools, navigation, communication, clothing, hygiene, light, other)
-- Status tracking - owned, missing, or to buy
-- Priority levels - low, medium, high, critical
-- Expiration tracking for consumables
+### Experience & Projects
+- Rich per-role experience data: company, position, employment type, dates, responsibilities, technologies
+- Projects documented independently of experiences, then explicitly linked to one or more experiences and skills - supports cross-company/portfolio work
+- Anonymization - hide the real company/client name behind a placeholder for NDA-restricted work, as a first-class field
+- User-orderable sections (drag-and-drop reordering)
 
-### Analytics & Insights
-- Weight calculations - total pack weight with recursive calculation for nested containers
-- Category-based weight distribution
-- Base weight vs. consumables tracking
-- Readiness indicators - kit completeness percentage
-- Donut charts - visual breakdown by category
-- Item statistics by status, category, or priority
+### Skills
+- Categorized skills (Technical/Tools/Soft) with 1-5 proficiency level and years of experience
+- Linkable to specific projects
+- AI-suggested skills for a target role (Pro/Expert)
 
-### Search & Filtering
-- Smart search - find items by name, brand, or notes across all containers
-- Multi-criteria filtering - by category, status, priority, or container
-- Sorting options - by name, weight, expiration date, or priority
-- Highlight expired items - visual warnings
+### CV Generation
+- Multiple named CV versions per profile, each an explicit curated selection over the master profile
+- Template choice per CV version
+- Async PDF generation (background job)
+- Free tier PDFs are watermarked
+
+### AI Features (Pro/Expert)
+- Optimize responsibility/description text
+- Suggest missing responsibilities for a role + seniority level
+- Gap analysis against a target role (match score, strengths, gaps, recommendations)
 
 ### Import/Export
-- JSON export/import - full data backup and restore
-- AI-ready markdown export - structured format with metadata, nested container support, calculated weights
-- CSV export - for spreadsheet applications
-- Cross-device transfer
+- LinkedIn import (async job)
+- Copy-paste text fallback parser
+- Full JSON export of profile data
 
 ## Business Features
 
 ### User Management & Security
 - Email/password authentication with secure password hashing
-- OAuth social login (Google, GitHub planned)
+- OAuth social login (Google, GitHub)
 - Email verification
 - Two-factor authentication (2FA) - TOTP and WebAuthn (passkeys)
 - Password management - reset and change
@@ -71,11 +70,9 @@ Gear Stack is a full-stack web application for managing survival gear, bug-out b
 - JWT tokens with automatic refresh
 - GDPR-compliant account deletion
 
-### User Profile
-- Profile management - name, email, preferences
-- Avatar support from OAuth providers
-- Preferred settings - weight units, language, theme
-- Security settings - manage 2FA methods
+### Subscription & Billing
+- Free / Pro / Expert plans via Stripe
+- Feature gating per plan (CV version limits, watermark, AI access, custom domain, API access)
 
 ### Multi-Language Support
 - English and Polish fully supported
@@ -100,18 +97,17 @@ Gear Stack is a full-stack web application for managing survival gear, bug-out b
 
 ### Backend
 - FastAPI (Python) with async/await
-- PostgreSQL database
+- PostgreSQL database, ULID primary keys
 - SQLAlchemy ORM with async support
 - JWT authentication with refresh tokens
 - Rate limiting and reCAPTCHA protection
-- Modular architecture (auth, two-factor, email)
+- Modular architecture (auth, two-factor, billing, feature_limits, ai, career)
 
 ## Architecture
-- **Hybrid Persistence**: Client-side localStorage for offline-first, server-side PostgreSQL for multi-device sync
-- **Automatic Synchronization** - Changes sync to cloud when online
-- **Conflict Resolution** - Smart merging of offline changes
-- **Module-Based Frontend** - Each feature is self-contained in modules
-- **Backend Modules** - FastAPI modular pattern with routers, services, repositories`
+- **Module-Based Frontend** - Each feature is self-contained in modules (services/composables/types/routes/i18n)
+- **Backend Modules** - FastAPI modular pattern with routers, services, repositories
+- **JSONB for flexible fields** - responsibilities, achievements, CV section selection
+- **Async job pattern** - long operations (PDF generation, LinkedIn import) run as background jobs, polled via job id`
 })
 
 const handleCopy = async () => {
@@ -134,10 +130,10 @@ const handleCopy = async () => {
     <div class="space-y-8">
       <div class="space-y-2">
         <h1 class="text-3xl font-bold tracking-tight">
-          {{ t('about.title', 'About Gear Stack') }}
+          {{ t('about.title', 'About CareerHub') }}
         </h1>
         <p class="text-muted-foreground">
-          {{ t('about.subtitle', 'A comprehensive web application for managing survival gear, bug-out bags, and outdoor equipment') }}
+          {{ t('about.subtitle', 'A single professional profile that generates as many tailored CVs as you need') }}
         </p>
       </div>
 
@@ -174,7 +170,7 @@ const handleCopy = async () => {
           {{ t('about.overview.title', 'Overview') }}
         </h2>
         <p class="text-muted-foreground">
-          {{ t('about.overview.description', 'Gear Stack is a full-stack application designed for outdoor enthusiasts, preppers, and survival gear collectors. It combines an intuitive front-end interface with a robust backend to provide secure multi-user gear management with cloud synchronization across devices.') }}
+          {{ t('about.overview.description', 'CareerHub is a full-stack application for building one master professional profile — experience, projects, skills, education, certifications — and generating multiple tailored CVs from it. It combines an intuitive front-end interface with a robust backend to keep your career data in sync across devices.') }}
         </p>
       </section>
 
@@ -185,10 +181,10 @@ const handleCopy = async () => {
         </h2>
         <ul class="list-disc list-inside space-y-2 text-muted-foreground">
           <li>{{ t('about.capabilities.multiUser', 'Multi-User Platform - Secure user accounts with authentication and authorization') }}</li>
-          <li>{{ t('about.capabilities.hybrid', 'Hybrid Architecture - Works offline with localStorage, syncs with cloud when online') }}</li>
-          <li>{{ t('about.capabilities.organization', 'Advanced Organization - Hierarchical container system with nested items and weight tracking') }}</li>
-          <li>{{ t('about.capabilities.metadata', 'Rich Metadata - Track weight, expiration dates, priorities, brands, and custom categories') }}</li>
-          <li>{{ t('about.capabilities.portability', 'Data Portability - Import/export functionality with AI-ready markdown format') }}</li>
+          <li>{{ t('about.capabilities.hybrid', 'Freemium Tiers - Free, Pro, and Expert plans gate CV limits, watermarking, AI features, and custom domain') }}</li>
+          <li>{{ t('about.capabilities.organization', 'Curated CVs - Named CV versions select which experiences, projects, skills, and education to include') }}</li>
+          <li>{{ t('about.capabilities.metadata', 'Rich Metadata - Track responsibilities, technologies, anonymized clients, achievements, and certifications') }}</li>
+          <li>{{ t('about.capabilities.portability', 'Data Portability - LinkedIn import, copy-paste import fallback, and full JSON export') }}</li>
         </ul>
       </section>
 
@@ -200,51 +196,51 @@ const handleCopy = async () => {
         <div class="space-y-6">
           <div id="container-system" class="space-y-2 scroll-mt-18">
             <h3 class="text-xl font-semibold">
-              {{ t('about.coreFeatures.containers.title', 'Container System') }}
+              {{ t('about.coreFeatures.containers.title', 'Profile') }}
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-              <li>{{ t('about.coreFeatures.containers.multiple', 'Multiple container types (Bug-out bags, EDC kits, get-home bags, medical kits, camping gear, and custom types)') }}</li>
-              <li>{{ t('about.coreFeatures.containers.hierarchical', 'Hierarchical organization - containers can contain other containers (nested packs, pouches in bags)') }}</li>
-              <li>{{ t('about.coreFeatures.containers.colors', 'Visual distinction - assign colors to containers for quick identification (10+ colors)') }}</li>
-              <li>{{ t('about.coreFeatures.containers.metadata', 'Container metadata - type, description, base weight, color coding') }}</li>
-              <li>{{ t('about.coreFeatures.containers.cycle', 'Cycle detection - prevents circular references in nested containers') }}</li>
+              <li>{{ t('about.coreFeatures.containers.multiple', 'Multi-step profile wizard with per-step draft autosave') }}</li>
+              <li>{{ t('about.coreFeatures.containers.hierarchical', 'Completeness score to nudge you toward a fuller profile') }}</li>
+              <li>{{ t('about.coreFeatures.containers.colors', 'Three-level visibility - Private, Friends, or Public') }}</li>
+              <li>{{ t('about.coreFeatures.containers.metadata', 'Public profile page at a shareable slug, SEO-friendly') }}</li>
+              <li>{{ t('about.coreFeatures.containers.cycle', 'Contact info, headline, summary, and profile photo') }}</li>
             </ul>
           </div>
 
           <div id="item-management" class="space-y-2 scroll-mt-18">
             <h3 class="text-xl font-semibold">
-              {{ t('about.coreFeatures.items.title', 'Item Management') }}
+              {{ t('about.coreFeatures.items.title', 'Experience & Projects') }}
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-              <li>{{ t('about.coreFeatures.items.rich', 'Rich item data: name, quantity, weight (with unit selection: g, kg, oz, lb), category, priority, status (owned/missing/to buy), brand, notes, expiration date') }}</li>
-              <li>{{ t('about.coreFeatures.items.categorization', 'Smart categorization - automatic category recognition based on item name (water, fire, food, shelter, first aid, tools, navigation, communication, clothing, hygiene, light, other)') }}</li>
-              <li>{{ t('about.coreFeatures.items.status', 'Status tracking - mark items as owned, missing, or to buy') }}</li>
-              <li>{{ t('about.coreFeatures.items.priority', 'Priority levels - low, medium, high, critical') }}</li>
-              <li>{{ t('about.coreFeatures.items.expiration', 'Expiration tracking - monitor consumables and replace before they expire') }}</li>
+              <li>{{ t('about.coreFeatures.items.rich', 'Rich per-role data: company, position, employment type, dates, responsibilities, technologies') }}</li>
+              <li>{{ t('about.coreFeatures.items.categorization', 'Projects documented independently of roles, then explicitly linked to one or more experiences and skills') }}</li>
+              <li>{{ t('about.coreFeatures.items.status', 'Anonymization - hide the real company/client name behind a placeholder for NDA-restricted work') }}</li>
+              <li>{{ t('about.coreFeatures.items.priority', 'User-orderable sections via drag-and-drop') }}</li>
+              <li>{{ t('about.coreFeatures.items.expiration', 'Track achievements, challenges, and scale (team size, duration, users, budget)') }}</li>
             </ul>
           </div>
 
           <div id="analytics-insights" class="space-y-2 scroll-mt-18">
             <h3 class="text-xl font-semibold">
-              {{ t('about.coreFeatures.analytics.title', 'Analytics & Insights') }}
+              {{ t('about.coreFeatures.analytics.title', 'Skills') }}
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-              <li>{{ t('about.coreFeatures.analytics.weight', 'Weight calculations - total pack weight with recursive calculation for nested containers, category-based weight distribution, base weight vs. consumables tracking') }}</li>
-              <li>{{ t('about.coreFeatures.analytics.readiness', 'Readiness indicators - kit completeness percentage based on owned vs. missing items') }}</li>
-              <li>{{ t('about.coreFeatures.analytics.charts', 'Donut charts - visual breakdown of weight or quantity by category') }}</li>
-              <li>{{ t('about.coreFeatures.analytics.statistics', 'Item statistics - count items by status, category, or priority') }}</li>
+              <li>{{ t('about.coreFeatures.analytics.weight', 'Categorized skills (Technical/Tools/Soft) with 1-5 proficiency level and years of experience') }}</li>
+              <li>{{ t('about.coreFeatures.analytics.readiness', 'Linkable to specific projects to show where a skill was applied') }}</li>
+              <li>{{ t('about.coreFeatures.analytics.charts', 'AI-suggested skills for a target role (Pro/Expert)') }}</li>
+              <li>{{ t('about.coreFeatures.analytics.statistics', 'A shared technology catalog reused across profiles') }}</li>
             </ul>
           </div>
 
           <div id="search-filtering" class="space-y-2 scroll-mt-18">
             <h3 class="text-xl font-semibold">
-              {{ t('about.coreFeatures.search.title', 'Search & Filtering') }}
+              {{ t('about.coreFeatures.search.title', 'CV Generation') }}
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-              <li>{{ t('about.coreFeatures.search.smart', 'Smart search - find items by name, brand, or notes across all containers') }}</li>
-              <li>{{ t('about.coreFeatures.search.filtering', 'Multi-criteria filtering - filter by category, status, priority, or container') }}</li>
-              <li>{{ t('about.coreFeatures.search.sorting', 'Sorting options - sort by name, weight, expiration date, or priority') }}</li>
-              <li>{{ t('about.coreFeatures.search.expired', 'Highlight expired items - visual warnings for expired or soon-to-expire items') }}</li>
+              <li>{{ t('about.coreFeatures.search.smart', 'Multiple named CV versions per profile, each a curated selection over the master profile') }}</li>
+              <li>{{ t('about.coreFeatures.search.filtering', 'Optional custom summary override per CV version') }}</li>
+              <li>{{ t('about.coreFeatures.search.sorting', 'Template choice per CV version') }}</li>
+              <li>{{ t('about.coreFeatures.search.expired', 'Asynchronous PDF generation as a background job; Free tier PDFs are watermarked') }}</li>
             </ul>
           </div>
 
@@ -253,10 +249,10 @@ const handleCopy = async () => {
               {{ t('about.coreFeatures.importExport.title', 'Import/Export') }}
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
-              <li>{{ t('about.coreFeatures.importExport.json', 'JSON export/import - full data backup and restore') }}</li>
-              <li>{{ t('about.coreFeatures.importExport.markdown', 'AI-ready markdown export - export containers to markdown format for AI processing with structured format, nested container support, and calculated weights') }}</li>
-              <li>{{ t('about.coreFeatures.importExport.csv', 'CSV export - export data in CSV format for spreadsheet applications') }}</li>
-              <li>{{ t('about.coreFeatures.importExport.crossDevice', 'Cross-device transfer - export from one device, import on another') }}</li>
+              <li>{{ t('about.coreFeatures.importExport.json', 'Full JSON export/import of your profile data') }}</li>
+              <li>{{ t('about.coreFeatures.importExport.markdown', 'LinkedIn import as a background job') }}</li>
+              <li>{{ t('about.coreFeatures.importExport.csv', 'Copy-paste text fallback parser when a LinkedIn export is unavailable') }}</li>
+              <li>{{ t('about.coreFeatures.importExport.crossDevice', 'Cross-device access - your profile is stored server-side, not just on one device') }}</li>
             </ul>
           </div>
         </div>
@@ -274,7 +270,7 @@ const handleCopy = async () => {
             </h3>
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
               <li>{{ t('about.businessFeatures.security.auth', 'User registration & login - email/password authentication with secure password hashing') }}</li>
-              <li>{{ t('about.businessFeatures.security.oauth', 'OAuth social login - sign in with Google (GitHub support planned)') }}</li>
+              <li>{{ t('about.businessFeatures.security.oauth', 'OAuth social login - sign in with Google, Facebook, or GitHub') }}</li>
               <li>{{ t('about.businessFeatures.security.email', 'Email verification - confirm email addresses for account security') }}</li>
               <li>{{ t('about.businessFeatures.security.2fa', 'Two-factor authentication (2FA) - TOTP (authenticator apps) and WebAuthn (passkeys/security keys)') }}</li>
               <li>{{ t('about.businessFeatures.security.password', 'Password management - reset forgotten passwords, change password for authenticated users') }}</li>
@@ -291,7 +287,7 @@ const handleCopy = async () => {
             <ul class="list-disc list-inside space-y-1 text-muted-foreground ml-4">
               <li>{{ t('about.businessFeatures.profile.management', 'Profile management - update name, email, and preferences') }}</li>
               <li>{{ t('about.businessFeatures.profile.avatar', 'Avatar support - OAuth providers automatically provide profile pictures') }}</li>
-              <li>{{ t('about.businessFeatures.profile.settings', 'Preferred settings - weight units, language, theme preferences') }}</li>
+              <li>{{ t('about.businessFeatures.profile.settings', 'Preferred settings - language, theme preferences') }}</li>
               <li>{{ t('about.businessFeatures.profile.security', 'Security settings - manage 2FA methods, view security status') }}</li>
             </ul>
           </div>
@@ -363,7 +359,7 @@ const handleCopy = async () => {
           {{ t('aiContext.title', 'AI Context') }}
         </h2>
         <p class="text-muted-foreground">
-          {{ t('aiContext.subtitle', 'Short description of Gear Stack in Markdown format for AI assistants like ChatGPT') }}
+          {{ t('aiContext.subtitle', 'Short description of CareerHub in Markdown format for AI assistants like ChatGPT') }}
         </p>
 
         <Card>
@@ -374,7 +370,7 @@ const handleCopy = async () => {
                   {{ t('aiContext.card.title', 'Copy Context to Clipboard') }}
                 </CardTitle>
                 <CardDescription>
-                  {{ t('aiContext.card.description', 'Click the button below to copy the context description. You can then paste it into ChatGPT or other AI assistants to provide context about Gear Stack.') }}
+                  {{ t('aiContext.card.description', 'Click the button below to copy the context description. You can then paste it into ChatGPT or other AI assistants to provide context about CareerHub.') }}
                 </CardDescription>
               </div>
               <Button @click="handleCopy">

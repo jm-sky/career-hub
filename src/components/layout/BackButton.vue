@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { ArrowLeft } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import Button from '@/components/ui/button/Button.vue'
-import { getActionIcon } from '@/modules/gear/utils/actionIcons'
 
 const { t } = useI18n()
-const BackIcon = getActionIcon('back')
+const BackIcon = ArrowLeft
 
 defineProps<{
   noLabel?: boolean

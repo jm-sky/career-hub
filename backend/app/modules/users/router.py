@@ -12,7 +12,6 @@ from app.modules.auth.repositories import UserRepository as AuthUserRepository
 from app.modules.auth.repositories import (
     get_user_repository as get_auth_user_repository,
 )
-from app.modules.gear.item_image_repository import ItemImageRepository
 from app.modules.settings.db_models import UserSettingsDB
 
 from .dependencies import AdminUser, CurrentUser
@@ -356,8 +355,9 @@ async def get_storage_usage(
     """
     from app.modules.feature_limits.repository import FeatureLimitRepository
 
-    image_repo = ItemImageRepository(db)
-    used_bytes = await image_repo.get_user_storage_usage(current_user.id)
+    # TODO: wire up to real storage consumers (profile photos, CV PDFs) once the
+    # `career` module lands; no storage-consuming domain exists yet post gear-strip.
+    used_bytes = 0
 
     # Determine user role for limit lookup
     # CurrentUser from users module has role as string
