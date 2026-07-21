@@ -2,9 +2,9 @@
   "json.schemas": [
     {
       "fileMatch": [
-        "backend/app/seeders/catalogue_items.json"
+        "backend/app/seeders/career-projects.json"
       ],
-      "url": "./backend/app/seeders/catalogue_items.schema.json"
+      "url": "./backend/app/seeders/career-projects.schema.json"
     }
   ]
 }

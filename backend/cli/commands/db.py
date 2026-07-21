@@ -133,6 +133,7 @@ def init_test_database(
             async with engine.begin() as conn:
                 if force:
                     from sqlalchemy import text
+
                     console.print("[yellow]Dropping existing test database tables...[/yellow]")
                     # Drop all tables with CASCADE to handle foreign keys
                     await conn.execute(text("DROP SCHEMA public CASCADE"))
@@ -524,3 +525,66 @@ def migrate_unmark(
         console.print(f"[yellow]You can now re-run it with:[/yellow] cli db migrate-graceful --from {version}")
 
     asyncio.run(_unmark())
+
+
+@db_app.command("seed")
+def seed(
+    seeder: str = typer.Argument(..., help="Seeder to run (e.g. 'career-projects')"),
+    email: str | None = typer.Option(None, "--email", help="Owner user email (find-or-create). Defaults to the seeder's built-in email, if it has one."),
+    name: str | None = typer.Option(None, "--name", help="Full name, used only if the user has to be created"),
+    password: str | None = typer.Option(None, "--password", help="Password, used only if the user has to be created"),
+) -> None:
+    """Seed the database with sample/reference data.
+
+    Available seeders:
+        career-projects  Jan Madeyski's real project history, from madeyski.org
+    """
+    if seeder == "career-projects":
+        from ..seeds.career_projects import SEED_USER_EMAIL
+
+        asyncio.run(_seed_career_projects(email or SEED_USER_EMAIL, name, password))
+    else:
+        console.print(f"[red]Unknown seeder:[/red] {seeder}")
+        raise typer.Exit(1)
+
+
+async def _seed_career_projects(email: str, name: str | None, password: str | None) -> None:
+    """Find-or-create the owning user, then idempotently create each seed project on their profile."""
+    from app.core.database import get_db
+    from app.modules.auth.repositories import UserRepository
+    from app.modules.career.dependencies import get_profile_service, get_project_service
+
+    from app.seeders.career_projects import RAW_PROJECTS, build_create_project_request
+
+    async for db in get_db():
+        user_repo = UserRepository(db)
+        user = await user_repo.get_user_by_email(email)
+
+        if user is None:
+            console.print(f"[yellow]No user found for {email} — creating one.[/yellow]")
+            if not name:
+                name = typer.prompt("Full name")
+            if not password:
+                password = typer.prompt("Password", hide_input=True, confirmation_prompt=True)
+            user = await user_repo.create_user(email=email, password=password, full_name=name)
+            console.print(f"[green]✓ Created user {user.email} ({user.id})[/green]")
+        else:
+            console.print(f"[dim]Using existing user {user.email} ({user.id})[/dim]")
+
+        profile_service = get_profile_service(db)
+        profile = await profile_service.get_or_create_for_user(user.id, user.name)
+
+        project_service = get_project_service(db)
+        existing_names = {p.name for p in await project_service.list_for_profile(profile.id)}
+
+        created = 0
+        skipped = 0
+        for raw in RAW_PROJECTS:
+            if raw["name"] in existing_names:
+                skipped += 1
+                continue
+            await project_service.create(profile.id, build_create_project_request(raw))
+            created += 1
+
+        console.print(f"\n[bold green]✓ Seed 'career-projects' complete:[/bold green] " f"{created} created, {skipped} skipped (already existed)")
+        break
