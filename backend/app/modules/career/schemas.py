@@ -1,5 +1,6 @@
 """Pydantic schemas for the career module (Phase 1: profile. Phase 2: experiences,
-technologies, skills. Phase 3: projects)."""
+technologies, skills. Phase 3: projects. Phase 4: education, certifications,
+achievements. Phase 5: cv_versions)."""
 
 from datetime import date, datetime
 from datetime import date as _Date
@@ -451,3 +452,109 @@ class UpdateAchievementRequest(BaseModel):
     date: _Date | None = Field(default=None)
     category: AchievementCategory | None = Field(default=None)
     url: str | None = Field(default=None, max_length=500)
+
+
+# --- Languages -------------------------------------------------------------------
+
+LanguageLevel = Literal["NATIVE", "C2", "C1", "B2", "B1", "A2", "A1"]
+
+
+class LanguageResponse(BaseModel):
+    """A spoken/written language on the profile."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    name: str = Field(alias="name", serialization_alias="name")
+    level: LanguageLevel = Field(alias="level", serialization_alias="level")
+    description: str | None = Field(None, alias="description", serialization_alias="description")
+    displayOrder: int = Field(alias="display_order", serialization_alias="displayOrder")
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateLanguageRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    level: LanguageLevel
+    description: str | None = Field(default=None)
+
+
+class UpdateLanguageRequest(BaseModel):
+    """Partial update — only provided fields change."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=100)
+    level: LanguageLevel | None = Field(default=None)
+    description: str | None = Field(default=None)
+
+
+# --- Phase 5: cv_versions ---------------------------------------------------------
+
+
+class CvSectionsConfig(BaseModel):
+    """Which profile-section items to include in a CV export, plus a few overrides.
+
+    Ids reference the profile's own experiences/projects/skills/education/
+    certifications/achievements/languages — ownership is validated at the service layer
+    (this schema has no DB access), same as Project's ``experienceIds``.
+    """
+
+    experienceIds: list[str] = Field(default_factory=list)
+    projectIds: list[str] = Field(default_factory=list)
+    skillIds: list[str] = Field(default_factory=list)
+    educationIds: list[str] = Field(default_factory=list)
+    certificationIds: list[str] = Field(default_factory=list)
+    achievementIds: list[str] = Field(default_factory=list)
+    languageIds: list[str] = Field(default_factory=list)
+    customSummary: str | None = Field(default=None)
+    includePhoto: bool = Field(default=True)
+    includeSummary: bool = Field(default=True)
+
+
+class CvVersionResponse(BaseModel):
+    """Full CV version representation. ``pdfUrl`` is null until Phase 5's follow-up
+    (PDF render pipeline) actually generates one."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    name: str = Field(alias="name", serialization_alias="name")
+    template: str = Field(alias="template", serialization_alias="template")
+    sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig, alias="sections_config", serialization_alias="sectionsConfig")
+    pdfUrl: str | None = Field(None, alias="pdf_url", serialization_alias="pdfUrl")
+    isDefault: bool = Field(alias="is_default", serialization_alias="isDefault")
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateCvVersionRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    template: str = Field(default="default", max_length=50)
+    sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig)
+    isDefault: bool = Field(default=False)
+
+
+class UpdateCvVersionRequest(BaseModel):
+    """Partial update — only provided fields change. ``sectionsConfig``, when
+    provided, fully replaces the existing selection."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    template: str | None = Field(default=None, max_length=50)
+    sectionsConfig: CvSectionsConfig | None = Field(default=None)
+    isDefault: bool | None = Field(default=None)
+
+
+class GenerateCvVersionResponse(BaseModel):
+    """Stub response — no PDF render pipeline exists yet (PDF engine choice is
+    still an open question per the plan doc). Confirms the request was accepted
+    without pretending a PDF was actually produced."""
+
+    jobId: str
+    status: Literal["queued"]

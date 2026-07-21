@@ -344,6 +344,7 @@ export default {
     },
     login: 'Zaloguj się',
     register: 'Załóż konto',
+    goToProfile: 'Przejdź do mojego profilu',
     footer: 'Zacznij budować swój profil już dziś',
   },
   notFound: {

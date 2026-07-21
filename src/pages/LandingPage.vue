@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/ui/button-link/ButtonLink.vue'
 import LandingLayout from '@/layouts/LandingLayout.vue'
-import { AuthRoutePaths } from '@/modules/auth/config/routes'
 import { useAuth } from '@/modules/auth/composables/useAuth'
+import { AuthRoutePaths } from '@/modules/auth/config/routes'
 import { CareerRoutePaths } from '@/modules/career/routes'
 import { config } from '@/shared/config/config'
 
@@ -82,11 +82,11 @@ if (!config.backend.enabled) {
       <div v-else-if="config.backend.enabled" class="flex flex-col items-center justify-center sm:flex-row gap-4">
         <ButtonLink size="lg" :to="AuthRoutePaths.login">
           <LogInIcon class="size-5" />
-          {{ t('auth.login', 'Log In') }}
+          {{ t('landing.login') }}
         </ButtonLink>
         <ButtonLink size="lg" variant="outline" :to="AuthRoutePaths.register">
           <UserPlusIcon class="size-5" />
-          {{ t('auth.register', 'Sign Up') }}
+          {{ t('landing.register') }}
         </ButtonLink>
       </div>
     </div>

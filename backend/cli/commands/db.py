@@ -527,9 +527,12 @@ def migrate_unmark(
     asyncio.run(_unmark())
 
 
+AVAILABLE_SEEDERS = ("career", "career-projects")
+
+
 @db_app.command("seed")
 def seed(
-    seeder: str = typer.Argument(..., help="Seeder to run (e.g. 'career-projects')"),
+    seeder: str = typer.Argument(..., help="Seeder to run (e.g. 'career')"),
     email: str | None = typer.Option(None, "--email", help="Owner user email (find-or-create). Defaults to the seeder's built-in email, if it has one."),
     name: str | None = typer.Option(None, "--name", help="Full name, used only if the user has to be created"),
     password: str | None = typer.Option(None, "--password", help="Password, used only if the user has to be created"),
@@ -537,54 +540,467 @@ def seed(
     """Seed the database with sample/reference data.
 
     Available seeders:
-        career-projects  Jan Madeyski's real project history, from madeyski.org
+        career           Full Jan Madeyski profile (profile, experiences, projects, skills, …)
+        career-projects  Projects only (subset of `career`)
     """
-    if seeder == "career-projects":
-        from ..seeds.career_projects import SEED_USER_EMAIL
-
-        asyncio.run(_seed_career_projects(email or SEED_USER_EMAIL, name, password))
-    else:
+    if seeder not in AVAILABLE_SEEDERS:
         console.print(f"[red]Unknown seeder:[/red] {seeder}")
+        console.print(f"[dim]Available:[/dim] {', '.join(AVAILABLE_SEEDERS)}")
         raise typer.Exit(1)
 
+    from app.seeders.constants import SEED_USER_EMAIL, SEED_USER_NAME
 
-async def _seed_career_projects(email: str, name: str | None, password: str | None) -> None:
-    """Find-or-create the owning user, then idempotently create each seed project on their profile."""
-    from app.core.database import get_db
+    asyncio.run(
+        _seed_career(
+            email or SEED_USER_EMAIL,
+            name or SEED_USER_NAME,
+            password,
+            projects_only=(seeder == "career-projects"),
+            seeder_label=seeder,
+        )
+    )
+
+
+@db_app.command("seed-remove")
+def seed_remove(
+    seeder: str = typer.Argument(..., help="Seeder whose data to remove (e.g. 'career')"),
+    email: str | None = typer.Option(None, "--email", help="Owner user email. Defaults to the seeder's built-in email."),
+) -> None:
+    """Remove data previously created by a seeder (idempotent; does not delete the user).
+
+    Available seeders:
+        career           Remove profile-seeded career entities matching seed keys
+        career-projects  Remove only seeded projects
+    """
+    if seeder not in AVAILABLE_SEEDERS:
+        console.print(f"[red]Unknown seeder:[/red] {seeder}")
+        console.print(f"[dim]Available:[/dim] {', '.join(AVAILABLE_SEEDERS)}")
+        raise typer.Exit(1)
+
+    from app.seeders.constants import SEED_USER_EMAIL
+
+    asyncio.run(
+        _seed_remove_career(
+            email or SEED_USER_EMAIL,
+            projects_only=(seeder == "career-projects"),
+            seeder_label=seeder,
+        )
+    )
+
+
+async def _resolve_seed_user(
+    db: "AsyncSession",
+    email: str,
+    name: str | None,
+    password: str | None,
+    *,
+    create_if_missing: bool,
+):
+    """Find the seed owner; optionally create when missing."""
     from app.modules.auth.repositories import UserRepository
-    from app.modules.career.dependencies import get_profile_service, get_project_service
 
-    from app.seeders.career_projects import RAW_PROJECTS, build_create_project_request
+    user_repo = UserRepository(db)
+    user = await user_repo.get_user_by_email(email)
+
+    if user is not None:
+        console.print(f"[dim]Using existing user {user.email} ({user.id})[/dim]")
+        return user
+
+    if not create_if_missing:
+        console.print(f"[red]No user found for {email}[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[yellow]No user found for {email} — creating one.[/yellow]")
+    if not name:
+        name = typer.prompt("Full name")
+    if not password:
+        password = typer.prompt("Password", hide_input=True, confirmation_prompt=True)
+    user = await user_repo.create_user(email=email, password=password, full_name=name)
+    console.print(f"[green]✓ Created user {user.email} ({user.id})[/green]")
+    return user
+
+
+def _experience_ids_for_companies(company_to_ids: dict[str, list[str]], companies: list[str]) -> list[str]:
+    """Resolve experience ids by case-insensitive company name match."""
+    ids: list[str] = []
+    seen: set[str] = set()
+    for company in companies:
+        key = company.casefold()
+        for exp_id in company_to_ids.get(key, []):
+            if exp_id not in seen:
+                seen.add(exp_id)
+                ids.append(exp_id)
+    return ids
+
+
+async def _seed_career(
+    email: str,
+    name: str | None,
+    password: str | None,
+    *,
+    projects_only: bool,
+    seeder_label: str,
+) -> None:
+    """Find-or-create the owning user, then idempotently seed career data on their profile."""
+    from datetime import date
+
+    from app.core.database import get_db
+    from app.modules.career.achievement_repository import AchievementRepository
+    from app.modules.career.dependencies import (
+        get_achievement_service,
+        get_certification_service,
+        get_education_service,
+        get_experience_service,
+        get_language_service,
+        get_profile_service,
+        get_project_service,
+        get_skill_service,
+    )
+    from app.modules.career.experience_repository import ExperienceRepository
+    from app.modules.career.language_repository import LanguageRepository
+    from app.modules.career.project_repository import ProjectRepository
+    from app.modules.career.schemas import UpdateAchievementRequest, UpdateProfileRequest
+    from app.modules.career.skill_repository import SkillRepository
+    from app.seeders.career_achievements import (
+        OBSOLETE_ACHIEVEMENT_TITLES,
+        RAW_ACHIEVEMENTS,
+        build_create_achievement_request,
+    )
+    from app.seeders.career_certifications import (
+        RAW_CERTIFICATIONS,
+        build_create_certification_request,
+        certification_key,
+    )
+    from app.seeders.career_education import RAW_EDUCATION, build_create_education_request, education_key
+    from app.seeders.career_experiences import (
+        RAW_EXPERIENCES,
+        build_create_experience_request,
+        build_update_experience_request,
+        experience_key,
+    )
+    from app.modules.career.certification_repository import CertificationRepository
+    from app.modules.career.education_repository import EducationRepository
+    from app.modules.career.schemas import UpdateCertificationRequest, UpdateEducationRequest
+    from app.seeders.career_languages import (
+        RAW_LANGUAGES,
+        build_create_language_request,
+        build_update_language_request,
+    )
+    from app.seeders.career_profile import SEED_PROFILE, build_update_profile_request
+    from app.seeders.career_projects import (
+        RAW_PROJECTS,
+        build_create_project_request,
+        build_update_project_request,
+    )
+    from app.seeders.career_skills import RAW_SKILLS, build_create_skill_request, build_update_skill_request
 
     async for db in get_db():
-        user_repo = UserRepository(db)
-        user = await user_repo.get_user_by_email(email)
-
-        if user is None:
-            console.print(f"[yellow]No user found for {email} — creating one.[/yellow]")
-            if not name:
-                name = typer.prompt("Full name")
-            if not password:
-                password = typer.prompt("Password", hide_input=True, confirmation_prompt=True)
-            user = await user_repo.create_user(email=email, password=password, full_name=name)
-            console.print(f"[green]✓ Created user {user.email} ({user.id})[/green]")
-        else:
-            console.print(f"[dim]Using existing user {user.email} ({user.id})[/dim]")
+        user = await _resolve_seed_user(db, email, name, password, create_if_missing=True)
 
         profile_service = get_profile_service(db)
         profile = await profile_service.get_or_create_for_user(user.id, user.name)
 
+        counts: dict[str, tuple[int, int]] = {}
+
+        if not projects_only:
+            # Profile — always refresh from seed (source of truth for this personal seeder).
+            try:
+                await profile_service.update_profile(profile, build_update_profile_request(SEED_PROFILE))
+                console.print("[green]✓ Profile updated[/green]")
+            except ValueError as exc:
+                # Slug collision: keep existing slug, still fill the rest.
+                console.print(f"[yellow]Profile slug skipped:[/yellow] {exc}")
+                await profile_service.update_profile(
+                    profile,
+                    UpdateProfileRequest(
+                        headline=SEED_PROFILE.get("headline"),
+                        summary=SEED_PROFILE.get("summary"),
+                        location=SEED_PROFILE.get("location"),
+                        visibility=SEED_PROFILE.get("visibility"),
+                        contact=build_update_profile_request(SEED_PROFILE).contact,
+                    ),
+                )
+                console.print("[green]✓ Profile updated (without slug)[/green]")
+
+            experience_service = get_experience_service(db)
+            experience_repo = ExperienceRepository(db)
+            exp_rows = await experience_repo.list_by_profile(profile.id)
+            existing_exps = {(e.company_name, e.position, e.start_date.isoformat()): e for e in exp_rows}
+            # Fallback when position was renamed in the seeder (same company + start).
+            existing_exps_by_company_start = {(e.company_name, e.start_date.isoformat()): e for e in exp_rows}
+            created = updated = 0
+            for raw in RAW_EXPERIENCES:
+                key = experience_key(raw)
+                entity = existing_exps.get(key) or existing_exps_by_company_start.get(
+                    (raw["companyName"], raw["startDate"])
+                )
+                if entity is not None:
+                    await experience_service.update(entity, build_update_experience_request(raw))
+                    updated += 1
+                else:
+                    await experience_service.create(profile.id, build_create_experience_request(raw))
+                    created += 1
+            counts["experiences"] = (created, updated)
+
+            skill_service = get_skill_service(db)
+            skill_repo = SkillRepository(db)
+            existing_skills = {technology.name.casefold(): (skill, technology) for skill, technology in await skill_repo.list_by_profile(profile.id)}
+            created = updated = 0
+            for raw in RAW_SKILLS:
+                row = existing_skills.get(raw["technologyName"].casefold())
+                if row is not None:
+                    skill, technology = row
+                    await skill_service.update(skill, technology, build_update_skill_request(raw))
+                    updated += 1
+                else:
+                    await skill_service.create(profile.id, build_create_skill_request(raw))
+                    created += 1
+            counts["skills"] = (created, updated)
+
+            education_service = get_education_service(db)
+            education_repo = EducationRepository(db)
+            existing_edu = {
+                (e.institution, e.degree, e.start_date.isoformat()): e for e in await education_repo.list_by_profile(profile.id)
+            }
+            created = updated = 0
+            for raw in RAW_EDUCATION:
+                entity = existing_edu.get(education_key(raw))
+                if entity is not None:
+                    end = raw.get("endDate")
+                    await education_service.update(
+                        entity,
+                        UpdateEducationRequest(
+                            institution=raw["institution"],
+                            degree=raw["degree"],
+                            fieldOfStudy=raw.get("fieldOfStudy"),
+                            startDate=date.fromisoformat(raw["startDate"]),
+                            endDate=date.fromisoformat(end) if end else None,
+                            grade=raw.get("grade"),
+                            description=raw.get("description"),
+                        ),
+                    )
+                    updated += 1
+                else:
+                    await education_service.create(profile.id, build_create_education_request(raw))
+                    created += 1
+            counts["education"] = (created, updated)
+
+            certification_service = get_certification_service(db)
+            certification_repo = CertificationRepository(db)
+            existing_certs = {
+                (c.name, c.issuing_organization): c for c in await certification_repo.list_by_profile(profile.id)
+            }
+            created = updated = 0
+            for raw in RAW_CERTIFICATIONS:
+                entity = existing_certs.get(certification_key(raw))
+                if entity is not None:
+                    expiry = raw.get("expiryDate")
+                    await certification_service.update(
+                        entity,
+                        UpdateCertificationRequest(
+                            name=raw["name"],
+                            issuingOrganization=raw["issuingOrganization"],
+                            credentialId=raw.get("credentialId"),
+                            credentialUrl=raw.get("credentialUrl"),
+                            issueDate=date.fromisoformat(raw["issueDate"]),
+                            expiryDate=date.fromisoformat(expiry) if expiry else None,
+                        ),
+                    )
+                    updated += 1
+                else:
+                    await certification_service.create(profile.id, build_create_certification_request(raw))
+                    created += 1
+            counts["certifications"] = (created, updated)
+
+            achievement_service = get_achievement_service(db)
+            achievement_repo = AchievementRepository(db)
+            existing_achs = {a.title: a for a in await achievement_repo.list_by_profile(profile.id)}
+            for obsolete_title in OBSOLETE_ACHIEVEMENT_TITLES:
+                entity = existing_achs.pop(obsolete_title, None)
+                if entity is not None:
+                    await achievement_service.delete(entity)
+
+            created = updated = 0
+            for raw in RAW_ACHIEVEMENTS:
+                entity = existing_achs.get(raw["title"])
+                if entity is not None:
+                    d = raw.get("date")
+                    await achievement_service.update(
+                        entity,
+                        UpdateAchievementRequest(
+                            title=raw["title"],
+                            description=raw.get("description"),
+                            date=date.fromisoformat(d) if d else None,
+                            category=raw.get("category"),
+                            url=raw.get("url"),
+                        ),
+                    )
+                    updated += 1
+                else:
+                    await achievement_service.create(profile.id, build_create_achievement_request(raw))
+                    created += 1
+            counts["achievements"] = (created, updated)
+
+            language_service = get_language_service(db)
+            language_repo = LanguageRepository(db)
+            existing_langs = {lang.name.casefold(): lang for lang in await language_repo.list_by_profile(profile.id)}
+            created = updated = 0
+            for raw in RAW_LANGUAGES:
+                entity = existing_langs.get(raw["name"].casefold())
+                if entity is not None:
+                    await language_service.update(entity, build_update_language_request(raw))
+                    updated += 1
+                else:
+                    await language_service.create(profile.id, build_create_language_request(raw))
+                    created += 1
+            counts["languages"] = (created, updated)
+
+        # Experiences map for project linking (needed even on projects-only if experiences already exist)
+        experience_service = get_experience_service(db)
+        company_to_ids: dict[str, list[str]] = {}
+        for exp in await experience_service.list_for_profile(profile.id):
+            company_to_ids.setdefault(exp.companyName.casefold(), []).append(exp.id)
+
         project_service = get_project_service(db)
-        existing_names = {p.name for p in await project_service.list_for_profile(profile.id)}
-
-        created = 0
-        skipped = 0
+        project_repo = ProjectRepository(db)
+        existing_projects = {p.name: p for p in await project_repo.list_by_profile(profile.id)}
+        created = updated = 0
         for raw in RAW_PROJECTS:
-            if raw["name"] in existing_names:
-                skipped += 1
-                continue
-            await project_service.create(profile.id, build_create_project_request(raw))
-            created += 1
+            experience_ids = _experience_ids_for_companies(
+                company_to_ids,
+                list(raw.get("experience_companies", [])),
+            )
+            entity = existing_projects.get(raw["name"])
+            if entity is not None:
+                await project_service.update(
+                    entity,
+                    build_update_project_request(raw, experience_ids=experience_ids),
+                )
+                updated += 1
+            else:
+                await project_service.create(
+                    profile.id,
+                    build_create_project_request(raw, experience_ids=experience_ids),
+                )
+                created += 1
+        counts["projects"] = (created, updated)
 
-        console.print(f"\n[bold green]✓ Seed 'career-projects' complete:[/bold green] " f"{created} created, {skipped} skipped (already existed)")
+        console.print(f"\n[bold green]✓ Seed '{seeder_label}' complete:[/bold green]")
+        for section, (c, s) in counts.items():
+            console.print(f"  {section}: {c} created, {s} updated")
+        break
+
+
+async def _seed_remove_career(email: str, *, projects_only: bool, seeder_label: str) -> None:
+    """Remove seeded career entities that match seed keys. Does not delete the user."""
+    from app.core.database import get_db
+    from app.modules.career.dependencies import (
+        get_achievement_service,
+        get_certification_service,
+        get_education_service,
+        get_experience_service,
+        get_language_service,
+        get_profile_service,
+        get_project_service,
+        get_skill_service,
+    )
+    from app.modules.career.experience_repository import ExperienceRepository
+    from app.modules.career.project_repository import ProjectRepository
+    from app.modules.career.skill_repository import SkillRepository
+    from app.modules.career.education_repository import EducationRepository
+    from app.modules.career.certification_repository import CertificationRepository
+    from app.modules.career.achievement_repository import AchievementRepository
+    from app.modules.career.language_repository import LanguageRepository
+    from app.seeders.career_achievements import OBSOLETE_ACHIEVEMENT_TITLES, RAW_ACHIEVEMENTS
+    from app.seeders.career_certifications import RAW_CERTIFICATIONS, certification_key
+    from app.seeders.career_education import RAW_EDUCATION, education_key
+    from app.seeders.career_experiences import RAW_EXPERIENCES, experience_key
+    from app.seeders.career_languages import RAW_LANGUAGES
+    from app.seeders.career_projects import RAW_PROJECTS
+    from app.seeders.career_skills import RAW_SKILLS
+
+    async for db in get_db():
+        user = await _resolve_seed_user(db, email, None, None, create_if_missing=False)
+
+        profile_service = get_profile_service(db)
+        profile = await profile_service.get_or_create_for_user(user.id, user.name)
+
+        removed: dict[str, int] = {}
+
+        project_service = get_project_service(db)
+        project_repo = ProjectRepository(db)
+        seed_project_names = {p["name"] for p in RAW_PROJECTS}
+        n = 0
+        for project in await project_repo.list_by_profile(profile.id):
+            if project.name in seed_project_names:
+                await project_service.delete(project)
+                n += 1
+        removed["projects"] = n
+
+        if not projects_only:
+            experience_service = get_experience_service(db)
+            experience_repo = ExperienceRepository(db)
+            seed_exp_keys = {experience_key(r) for r in RAW_EXPERIENCES}
+            n = 0
+            for exp in await experience_repo.list_by_profile(profile.id):
+                key = (exp.company_name, exp.position, exp.start_date.isoformat())
+                if key in seed_exp_keys:
+                    await experience_service.delete(exp)
+                    n += 1
+            removed["experiences"] = n
+
+            skill_service = get_skill_service(db)
+            skill_repo = SkillRepository(db)
+            seed_skill_names = {s["technologyName"].casefold() for s in RAW_SKILLS}
+            n = 0
+            for skill, technology in await skill_repo.list_by_profile(profile.id):
+                if technology.name.casefold() in seed_skill_names:
+                    await skill_service.delete(skill)
+                    n += 1
+            removed["skills"] = n
+
+            education_service = get_education_service(db)
+            education_repo = EducationRepository(db)
+            seed_edu_keys = {education_key(r) for r in RAW_EDUCATION}
+            n = 0
+            for edu in await education_repo.list_by_profile(profile.id):
+                key = (edu.institution, edu.degree, edu.start_date.isoformat())
+                if key in seed_edu_keys:
+                    await education_service.delete(edu)
+                    n += 1
+            removed["education"] = n
+
+            certification_service = get_certification_service(db)
+            certification_repo = CertificationRepository(db)
+            seed_cert_keys = {certification_key(r) for r in RAW_CERTIFICATIONS}
+            n = 0
+            for cert in await certification_repo.list_by_profile(profile.id):
+                if (cert.name, cert.issuing_organization) in seed_cert_keys:
+                    await certification_service.delete(cert)
+                    n += 1
+            removed["certifications"] = n
+
+            achievement_service = get_achievement_service(db)
+            achievement_repo = AchievementRepository(db)
+            seed_titles = {a["title"] for a in RAW_ACHIEVEMENTS} | OBSOLETE_ACHIEVEMENT_TITLES
+            n = 0
+            for ach in await achievement_repo.list_by_profile(profile.id):
+                if ach.title in seed_titles:
+                    await achievement_service.delete(ach)
+                    n += 1
+            removed["achievements"] = n
+
+            language_service = get_language_service(db)
+            language_repo = LanguageRepository(db)
+            seed_lang_names = {lang["name"].casefold() for lang in RAW_LANGUAGES}
+            n = 0
+            for lang in await language_repo.list_by_profile(profile.id):
+                if lang.name.casefold() in seed_lang_names:
+                    await language_service.delete(lang)
+                    n += 1
+            removed["languages"] = n
+
+        console.print(f"\n[bold green]✓ Seed-remove '{seeder_label}' complete:[/bold green]")
+        for section, n in removed.items():
+            console.print(f"  {section}: {n} removed")
         break

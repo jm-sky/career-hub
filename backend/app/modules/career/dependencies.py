@@ -16,11 +16,15 @@ from .achievement_repository import AchievementRepository
 from .achievement_service import AchievementService
 from .certification_repository import CertificationRepository
 from .certification_service import CertificationService
+from .cv_version_repository import CvVersionRepository
+from .cv_version_service import CvVersionService
 from .db_models import ProfileDB
 from .education_repository import EducationRepository
 from .education_service import EducationService
 from .experience_repository import ExperienceRepository, ExperienceTechnologyRepository
 from .experience_service import ExperienceService
+from .language_repository import LanguageRepository
+from .language_service import LanguageService
 from .project_repository import (
     ProjectExperienceRepository,
     ProjectRepository,
@@ -125,3 +129,20 @@ def get_certification_service(db: AsyncSession = Depends(get_db)) -> Certificati
 
 def get_achievement_service(db: AsyncSession = Depends(get_db)) -> AchievementService:
     return AchievementService(AchievementRepository(db))
+
+
+def get_language_service(db: AsyncSession = Depends(get_db)) -> LanguageService:
+    return LanguageService(LanguageRepository(db))
+
+
+def get_cv_version_service(db: AsyncSession = Depends(get_db)) -> CvVersionService:
+    return CvVersionService(
+        CvVersionRepository(db),
+        ExperienceRepository(db),
+        ProjectRepository(db),
+        SkillRepository(db),
+        EducationRepository(db),
+        CertificationRepository(db),
+        AchievementRepository(db),
+        LanguageRepository(db),
+    )

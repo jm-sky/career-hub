@@ -21,6 +21,14 @@ class ProjectRepository:
         result = await self.db.execute(select(ProjectDB).where(ProjectDB.id == id_, ProjectDB.profile_id == profile_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids_and_profile(self, ids: list[str], profile_id: str) -> list[ProjectDB]:
+        """Bulk ownership-scoped lookup — used to validate a batch of project ids
+        (e.g. a CV version's ``sectionsConfig.projectIds``) all belong to the profile."""
+        if not ids:
+            return []
+        result = await self.db.execute(select(ProjectDB).where(ProjectDB.id.in_(ids), ProjectDB.profile_id == profile_id))
+        return list(result.scalars().all())
+
     async def get_next_display_order(self, profile_id: str) -> int:
         result = await self.db.execute(select(func.max(ProjectDB.display_order)).where(ProjectDB.profile_id == profile_id))
         current_max = result.scalar_one_or_none()

@@ -1,6 +1,6 @@
 """Database models for the career module (Phase 1: profiles. Phase 2: experiences,
 technologies, skills. Phase 3: projects. Phase 4: education, certifications,
-achievements)."""
+achievements. Phase 5: cv_versions)."""
 
 from datetime import UTC, date, datetime
 from datetime import date as _Date
@@ -278,6 +278,58 @@ class AchievementDB(Base):
     category: Mapped[str | None] = mapped_column(String(20), nullable=True)
     url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class LanguageDB(Base):
+    """A spoken/written language on a profile, with a CEFR (or native) proficiency level."""
+
+    __tablename__ = "languages"
+    __table_args__ = (UniqueConstraint("profile_id", "name", name="uq_languages_profile_name"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    level: Mapped[str] = mapped_column(String(10), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class CvVersionDB(Base):
+    """A named, curated selection of a profile's data for CV export.
+
+    ``sections_config`` holds the actual curation (which experience/project/skill/
+    education/certification/achievement/language ids to include, plus summary/photo overrides)
+    as JSONB rather than relational rows — it's a snapshot of *which ids to select at
+    render time*, not a copy of the underlying data, so it stays accurate as the
+    profile changes.
+
+    ``pdf_url`` is null until a PDF has actually been generated — Phase 5 ships CRUD
+    only; the render pipeline (PDF engine choice still open) lands in a later pass.
+    """
+
+    __tablename__ = "cv_versions"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    template: Mapped[str] = mapped_column(String(50), nullable=False, default="default")
+    sections_config: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    pdf_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    is_default: Mapped[bool] = mapped_column(default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

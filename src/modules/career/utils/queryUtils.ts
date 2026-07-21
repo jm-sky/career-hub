@@ -37,6 +37,14 @@ export const achievementQueryKeys = {
   all: ['career', 'achievements'] as const,
 } as const
 
+export const languageQueryKeys = {
+  all: ['career', 'languages'] as const,
+} as const
+
+export const cvVersionQueryKeys = {
+  all: ['career', 'cv-versions'] as const,
+} as const
+
 export function createProfileRetryFunction(maxAttempts = 2) {
   return (failureCount: number, error: unknown) => {
     if (isAuthError(error)) return false

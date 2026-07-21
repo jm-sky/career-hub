@@ -26,6 +26,14 @@ class SkillRepository:
         result = await self.db.execute(select(SkillDB).where(SkillDB.profile_id == profile_id, SkillDB.technology_id == technology_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids_and_profile(self, ids: list[str], profile_id: str) -> list[SkillDB]:
+        """Bulk ownership-scoped lookup — used to validate a batch of skill ids
+        (e.g. a CV version's ``sectionsConfig.skillIds``) all belong to the profile."""
+        if not ids:
+            return []
+        result = await self.db.execute(select(SkillDB).where(SkillDB.id.in_(ids), SkillDB.profile_id == profile_id))
+        return list(result.scalars().all())
+
     async def create(self, skill: SkillDB) -> SkillDB:
         self.db.add(skill)
         await self.db.commit()

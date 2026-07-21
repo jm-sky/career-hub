@@ -5,11 +5,18 @@ here already (deduplicated). `team` (colleague names) and `subProjects`
 (`{name,url}[]`, only on "DEV Made IT Template") have no equivalent field at all
 and are intentionally omitted — see
 docs/issues/2026-07-21--001--project-team-and-subprojects-fields.md.
+
+Optional ``experience_companies`` lists company names used to link projects to
+seeded experiences after both are created (case-insensitive match).
 """
 
-from app.modules.career.schemas import CreateProjectRequest, ProjectCategory, ProjectLinks, ProjectStatus
-
-SEED_USER_EMAIL = "jan.madeyski@gmail.com"
+from app.modules.career.schemas import (
+    CreateProjectRequest,
+    ProjectCategory,
+    ProjectLinks,
+    ProjectStatus,
+    UpdateProjectRequest,
+)
 
 STATUS_MAP: dict[str, ProjectStatus] = {
     "Live": "ACTIVE",
@@ -44,6 +51,7 @@ RAW_PROJECTS: list[dict] = [
         "category": "Production",
         "status": "Retired",
         "clients": ["University of Warsaw"],
+        "experience_companies": ["Wider-Group s.c."],
         "date_start": "2010-12-01",
         "date_end": "2011-08-01",
         "description": (
@@ -52,13 +60,17 @@ RAW_PROJECTS: list[dict] = [
             "request for a postgraduate research project at the University of Warsaw."
         ),
         "role": "Full Stack Developer",
+        "achievements": [
+            "Delivered a research-ready IAT web app for University of Warsaw postgraduate work",
+        ],
         "technologies": ["PHP", "MySQL", "JavaScript", "ActionScript", "Flash", "HTML"],
     },
     {
         "name": "Logistics Center",
         "category": "Production",
         "status": "Live",
-        "clients": ["Home décor group (3 companies)", "Skłodowscy sp. z o.o."],
+        "clients": ["Home décor group (3 companies)", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-06-01",
         "date_end": "2015-09-01",
         "description": (
@@ -69,13 +81,17 @@ RAW_PROJECTS: list[dict] = [
             "management."
         ),
         "role": "ERP Developer & Implementation Specialist",
+        "achievements": [
+            "Synchronized logistics workflows across three companies' ERP systems",
+        ],
         "technologies": ["Microsoft SQL Server", "Asseco Softlab ERP"],
     },
     {
         "name": "Production planning",
         "category": "Production",
         "status": "Retired",
-        "clients": ["Furniture manufacturer", "Skłodowscy sp. z o.o."],
+        "clients": ["Furniture manufacturer", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-11-01",
         "date_end": "2016-06-01",
         "description": (
@@ -91,10 +107,14 @@ RAW_PROJECTS: list[dict] = [
         "name": "Warehouse Management System (WMS)",
         "category": "Production",
         "status": "Live",
-        "clients": ["Home décor group (3 companies)", "Skłodowscy sp. z o.o."],
+        "clients": ["Home décor group (3 companies)", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-02-01",
         "date_end": "2016-07-01",
-        "description": ("Contributed to the development and implementation of a custom WMS module within Asseco " "Softlab ERP, adapted to the operational needs of three different companies."),
+        "description": (
+            "Contributed to the development and implementation of a custom WMS module within Asseco "
+            "Softlab ERP, adapted to the operational needs of three different companies."
+        ),
         "role": "ERP Developer & Implementation Specialist",
         "technologies": ["Microsoft SQL Server", "Asseco Softlab ERP"],
     },
@@ -102,29 +122,49 @@ RAW_PROJECTS: list[dict] = [
         "name": "EDI",
         "category": "Production",
         "status": "Live",
-        "clients": ["Home décor group (3 companies)", "Skłodowscy sp. z o.o."],
+        "clients": ["Home décor group (3 companies)", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-01-01",
         "date_end": "2018-01-01",
-        "description": ("EDI integration between a major international retailer and their suppliers, integrated " "with Asseco Softlab ERP."),
+        "description": (
+            "EDI integration between a major international retailer and their suppliers, integrated "
+            "with Asseco Softlab ERP."
+        ),
         "role": "Integration Support Developer",
+        "achievements": [
+            "Integrated supplier EDI flows with Asseco Softlab ERP for a major retailer chain",
+        ],
         "technologies": ["Asseco Softlab ERP", "Microsoft SQL Server", "Scala", "XML", "EDI"],
     },
     {
         "name": "LiteMES",
         "category": "Production",
         "status": "Retired",
-        "clients": ["Furniture manufacturer", "Skłodowscy sp. z o.o."],
+        "clients": ["Furniture manufacturer", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2016-02-01",
         "date_end": "2017-02-01",
-        "description": ("A manufacturing execution system tailored to production floor operations, integrated " "with ERP, and extended with modules for service tracking and time & attendance (RCP). " "Supported RFID and barcode-based workflows."),
+        "description": (
+            "A manufacturing execution system tailored to production floor operations, integrated "
+            "with ERP, and extended with modules for service tracking and time & attendance (RCP). "
+            "Supported RFID and barcode-based workflows."
+        ),
         "role": "Lead Developer & System Architect",
+        "achievements": [
+            "Led design of a custom MES with RFID/barcode shop-floor workflows",
+            "Extended the system with service tracking and RCP (time & attendance)",
+        ],
+        "challenges": [
+            "Fitting real-time floor operations into ERP constraints and offline-prone environments",
+        ],
         "technologies": ["PHP", "Microsoft SQL Server", "JavaScript", "jQuery", "Bootstrap", "HTML"],
     },
     {
         "name": "Tax Order",
         "category": "Production",
         "status": "Retired",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Tax Order", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Tax Order", "Skłodowscy Sp. z o.o."],
         "date_start": "2017-07-01",
         "date_end": "2018-02-01",
         "description": "Tax Order is a web application for managing the tax order of a company.",
@@ -135,7 +175,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "Portal Klienta",
         "category": "Production",
         "status": "Live",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o.", "Tax Order"],
         "date_start": "2018-01-01",
         "date_end": None,
         "description": (
@@ -147,6 +188,13 @@ RAW_PROJECTS: list[dict] = [
         ),
         "role": "Team Lead & System Architect",
         "scale": {"budget": "large", "duration": 84, "team_size": "medium", "users": "hundreds"},
+        "achievements": [
+            "Architected a multi-year client portal serving hundreds of users",
+            "Integrated ERP data with RBAC, document search, and payment tracking",
+        ],
+        "challenges": [
+            "Keeping ERP sync reliable while evolving the portal over many years and team members",
+        ],
         "technologies": [
             "PHP",
             "Laravel",
@@ -165,7 +213,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "KSeF integration for Portal Klienta",
         "category": "Internal",
         "status": "Retired",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2022-06-01",
         "date_end": "2023-05-26",
         "description": (
@@ -175,13 +224,20 @@ RAW_PROJECTS: list[dict] = [
             "Polish e-invoicing regulations while providing seamless user experience."
         ),
         "role": "Full Stack Developer",
+        "achievements": [
+            "Shipped KSeF XML validation and submission integrated into Portal Klienta",
+        ],
+        "challenges": [
+            "Tracking evolving government KSeF schemas and submission rules",
+        ],
         "technologies": ["PHP", "Laravel", "PostgreSQL", "XML", "Git", "Docker"],
     },
     {
         "name": "e-doręczenia",
         "category": "Internal",
         "status": "Retired",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2025-03-01",
         "date_end": "2025-04-01",
         "description": (
@@ -207,7 +263,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "JIRA Integration",
         "category": "Internal",
         "status": "Live",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2025-05-01",
         "date_end": "2025-07-01",
         "description": (
@@ -218,13 +275,17 @@ RAW_PROJECTS: list[dict] = [
             "platforms."
         ),
         "role": "Full Stack Developer & System Architect",
+        "achievements": [
+            "Built bidirectional Jira sync for issues, worklogs, and project reporting",
+        ],
         "technologies": ["Python", "Flask", "Jira", "Docker", "Git", "Linux", "Connect App"],
     },
     {
         "name": "Documents Generator",
         "category": "Internal",
         "status": "Live",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2025-05-01",
         "date_end": "2025-07-01",
         "description": (
@@ -240,7 +301,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "Azure OCR Service",
         "category": "Internal",
         "status": "Live",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2025-05-01",
         "date_end": "2025-07-01",
         "description": (
@@ -250,6 +312,9 @@ RAW_PROJECTS: list[dict] = [
             "extraction to automate document digitization workflows and reduce manual data entry."
         ),
         "role": "Full Stack Developer & System Architect",
+        "achievements": [
+            "Automated invoice/form digitization via Azure Computer Vision with confidence scoring",
+        ],
         "technologies": [
             "Python",
             "Django",
@@ -267,6 +332,7 @@ RAW_PROJECTS: list[dict] = [
         "category": "Demo",
         "status": "Staging",
         "clients": ["DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-04-01",
         "date_end": "2025-07-30",
         "description": (
@@ -277,8 +343,11 @@ RAW_PROJECTS: list[dict] = [
             "Finance APIs, EU VIES for VAT validation, and IBAN verification services. Includes Stripe "
             "integration for subscription payments and comprehensive admin dashboard."
         ),
-        "role": "Founder & Full Stack Developer",
+        "role": "Independent Full Stack Developer",
         "scale": {"budget": "small", "duration": 4, "team_size": "solo", "users": "dozens"},
+        "achievements": [
+            "Integrated REGON, MF, VIES, IBAN, and Stripe into a multi-tenant SaaS skeleton",
+        ],
         "technologies": [
             "PHP",
             "Laravel",
@@ -301,10 +370,11 @@ RAW_PROJECTS: list[dict] = [
         "category": "Demo",
         "status": "Staging",
         "clients": ["DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-07-01",
         "date_end": "2025-07-30",
         "description": "Api service integrating company data from REGON, MF, VIES and IBAN APIs.",
-        "role": "Founder & Full Stack Developer",
+        "role": "Independent Full Stack Developer",
         "technologies": [
             "Python",
             "FastAPI",
@@ -325,6 +395,7 @@ RAW_PROJECTS: list[dict] = [
         "category": "Production",
         "status": "Live",
         "clients": ["Jan Madeyski", "DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-07-01",
         "date_end": "2025-07-30",
         "description": "Development of a personal website for a software engineer.",
@@ -340,6 +411,7 @@ RAW_PROJECTS: list[dict] = [
         "category": "Production",
         "status": "Live",
         "clients": ["DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-11-18",
         "date_end": None,
         "description": (
@@ -352,7 +424,10 @@ RAW_PROJECTS: list[dict] = [
             "Admin, User), and Stripe-powered subscription billing (Free/Pro/Pro Plus tiers) alongside "
             "AI-assisted gear recommendations, a public container gallery, and an admin dashboard."
         ),
-        "role": "Founder & Full Stack Developer",
+        "role": "Independent Full Stack Developer",
+        "achievements": [
+            "Shipped offline-first gear management with sync, WebAuthn 2FA, and Stripe billing",
+        ],
         "technologies": [
             "Vue.js",
             "TypeScript",
@@ -378,17 +453,26 @@ RAW_PROJECTS: list[dict] = [
         "category": "Production",
         "status": "Live",
         "clients": ["DEV Made IT", "WIARBUD", "SAVA GROUP", "Kraina Snów"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-07-01",
         "date_end": None,
-        "description": ("A reusable template for building company websites with modern technologies. Multiple " "client websites have been built using this template, featuring responsive design, " "performance optimization, and SEO-friendly structure."),
+        "description": (
+            "A reusable template for building company websites with modern technologies. Multiple "
+            "client websites have been built using this template, featuring responsive design, "
+            "performance optimization, and SEO-friendly structure."
+        ),
         "role": "Frontend Developer",
+        "achievements": [
+            "Reused one Nuxt template across multiple client sites (WIARBUD, SAVA GROUP, Kraina Snów)",
+        ],
         "technologies": ["TypeScript", "Nuxt", "TailwindCSS", "HTML", "CSS", "Git", "Caddy"],
     },
     {
         "name": "Ops Monitor",
         "category": "Internal",
         "status": "Live",
-        "clients": ["Skłodowscy sp. z o.o.", "DEV Made IT"],
+        "clients": ["Skłodowscy Sp. z o.o.", "DEV Made IT"],
+        "experience_companies": ["Skłodowscy Sp. z o.o.", "DEV Made IT"],
         "date_start": "2025-10-30",
         "date_end": None,
         "description": (
@@ -400,6 +484,9 @@ RAW_PROJECTS: list[dict] = [
             "reboot status)."
         ),
         "role": "Full Stack Developer & System Architect",
+        "achievements": [
+            "Built fleet monitoring with historical metrics and deduplicated MS Teams alerts",
+        ],
         "technologies": [
             "Python",
             "FastAPI",
@@ -419,7 +506,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "AI Kancelaria",
         "category": "Internal",
         "status": "Staging",
-        "clients": ["Skłodowscy sp. z o.o."],
+        "clients": ["Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2026-06-05",
         "date_end": None,
         "description": (
@@ -433,6 +521,9 @@ RAW_PROJECTS: list[dict] = [
             "LLM (Ollama)."
         ),
         "role": "Full Stack Developer & System Architect",
+        "achievements": [
+            "Prototyped RAG + MCP tool servers over internal systems with a Tauri desktop client",
+        ],
         "technologies": [
             "Python",
             "FastAPI",
@@ -452,7 +543,8 @@ RAW_PROJECTS: list[dict] = [
         "name": "Wymiary AI",
         "category": "Internal",
         "status": "Staging",
-        "clients": ["Corporate accounting client", "Skłodowscy sp. z o.o."],
+        "clients": ["Corporate accounting client", "Skłodowscy Sp. z o.o."],
+        "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2026-04-22",
         "date_end": None,
         "description": (
@@ -464,6 +556,9 @@ RAW_PROJECTS: list[dict] = [
             "production."
         ),
         "role": "Lead Developer & System Architect",
+        "achievements": [
+            "Designed two-stage RAG + LLM dimension classification reviewed by accountants",
+        ],
         "technologies": [
             "n8n",
             "Qdrant",
@@ -483,6 +578,7 @@ RAW_PROJECTS: list[dict] = [
         "category": "Production",
         "status": "Live",
         "clients": ["CHWZ", "DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
         "date_start": "2025-12-28",
         "date_end": None,
         "description": (
@@ -494,8 +590,11 @@ RAW_PROJECTS: list[dict] = [
             "address/contact import from pasted text, Google Contacts sync, and an IMAP clergy e-mail "
             "import pipeline with admin review."
         ),
-        "role": "Founder & Full Stack Developer",
+        "role": "Independent Full Stack Developer",
         "scale": {"budget": "small", "team_size": "solo"},
+        "achievements": [
+            "Shipped encrypted multi-tenant congregation directory with map search and import pipelines",
+        ],
         "technologies": [
             "Vue.js",
             "TypeScript",
@@ -516,10 +615,51 @@ RAW_PROJECTS: list[dict] = [
             "github": "https://github.com/jm-sky/zbory-chwz",
         },
     },
+    {
+        "name": "CareerHub",
+        "category": "Production",
+        "status": "Staging",
+        "clients": ["DEV Made IT"],
+        "experience_companies": ["DEV Made IT"],
+        "date_start": "2026-06-01",
+        "date_end": None,
+        "description": (
+            "A Vue 3 + FastAPI application for building one master professional profile "
+            "(experience, projects, skills, education, certifications) and generating multiple "
+            "tailored CVs from it. Server-side career data in PostgreSQL with JWT auth, WebAuthn "
+            "2FA, Stripe billing, and AI infrastructure reused from the gear-stack skeleton."
+        ),
+        "role": "Independent Full Stack Developer",
+        "scale": {"budget": "small", "team_size": "solo"},
+        "achievements": [
+            "Forked gear-stack into a career-domain app with profile, experiences, projects, and CV-ready structure",
+        ],
+        "technologies": [
+            "Vue.js",
+            "TypeScript",
+            "Pinia",
+            "TailwindCSS",
+            "Python",
+            "FastAPI",
+            "PostgreSQL",
+            "Redis",
+            "WebAuthn",
+            "Docker",
+            "Git",
+            "Linux",
+        ],
+        "links": {
+            "github": "https://github.com/jm-sky/career-hub",
+        },
+    },
 ]
 
 
-def build_create_project_request(raw: dict) -> CreateProjectRequest:
+def build_create_project_request(
+    raw: dict,
+    *,
+    experience_ids: list[str] | None = None,
+) -> CreateProjectRequest:
     """Map one `RAW_PROJECTS` entry onto the API's `CreateProjectRequest` shape."""
     scale = raw.get("scale", {})
     links = raw.get("links", {})
@@ -535,6 +675,8 @@ def build_create_project_request(raw: dict) -> CreateProjectRequest:
         isOngoing=raw.get("date_end") is None,
         status=STATUS_MAP[raw["status"]],
         category=CATEGORY_MAP[raw["category"]],
+        achievements=list(raw.get("achievements", [])),
+        challenges=list(raw.get("challenges", [])),
         clients=list(raw.get("clients", [])),
         teamSize=TEAM_SIZE_MAP.get(team_size) if team_size else None,
         durationMonths=scale.get("duration"),
@@ -542,4 +684,37 @@ def build_create_project_request(raw: dict) -> CreateProjectRequest:
         budgetRange=scale.get("budget"),
         links=ProjectLinks(demo=links.get("demo"), github=links.get("github")),
         technologies=list(raw.get("technologies", [])),
+        experienceIds=list(experience_ids or []),
+    )
+
+
+def build_update_project_request(
+    raw: dict,
+    *,
+    experience_ids: list[str] | None = None,
+) -> UpdateProjectRequest:
+    """Full replace payload for an existing seeded project."""
+    create = build_create_project_request(raw, experience_ids=experience_ids)
+    return UpdateProjectRequest(
+        name=create.name,
+        description=create.description,
+        role=create.role,
+        startDate=create.startDate,
+        endDate=create.endDate,
+        isOngoing=create.isOngoing,
+        isAnonymized=create.isAnonymized,
+        anonymizedCompany=create.anonymizedCompany,
+        status=create.status,
+        category=create.category,
+        achievements=create.achievements,
+        challenges=create.challenges,
+        clients=create.clients,
+        teamSize=create.teamSize,
+        durationMonths=create.durationMonths,
+        usersCount=create.usersCount,
+        budgetRange=create.budgetRange,
+        links=create.links,
+        visibility=create.visibility,
+        technologies=create.technologies,
+        experienceIds=create.experienceIds,
     )

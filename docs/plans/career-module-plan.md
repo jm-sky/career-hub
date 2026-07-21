@@ -106,6 +106,13 @@ Tables (all ULID PK unless noted, `created_at`/`updated_at` timestamps on all):
   gate — see the open billing-tier-rename item in `gear-module-strip-log.md`, this
   endpoint's gating logic depends on that being resolved first).
 
+**DONE 2026-07-21 (CRUD only, deliberately split from the above):** table/migration,
+full CRUD, single-default enforcement, `sectionsConfig` ownership validation. `generate`
+returns 202+jobId but never renders a PDF; `download` 404s honestly. See
+`career-phase5-cv-versions-log.md`. The PDF engine choice and the billing-tier rename
+(blocking watermark gating) are both still open — pick this up as a separate follow-up
+task, not bundled into whichever phase is "next" by number.
+
 **Phase 6 — Import/Export:**
 - `import_history` table/migration. `POST /import/linkedin` (multipart, async 202),
   `POST /import/parse-text` (sync fallback parser), `GET /export/json`.
@@ -144,7 +151,7 @@ Tables (all ULID PK unless noted, `created_at`/`updated_at` timestamps on all):
 - [x] Phase 2 — Experiences/Technologies/Skills (see `career-phase2-experiences-log.md`)
 - [x] Phase 3 — Projects (see `career-phase3-projects-log.md`)
 - [x] Phase 4 — Education/Certifications/Achievements (see `career-phase4-education-log.md`)
-- [ ] Phase 5 — CV versions
+- [x] Phase 5 — CV versions, CRUD only (see `career-phase5-cv-versions-log.md`; PDF generation/watermark gating deliberately deferred)
 - [ ] Phase 6 — Import/Export
 - [ ] Phase 7 — AI features
 - [ ] Phase 8 — Public profile polish

@@ -20,6 +20,14 @@ class CertificationRepository:
         result = await self.db.execute(select(CertificationDB).where(CertificationDB.id == id_, CertificationDB.profile_id == profile_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids_and_profile(self, ids: list[str], profile_id: str) -> list[CertificationDB]:
+        """Bulk ownership-scoped lookup — used to validate a batch of certification ids
+        (e.g. a CV version's ``sectionsConfig.certificationIds``) all belong to the profile."""
+        if not ids:
+            return []
+        result = await self.db.execute(select(CertificationDB).where(CertificationDB.id.in_(ids), CertificationDB.profile_id == profile_id))
+        return list(result.scalars().all())
+
     async def get_next_display_order(self, profile_id: str) -> int:
         result = await self.db.execute(select(func.max(CertificationDB.display_order)).where(CertificationDB.profile_id == profile_id))
         current_max = result.scalar_one_or_none()

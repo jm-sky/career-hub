@@ -8,6 +8,8 @@ export const CareerRoutePaths = {
   education: '/education',
   certifications: '/certifications',
   achievements: '/achievements',
+  languages: '/languages',
+  cvVersions: '/cv-versions',
   publicProfile: '/p/:slug',
 } as const
 
@@ -19,6 +21,8 @@ export const CareerRouteNames = {
   education: 'career-education',
   certifications: 'career-certifications',
   achievements: 'career-achievements',
+  languages: 'career-languages',
+  cvVersions: 'career-cv-versions',
   publicProfile: 'career-public-profile',
 } as const
 
@@ -68,6 +72,18 @@ export const careerRoutes: RouteRecordRaw[] = [
     name: CareerRouteNames.achievements,
     component: () => import('@/modules/career/pages/AchievementsPage.vue'),
     meta: { layout: 'authenticated', title: 'career.achievements.page.title' },
+  },
+  {
+    path: CareerRoutePaths.languages,
+    name: CareerRouteNames.languages,
+    component: () => import('@/modules/career/pages/LanguagesPage.vue'),
+    meta: { layout: 'authenticated', title: 'career.languages.page.title' },
+  },
+  {
+    path: CareerRoutePaths.cvVersions,
+    name: CareerRouteNames.cvVersions,
+    component: () => import('@/modules/career/pages/CvVersionsPage.vue'),
+    meta: { layout: 'authenticated', title: 'career.cvVersions.page.title' },
   },
   {
     path: CareerRoutePaths.publicProfile,

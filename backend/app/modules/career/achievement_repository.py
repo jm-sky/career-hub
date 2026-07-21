@@ -20,6 +20,14 @@ class AchievementRepository:
         result = await self.db.execute(select(AchievementDB).where(AchievementDB.id == id_, AchievementDB.profile_id == profile_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids_and_profile(self, ids: list[str], profile_id: str) -> list[AchievementDB]:
+        """Bulk ownership-scoped lookup — used to validate a batch of achievement ids
+        (e.g. a CV version's ``sectionsConfig.achievementIds``) all belong to the profile."""
+        if not ids:
+            return []
+        result = await self.db.execute(select(AchievementDB).where(AchievementDB.id.in_(ids), AchievementDB.profile_id == profile_id))
+        return list(result.scalars().all())
+
     async def get_next_display_order(self, profile_id: str) -> int:
         result = await self.db.execute(select(func.max(AchievementDB.display_order)).where(AchievementDB.profile_id == profile_id))
         current_max = result.scalar_one_or_none()

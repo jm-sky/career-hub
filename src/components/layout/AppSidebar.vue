@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Award, Briefcase, FolderKanban, GraduationCap, Info, Sparkles, Star, UserRound } from 'lucide-vue-next'
+import { Award, Briefcase, FileStack, FolderKanban, GraduationCap, Info, Languages, Sparkles, Star, UserRound } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import {
@@ -119,6 +119,34 @@ const { t } = useI18n()
                 >
                   <Star class="size-4" />
                   <span>{{ t('career.achievements.page.title') }}</span>
+                </SidebarMenuButton>
+              </RouterLink>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.languages" custom>
+                <SidebarMenuButton
+                  :is-active="isActive"
+                  as="a"
+                  :href="href"
+                  @click="navigate"
+                >
+                  <Languages class="size-4" />
+                  <span>{{ t('career.languages.page.title') }}</span>
+                </SidebarMenuButton>
+              </RouterLink>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.cvVersions" custom>
+                <SidebarMenuButton
+                  :is-active="isActive"
+                  as="a"
+                  :href="href"
+                  @click="navigate"
+                >
+                  <FileStack class="size-4" />
+                  <span>{{ t('career.cvVersions.page.title') }}</span>
                 </SidebarMenuButton>
               </RouterLink>
             </SidebarMenuItem>
