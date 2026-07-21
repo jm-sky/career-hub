@@ -135,7 +135,7 @@ Tables (all ULID PK unless noted, `created_at`/`updated_at` timestamps on all):
 
 - [x] Phase 1 — Profile (see `career-phase1-profile-log.md`)
 - [x] Phase 2 — Experiences/Technologies/Skills (see `career-phase2-experiences-log.md`)
-- [ ] Phase 3 — Projects
+- [x] Phase 3 — Projects (see `career-phase3-projects-log.md`)
 - [ ] Phase 4 — Education/Certifications/Achievements
 - [ ] Phase 5 — CV versions
 - [ ] Phase 6 — Import/Export

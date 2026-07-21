@@ -9,6 +9,7 @@ from fastapi import APIRouter
 
 from .experience_router import router as experience_router
 from .profile_router import router as profile_router
+from .project_router import router as project_router
 from .skill_router import router as skill_router
 from .technology_router import router as technology_router
 
@@ -17,3 +18,4 @@ router.include_router(profile_router)
 router.include_router(experience_router)
 router.include_router(technology_router)
 router.include_router(skill_router)
+router.include_router(project_router)

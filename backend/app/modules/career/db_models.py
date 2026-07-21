@@ -1,5 +1,5 @@
 """Database models for the career module (Phase 1: profiles. Phase 2: experiences,
-technologies, skills)."""
+technologies, skills. Phase 3: projects)."""
 
 from datetime import UTC, date, datetime
 
@@ -109,6 +109,71 @@ class ExperienceTechnologyDB(Base):
     __tablename__ = "experience_technologies"
 
     experience_id: Mapped[str] = mapped_column(String(36), ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True)
+    technology_id: Mapped[str] = mapped_column(String(36), ForeignKey("technologies.id"), primary_key=True)
+
+
+class ProjectDB(Base):
+    """A profile's portfolio project — documented independently of any one experience,
+    then optionally linked to the experience(s) and technologies it came from.
+
+    ``is_anonymized``/``anonymized_company`` is a deliberately separate concern from
+    ``visibility``: an NDA-restricted project can still be shown publicly with the
+    company name redacted, which is not the same thing as hiding the project entirely.
+    """
+
+    __tablename__ = "projects"
+    __table_args__ = (CheckConstraint("end_date IS NULL OR end_date > start_date", name="ck_projects_end_after_start"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    role: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    is_ongoing: Mapped[bool] = mapped_column(default=False, nullable=False)
+    is_anonymized: Mapped[bool] = mapped_column(default=False, nullable=False)
+    anonymized_company: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="ACTIVE")
+    category: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    achievements: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    challenges: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    clients: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    team_size: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    duration_months: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    users_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    budget_range: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    # Shape: {demo?, github?, docs?}
+    links: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    visibility: Mapped[str] = mapped_column(String(10), nullable=False, default="PRIVATE")
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class ProjectExperienceDB(Base):
+    """M:N junction between projects and experiences — both sides are profile-owned,
+    deletable entities, so both cascade on delete (unlike *_technologies junctions,
+    where the technology side is shared reference data and never cascades)."""
+
+    __tablename__ = "project_experiences"
+
+    project_id: Mapped[str] = mapped_column(String(36), ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True)
+    experience_id: Mapped[str] = mapped_column(String(36), ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True)
+
+
+class ProjectTechnologyDB(Base):
+    """M:N junction between projects and technologies. ``project_id`` cascades on
+    delete; ``technology_id`` does not (shared reference data)."""
+
+    __tablename__ = "project_technologies"
+
+    project_id: Mapped[str] = mapped_column(String(36), ForeignKey("projects.id", ondelete="CASCADE"), primary_key=True)
     technology_id: Mapped[str] = mapped_column(String(36), ForeignKey("technologies.id"), primary_key=True)
 
 

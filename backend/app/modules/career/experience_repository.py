@@ -21,6 +21,14 @@ class ExperienceRepository:
         result = await self.db.execute(select(ExperienceDB).where(ExperienceDB.id == id_, ExperienceDB.profile_id == profile_id))
         return result.scalar_one_or_none()
 
+    async def get_by_ids_and_profile(self, ids: list[str], profile_id: str) -> list[ExperienceDB]:
+        """Bulk ownership-scoped lookup — used to validate a batch of experience ids
+        (e.g. a project's ``experienceIds``) all belong to the profile before linking."""
+        if not ids:
+            return []
+        result = await self.db.execute(select(ExperienceDB).where(ExperienceDB.id.in_(ids), ExperienceDB.profile_id == profile_id))
+        return list(result.scalars().all())
+
     async def get_next_display_order(self, profile_id: str) -> int:
         result = await self.db.execute(select(func.max(ExperienceDB.display_order)).where(ExperienceDB.profile_id == profile_id))
         current_max = result.scalar_one_or_none()

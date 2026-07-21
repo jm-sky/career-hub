@@ -21,6 +21,10 @@ export const technologyQueryKeys = {
   search: (query?: string) => [...technologyQueryKeys.all, 'search', query ?? ''] as const,
 } as const
 
+export const projectQueryKeys = {
+  all: ['career', 'projects'] as const,
+} as const
+
 export function createProfileRetryFunction(maxAttempts = 2) {
   return (failureCount: number, error: unknown) => {
     if (isAuthError(error)) return false

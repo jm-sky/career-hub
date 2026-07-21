@@ -1,5 +1,5 @@
 """Pydantic schemas for the career module (Phase 1: profile. Phase 2: experiences,
-technologies, skills)."""
+technologies, skills. Phase 3: projects)."""
 
 from datetime import date, datetime
 from typing import Any, Literal
@@ -207,3 +207,113 @@ class SkillResponse(BaseModel):
         "from_attributes": True,
         "populate_by_name": True,
     }
+
+
+# --- Phase 3: projects -----------------------------------------------------------
+
+ProjectStatus = Literal["ACTIVE", "STAGING", "ARCHIVED"]
+ProjectCategory = Literal["DEMO", "INTERNAL", "PRODUCTION"]
+
+
+class ProjectLinks(BaseModel):
+    """External links for a project. Never required — a project can exist with none."""
+
+    demo: str | None = None
+    github: str | None = None
+    docs: str | None = None
+
+
+class ProjectResponse(BaseModel):
+    """Full project representation, incl. linked technologies and experience ids."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    name: str = Field(alias="name", serialization_alias="name")
+    description: str | None = Field(None, alias="description", serialization_alias="description")
+    role: str | None = Field(None, alias="role", serialization_alias="role")
+    startDate: date = Field(alias="start_date", serialization_alias="startDate")
+    endDate: date | None = Field(None, alias="end_date", serialization_alias="endDate")
+    isOngoing: bool = Field(alias="is_ongoing", serialization_alias="isOngoing")
+    isAnonymized: bool = Field(alias="is_anonymized", serialization_alias="isAnonymized")
+    anonymizedCompany: str | None = Field(None, alias="anonymized_company", serialization_alias="anonymizedCompany")
+    status: ProjectStatus = Field(alias="status", serialization_alias="status")
+    category: ProjectCategory | None = Field(None, alias="category", serialization_alias="category")
+    achievements: list[str] = Field(default_factory=list)
+    challenges: list[str] = Field(default_factory=list)
+    clients: list[str] = Field(default_factory=list)
+    teamSize: int | None = Field(None, alias="team_size", serialization_alias="teamSize")
+    durationMonths: int | None = Field(None, alias="duration_months", serialization_alias="durationMonths")
+    usersCount: int | None = Field(None, alias="users_count", serialization_alias="usersCount")
+    budgetRange: str | None = Field(None, alias="budget_range", serialization_alias="budgetRange")
+    links: ProjectLinks = Field(default_factory=ProjectLinks, alias="links", serialization_alias="links")
+    visibility: ProfileVisibility = Field(alias="visibility", serialization_alias="visibility")
+    displayOrder: int = Field(alias="display_order", serialization_alias="displayOrder")
+    technologies: list[TechnologyResponse] = Field(default_factory=list)
+    experienceIds: list[str] = Field(default_factory=list)
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateProjectRequest(BaseModel):
+    """Payload to create a project.
+
+    ``technologies`` is get-or-create by name, same as experiences. ``experienceIds``
+    links this project to one or more of the profile's own existing experiences
+    (cross-company/portfolio projects) — ids not owned by the profile are rejected.
+    """
+
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(default=None)
+    role: str | None = Field(default=None, max_length=200)
+    startDate: date
+    endDate: date | None = Field(default=None)
+    isOngoing: bool = Field(default=False)
+    isAnonymized: bool = Field(default=False)
+    anonymizedCompany: str | None = Field(default=None, max_length=200)
+    status: ProjectStatus = Field(default="ACTIVE")
+    category: ProjectCategory | None = Field(default=None)
+    achievements: list[str] = Field(default_factory=list)
+    challenges: list[str] = Field(default_factory=list)
+    clients: list[str] = Field(default_factory=list)
+    teamSize: int | None = Field(default=None, ge=0)
+    durationMonths: int | None = Field(default=None, ge=0)
+    usersCount: int | None = Field(default=None, ge=0)
+    budgetRange: str | None = Field(default=None, max_length=50)
+    links: ProjectLinks = Field(default_factory=ProjectLinks)
+    visibility: ProfileVisibility = Field(default="PRIVATE")
+    technologies: list[str] = Field(default_factory=list)
+    experienceIds: list[str] = Field(default_factory=list)
+
+
+class UpdateProjectRequest(BaseModel):
+    """Partial update for a project — only provided fields change.
+
+    ``technologies``/``experienceIds``, when provided, fully replace the current set.
+    """
+
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None)
+    role: str | None = Field(default=None, max_length=200)
+    startDate: date | None = Field(default=None)
+    endDate: date | None = Field(default=None)
+    isOngoing: bool | None = Field(default=None)
+    isAnonymized: bool | None = Field(default=None)
+    anonymizedCompany: str | None = Field(default=None, max_length=200)
+    status: ProjectStatus | None = Field(default=None)
+    category: ProjectCategory | None = Field(default=None)
+    achievements: list[str] | None = Field(default=None)
+    challenges: list[str] | None = Field(default=None)
+    clients: list[str] | None = Field(default=None)
+    teamSize: int | None = Field(default=None, ge=0)
+    durationMonths: int | None = Field(default=None, ge=0)
+    usersCount: int | None = Field(default=None, ge=0)
+    budgetRange: str | None = Field(default=None, max_length=50)
+    links: ProjectLinks | None = Field(default=None)
+    visibility: ProfileVisibility | None = Field(default=None)
+    technologies: list[str] | None = Field(default=None)
+    experienceIds: list[str] | None = Field(default=None)

@@ -167,7 +167,10 @@ const onSubmit = handleSubmit((values) => {
         <FormField v-slot="{ componentField }" name="isCurrent">
           <FormItem class="flex items-center gap-2 space-y-0">
             <FormControl>
-              <Checkbox v-bind="componentField" />
+              <Checkbox
+                :model-value="componentField.modelValue"
+                @update:model-value="componentField['onUpdate:modelValue']"
+              />
             </FormControl>
             <FormLabel class="font-normal">
               {{ t('career.experiences.fields.isCurrent') }}

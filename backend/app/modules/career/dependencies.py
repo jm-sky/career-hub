@@ -15,6 +15,12 @@ from app.modules.auth.types.repository import UserRepositoryInterface
 from .db_models import ProfileDB
 from .experience_repository import ExperienceRepository, ExperienceTechnologyRepository
 from .experience_service import ExperienceService
+from .project_repository import (
+    ProjectExperienceRepository,
+    ProjectRepository,
+    ProjectTechnologyRepository,
+)
+from .project_service import ProjectService
 from .repository import ProfileRepository
 from .service import ProfileService
 from .skill_repository import SkillRepository
@@ -90,3 +96,14 @@ def get_experience_service(db: AsyncSession = Depends(get_db)) -> ExperienceServ
 
 def get_skill_service(db: AsyncSession = Depends(get_db)) -> SkillService:
     return SkillService(SkillRepository(db), TechnologyService(TechnologyRepository(db)))
+
+
+def get_project_service(db: AsyncSession = Depends(get_db)) -> ProjectService:
+    return ProjectService(
+        ProjectRepository(db),
+        ProjectTechnologyRepository(db),
+        ProjectExperienceRepository(db),
+        TechnologyRepository(db),
+        TechnologyService(TechnologyRepository(db)),
+        ExperienceRepository(db),
+    )
