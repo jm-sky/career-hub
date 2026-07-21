@@ -23,7 +23,7 @@ const { t } = useI18n()
   <Sidebar
     collapsible="icon"
     variant="floating"
-    class="mt-(--header-height) h-[calc(100svh-var(--header-height))] px-3 py-3"
+    class="mt-(--header-height) h-[calc(100svh-var(--header-height))] p-3 group-data-[collapsible=icon]:px-2"
   >
     <SidebarContent class="overflow-x-hidden overflow-y-auto">
       <SidebarGroup>
