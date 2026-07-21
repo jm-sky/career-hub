@@ -21,12 +21,16 @@ later (e.g. real domain purchased differs), update here first, then re-grep the 
 
 `connect-src` domain changed from `gear-stack.ovh` → `careerhub.com` (+ `api.careerhub.com`).
 
-## Docker Compose (`backend/docker-compose.yml`)
+## Docker Compose (root `compose.yaml` / `docker-compose.dev.yml`)
+
+> Updated 2026-07-21, mirroring gear-stack's "move Docker Compose to repo root" change: compose files
+> moved from `backend/` to the repo root (`compose.yaml` includes `docker-compose.dev.yml`, loads
+> `backend/.env`). Run `docker compose` from the repo root, not `backend/`.
 
 - Compose project `name:` → `career-hub`
 - Container names: `career-hub-db`, `career-hub-redis`, `career-hub-app`
 - Network: `career-hub-network`
-- Volumes: `career_hub_postgres_data`, `career_hub_redis_data`, `career_hub_uploads` (external names `backend_career_hub_*`)
+- Volumes: `career_hub_postgres_data` (external, pre-create with `docker volume create`), `career_hub_redis_data`, `career_hub_uploads` (managed by compose, no `backend_` prefix)
 - Default ports changed to avoid clashing with sibling gear-stack forks running locally at once:
 
 | Port | gear-stack/ops-monitor | AI-workspace | **career-hub** |

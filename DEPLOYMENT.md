@@ -6,14 +6,14 @@ Not yet deployed anywhere. This file documents the intended shape, mirroring the
 
 | Environment | How |
 |-------------|-----|
-| **Local (WSL)** | `pnpm dev` + `docker compose -f backend/docker-compose.yml up` |
+| **Local (WSL)** | `pnpm dev` + `docker compose up -d` (repo root) |
 | **Production VPS (manual)** | `bash scripts/deploy.sh` (once a production host is provisioned) |
 
 ## Planned production paths (placeholder — confirm before first real deploy)
 
 - **Repository:** `/home/madeyskij/projects/career-hub`
 - **Frontend (Caddy/Nginx):** `/var/www/career-hub`
-- **Backend:** `backend/docker-compose.yml` (volume mounts for hot reload)
+- **Backend:** root `compose.yaml` / `docker-compose.dev.yml` (volume mounts for hot reload)
 - **Domain:** `careerhub.com` / `api.careerhub.com` (provisional — see `docs/plans/rebranding-decisions.md`)
 
 ## Quick manual deploy (once configured)

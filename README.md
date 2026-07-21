@@ -168,10 +168,13 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-**Docker (Full Stack):**
+**Docker (Backend stack):**
 ```bash
-docker compose -f backend/docker-compose.yml up -d
+# From repo root
+docker compose up -d
 ```
+
+`compose.yaml` includes `docker-compose.dev.yml` and loads `backend/.env` for interpolation.
 
 ### Environment Variables
 
@@ -230,7 +233,8 @@ career-hub/
 │   └── migrations/           # Database migrations
 ├── docs/
 │   └── plans/                 # Requirements digest, rebrand/module decisions
-└── backend/docker-compose.yml # Docker configuration
+├── compose.yaml              # Compose entry (include + backend/.env)
+├── docker-compose.dev.yml    # Backend stack
 ```
 
 ---
