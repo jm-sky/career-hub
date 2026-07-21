@@ -1,7 +1,9 @@
 """Database models for the career module (Phase 1: profiles. Phase 2: experiences,
-technologies, skills. Phase 3: projects)."""
+technologies, skills. Phase 3: projects. Phase 4: education, certifications,
+achievements)."""
 
 from datetime import UTC, date, datetime
+from datetime import date as _Date
 
 from sqlalchemy import (
     CheckConstraint,
@@ -197,6 +199,85 @@ class SkillDB(Base):
     years_of_experience: Mapped[float | None] = mapped_column(Float, nullable=True)
     started_using_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_primary: Mapped[bool] = mapped_column(default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class EducationDB(Base):
+    """A profile's education entry. Nullable ``end_date`` means "still studying" —
+    same convention as experiences, no separate is-ongoing flag needed."""
+
+    __tablename__ = "education"
+    __table_args__ = (CheckConstraint("end_date IS NULL OR end_date > start_date", name="ck_education_end_after_start"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    institution: Mapped[str] = mapped_column(String(200), nullable=False)
+    degree: Mapped[str] = mapped_column(String(200), nullable=False)
+    field_of_study: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    grade: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class CertificationDB(Base):
+    """A profile's certification. ``is_expired`` is deliberately not a DB column —
+    computed at the service/response layer instead, so it's always correct relative
+    to "now" without needing a scheduled job or DB-specific generated column."""
+
+    __tablename__ = "certifications"
+    __table_args__ = (CheckConstraint("expiry_date IS NULL OR expiry_date > issue_date", name="ck_certifications_expiry_after_issue"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False)
+    issuing_organization: Mapped[str] = mapped_column(String(200), nullable=False)
+    credential_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    credential_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    issue_date: Mapped[date] = mapped_column(Date, nullable=False)
+    expiry_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class AchievementDB(Base):
+    """A profile's standalone achievement (award, publication, speaking engagement, ...)."""
+
+    __tablename__ = "achievements"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    title: Mapped[str] = mapped_column(String(200), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Annotated as `_Date`, not `date` — a column literally named `date` self-shadows
+    # the `date` type mid-statement (the value binds to the name before its own
+    # annotation is evaluated). Harmless here only because `MappedColumn` happens to
+    # define `__or__` (for SQL OR-expressions); Pydantic's `FieldInfo` does not, which
+    # is exactly what turned the same pattern into a hard crash in schemas.py.
+    date: Mapped[_Date | None] = mapped_column(Date, nullable=True)
+    category: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

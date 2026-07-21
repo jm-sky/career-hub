@@ -169,5 +169,93 @@ export const careerPl = {
         description: 'Ten projekt zostanie trwale usunięty z Twojego profilu.',
       },
     },
+    education: {
+      page: {
+        title: 'Wykształcenie',
+        subtitle: 'Kierunki i kursy, które ukształtowały Twoje doświadczenie.',
+        add: 'Dodaj wykształcenie',
+        empty: 'Brak wpisów wykształcenia. Dodaj pierwszy.',
+        error: 'Nie udało się wczytać Twojego wykształcenia.',
+      },
+      form: {
+        createTitle: 'Dodaj wykształcenie',
+        editTitle: 'Edytuj wykształcenie',
+        subtitle: 'Dodaj ukończony kierunek, kurs lub program.',
+      },
+      fields: {
+        institution: 'Uczelnia/Instytucja',
+        degree: 'Stopień/Tytuł',
+        fieldOfStudy: 'Kierunek studiów',
+        startDate: 'Data rozpoczęcia',
+        endDate: 'Data zakończenia',
+        present: 'Obecnie',
+        grade: 'Ocena',
+        gradePlaceholder: 'np. 3.8 GPA, z wyróżnieniem',
+        description: 'Opis',
+      },
+      deleteConfirm: {
+        title: 'Usunąć ten wpis wykształcenia?',
+        description: 'Ten wpis zostanie trwale usunięty z Twojego profilu.',
+      },
+    },
+    certifications: {
+      page: {
+        title: 'Certyfikaty',
+        subtitle: 'Certyfikaty i uprawnienia zawodowe.',
+        add: 'Dodaj certyfikat',
+        empty: 'Brak certyfikatów. Dodaj pierwszy.',
+        error: 'Nie udało się wczytać Twoich certyfikatów.',
+      },
+      form: {
+        createTitle: 'Dodaj certyfikat',
+        editTitle: 'Edytuj certyfikat',
+        subtitle: 'Dodaj certyfikat i dane poświadczenia.',
+      },
+      fields: {
+        name: 'Nazwa certyfikatu',
+        issuingOrganization: 'Organizacja wydająca',
+        credentialId: 'ID poświadczenia',
+        credentialUrl: 'URL poświadczenia',
+        issueDate: 'Data wydania',
+        expiryDate: 'Data wygaśnięcia',
+      },
+      expired: 'Wygasł',
+      deleteConfirm: {
+        title: 'Usunąć ten certyfikat?',
+        description: 'Ten certyfikat zostanie trwale usunięty z Twojego profilu.',
+      },
+    },
+    achievements: {
+      page: {
+        title: 'Osiągnięcia',
+        subtitle: 'Nagrody, publikacje i wystąpienia.',
+        add: 'Dodaj osiągnięcie',
+        empty: 'Brak osiągnięć. Dodaj pierwsze.',
+        error: 'Nie udało się wczytać Twoich osiągnięć.',
+      },
+      form: {
+        createTitle: 'Dodaj osiągnięcie',
+        editTitle: 'Edytuj osiągnięcie',
+        subtitle: 'Dodaj nagrodę, publikację lub wystąpienie.',
+      },
+      fields: {
+        title: 'Tytuł',
+        description: 'Opis',
+        date: 'Data',
+        category: 'Kategoria',
+        categoryPlaceholder: 'Wybierz kategorię',
+        url: 'URL',
+      },
+      categoryOptions: {
+        AWARD: 'Nagroda',
+        PUBLICATION: 'Publikacja',
+        SPEAKING: 'Wystąpienie',
+        OTHER: 'Inne',
+      },
+      deleteConfirm: {
+        title: 'Usunąć to osiągnięcie?',
+        description: 'To osiągnięcie zostanie trwale usunięte z Twojego profilu.',
+      },
+    },
   },
 }

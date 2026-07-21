@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Briefcase, FolderKanban, Info, Sparkles, UserRound } from 'lucide-vue-next'
+import { Award, Briefcase, FolderKanban, GraduationCap, Info, Sparkles, Star, UserRound } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import {
@@ -73,6 +73,48 @@ const { t } = useI18n()
             >
               <FolderKanban class="size-4" />
               <span>{{ t('career.projects.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.education" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <GraduationCap class="size-4" />
+              <span>{{ t('career.education.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.certifications" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <Award class="size-4" />
+              <span>{{ t('career.certifications.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.achievements" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <Star class="size-4" />
+              <span>{{ t('career.achievements.page.title') }}</span>
             </SidebarMenuButton>
           </RouterLink>
         </SidebarMenuItem>

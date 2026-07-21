@@ -25,6 +25,18 @@ export const projectQueryKeys = {
   all: ['career', 'projects'] as const,
 } as const
 
+export const educationQueryKeys = {
+  all: ['career', 'education'] as const,
+} as const
+
+export const certificationQueryKeys = {
+  all: ['career', 'certifications'] as const,
+} as const
+
+export const achievementQueryKeys = {
+  all: ['career', 'achievements'] as const,
+} as const
+
 export function createProfileRetryFunction(maxAttempts = 2) {
   return (failureCount: number, error: unknown) => {
     if (isAuthError(error)) return false

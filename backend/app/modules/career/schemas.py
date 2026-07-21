@@ -2,6 +2,7 @@
 technologies, skills. Phase 3: projects)."""
 
 from datetime import date, datetime
+from datetime import date as _Date
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
@@ -317,3 +318,136 @@ class UpdateProjectRequest(BaseModel):
     visibility: ProfileVisibility | None = Field(default=None)
     technologies: list[str] | None = Field(default=None)
     experienceIds: list[str] | None = Field(default=None)
+
+
+# --- Phase 4: education, certifications, achievements ----------------------------
+
+AchievementCategory = Literal["AWARD", "PUBLICATION", "SPEAKING", "OTHER"]
+
+
+class EducationResponse(BaseModel):
+    """Full education entry representation."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    institution: str = Field(alias="institution", serialization_alias="institution")
+    degree: str = Field(alias="degree", serialization_alias="degree")
+    fieldOfStudy: str | None = Field(None, alias="field_of_study", serialization_alias="fieldOfStudy")
+    startDate: date = Field(alias="start_date", serialization_alias="startDate")
+    endDate: date | None = Field(None, alias="end_date", serialization_alias="endDate")
+    grade: str | None = Field(None, alias="grade", serialization_alias="grade")
+    description: str | None = Field(None, alias="description", serialization_alias="description")
+    displayOrder: int = Field(alias="display_order", serialization_alias="displayOrder")
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateEducationRequest(BaseModel):
+    institution: str = Field(..., min_length=1, max_length=200)
+    degree: str = Field(..., min_length=1, max_length=200)
+    fieldOfStudy: str | None = Field(default=None, max_length=200)
+    startDate: date
+    endDate: date | None = Field(default=None)
+    grade: str | None = Field(default=None, max_length=50)
+    description: str | None = Field(default=None)
+
+
+class UpdateEducationRequest(BaseModel):
+    """Partial update — only provided fields change."""
+
+    institution: str | None = Field(default=None, min_length=1, max_length=200)
+    degree: str | None = Field(default=None, min_length=1, max_length=200)
+    fieldOfStudy: str | None = Field(default=None, max_length=200)
+    startDate: date | None = Field(default=None)
+    endDate: date | None = Field(default=None)
+    grade: str | None = Field(default=None, max_length=50)
+    description: str | None = Field(default=None)
+
+
+class CertificationResponse(BaseModel):
+    """Full certification representation. ``isExpired`` is computed relative to the
+    current date at request time — never stored."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    name: str = Field(alias="name", serialization_alias="name")
+    issuingOrganization: str = Field(alias="issuing_organization", serialization_alias="issuingOrganization")
+    credentialId: str | None = Field(None, alias="credential_id", serialization_alias="credentialId")
+    credentialUrl: str | None = Field(None, alias="credential_url", serialization_alias="credentialUrl")
+    issueDate: date = Field(alias="issue_date", serialization_alias="issueDate")
+    expiryDate: date | None = Field(None, alias="expiry_date", serialization_alias="expiryDate")
+    isExpired: bool = Field(default=False)
+    displayOrder: int = Field(alias="display_order", serialization_alias="displayOrder")
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateCertificationRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    issuingOrganization: str = Field(..., min_length=1, max_length=200)
+    credentialId: str | None = Field(default=None, max_length=100)
+    credentialUrl: str | None = Field(default=None, max_length=500)
+    issueDate: date
+    expiryDate: date | None = Field(default=None)
+
+
+class UpdateCertificationRequest(BaseModel):
+    """Partial update — only provided fields change."""
+
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    issuingOrganization: str | None = Field(default=None, min_length=1, max_length=200)
+    credentialId: str | None = Field(default=None, max_length=100)
+    credentialUrl: str | None = Field(default=None, max_length=500)
+    issueDate: date | None = Field(default=None)
+    expiryDate: date | None = Field(default=None)
+
+
+class AchievementResponse(BaseModel):
+    """Full achievement representation."""
+
+    id: str = Field(alias="id", serialization_alias="id")
+    profileId: str = Field(alias="profile_id", serialization_alias="profileId")
+    title: str = Field(alias="title", serialization_alias="title")
+    description: str | None = Field(None, alias="description", serialization_alias="description")
+    # Annotated as `_Date`, not `date` — a field literally named `date` self-shadows the
+    # `date` type mid-statement (the value binds to the name before its own annotation
+    # is evaluated), which raises `TypeError: unsupported operand type(s) for |: 'FieldInfo' and 'NoneType'`.
+    date: _Date | None = Field(None, alias="date", serialization_alias="date")
+    category: AchievementCategory | None = Field(None, alias="category", serialization_alias="category")
+    url: str | None = Field(None, alias="url", serialization_alias="url")
+    displayOrder: int = Field(alias="display_order", serialization_alias="displayOrder")
+    createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
+    updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
+
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True,
+    }
+
+
+class CreateAchievementRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(default=None)
+    date: _Date | None = Field(default=None)
+    category: AchievementCategory | None = Field(default=None)
+    url: str | None = Field(default=None, max_length=500)
+
+
+class UpdateAchievementRequest(BaseModel):
+    """Partial update — only provided fields change."""
+
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = Field(default=None)
+    date: _Date | None = Field(default=None)
+    category: AchievementCategory | None = Field(default=None)
+    url: str | None = Field(default=None, max_length=500)

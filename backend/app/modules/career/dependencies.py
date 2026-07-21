@@ -12,7 +12,13 @@ from app.modules.auth.dependencies import CurrentUser
 from app.modules.auth.repositories import get_user_repository
 from app.modules.auth.types.repository import UserRepositoryInterface
 
+from .achievement_repository import AchievementRepository
+from .achievement_service import AchievementService
+from .certification_repository import CertificationRepository
+from .certification_service import CertificationService
 from .db_models import ProfileDB
+from .education_repository import EducationRepository
+from .education_service import EducationService
 from .experience_repository import ExperienceRepository, ExperienceTechnologyRepository
 from .experience_service import ExperienceService
 from .project_repository import (
@@ -107,3 +113,15 @@ def get_project_service(db: AsyncSession = Depends(get_db)) -> ProjectService:
         TechnologyService(TechnologyRepository(db)),
         ExperienceRepository(db),
     )
+
+
+def get_education_service(db: AsyncSession = Depends(get_db)) -> EducationService:
+    return EducationService(EducationRepository(db))
+
+
+def get_certification_service(db: AsyncSession = Depends(get_db)) -> CertificationService:
+    return CertificationService(CertificationRepository(db))
+
+
+def get_achievement_service(db: AsyncSession = Depends(get_db)) -> AchievementService:
+    return AchievementService(AchievementRepository(db))

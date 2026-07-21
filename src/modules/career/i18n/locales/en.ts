@@ -169,5 +169,93 @@ export const careerEn = {
         description: 'This will permanently remove this project from your profile.',
       },
     },
+    education: {
+      page: {
+        title: 'Education',
+        subtitle: 'Degrees and courses that shaped your background.',
+        add: 'Add education',
+        empty: 'No education entries yet. Add your first one.',
+        error: 'Failed to load your education entries.',
+      },
+      form: {
+        createTitle: 'Add education',
+        editTitle: 'Edit education',
+        subtitle: 'Add a degree, course, or program you completed.',
+      },
+      fields: {
+        institution: 'Institution',
+        degree: 'Degree',
+        fieldOfStudy: 'Field of study',
+        startDate: 'Start date',
+        endDate: 'End date',
+        present: 'Present',
+        grade: 'Grade',
+        gradePlaceholder: 'e.g. 3.8 GPA, First Class Honours',
+        description: 'Description',
+      },
+      deleteConfirm: {
+        title: 'Delete this education entry?',
+        description: 'This will permanently remove this entry from your profile.',
+      },
+    },
+    certifications: {
+      page: {
+        title: 'Certifications',
+        subtitle: 'Professional certifications and credentials.',
+        add: 'Add certification',
+        empty: 'No certifications yet. Add your first one.',
+        error: 'Failed to load your certifications.',
+      },
+      form: {
+        createTitle: 'Add certification',
+        editTitle: 'Edit certification',
+        subtitle: 'Add a certification and its credential details.',
+      },
+      fields: {
+        name: 'Certification name',
+        issuingOrganization: 'Issuing organization',
+        credentialId: 'Credential ID',
+        credentialUrl: 'Credential URL',
+        issueDate: 'Issue date',
+        expiryDate: 'Expiry date',
+      },
+      expired: 'Expired',
+      deleteConfirm: {
+        title: 'Delete this certification?',
+        description: 'This will permanently remove this certification from your profile.',
+      },
+    },
+    achievements: {
+      page: {
+        title: 'Achievements',
+        subtitle: 'Awards, publications, and speaking engagements.',
+        add: 'Add achievement',
+        empty: 'No achievements yet. Add your first one.',
+        error: 'Failed to load your achievements.',
+      },
+      form: {
+        createTitle: 'Add achievement',
+        editTitle: 'Edit achievement',
+        subtitle: 'Add an award, publication, or speaking engagement.',
+      },
+      fields: {
+        title: 'Title',
+        description: 'Description',
+        date: 'Date',
+        category: 'Category',
+        categoryPlaceholder: 'Select a category',
+        url: 'URL',
+      },
+      categoryOptions: {
+        AWARD: 'Award',
+        PUBLICATION: 'Publication',
+        SPEAKING: 'Speaking',
+        OTHER: 'Other',
+      },
+      deleteConfirm: {
+        title: 'Delete this achievement?',
+        description: 'This will permanently remove this achievement from your profile.',
+      },
+    },
   },
 }
