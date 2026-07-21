@@ -130,6 +130,13 @@ Tables (all ULID PK unless noted, `created_at`/`updated_at` timestamps on all):
   Phase 7. Should probably be done as its own small task before Phase 5, not bundled in.
 - LinkedIn import parsing approach (official API vs. HTML scrape vs. user-exported data
   archive) — Phase 6, genuinely undecided per the old ROADMAP.
+- Sensitive numeric fields (`usersCount`, `teamSize`) on shared/public profiles may need
+  a descriptive-display mode: store the real number, but let the owner flag it per-field
+  (e.g. `usersCountDisplayMode` / `teamSizeDisplayMode`: `EXACT|DESCRIPTIVE`) so the API
+  returns a bucketed label ("dozens", "hundreds", "thousands", ...) instead of the
+  precise value on public output. Raised while seeding real project data where several
+  source values were only ever qualitative words to begin with. Touches Phase 3
+  (`projects` schema) and Phase 8 (public profile rendering).
 
 ## Status
 

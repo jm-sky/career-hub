@@ -92,7 +92,7 @@ async function move(index: number, direction: -1 | 1) {
 
 <template>
   <AuthenticatedLayout>
-    <div class="space-y-6 max-w-3xl">
+    <div class="space-y-6">
       <div class="flex items-start justify-between gap-4">
         <div class="space-y-2">
           <h1 class="text-3xl font-bold tracking-tight">

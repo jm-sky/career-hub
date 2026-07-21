@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { FileText } from 'lucide-vue-next'
+import { FileText, LogInIcon, UserPlusIcon, UserRoundIcon } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import ButtonLink from '@/components/ui/button-link/ButtonLink.vue'
 import LandingLayout from '@/layouts/LandingLayout.vue'
+import { AuthRoutePaths } from '@/modules/auth/config/routes'
 import { useAuth } from '@/modules/auth/composables/useAuth'
+import { CareerRoutePaths } from '@/modules/career/routes'
 import { config } from '@/shared/config/config'
 
 const { t } = useI18n()
@@ -67,6 +70,24 @@ if (!config.backend.enabled) {
             {{ t('landing.feature3.description', 'Generate a tailored CV or share your public profile link') }}
           </p>
         </div>
+      </div>
+
+      <div v-if="isAuthenticated" class="flex justify-center">
+        <ButtonLink size="lg" :to="CareerRoutePaths.profileEdit">
+          <UserRoundIcon class="size-5" />
+          {{ t('landing.goToProfile', 'Go to my profile') }}
+        </ButtonLink>
+      </div>
+
+      <div v-else-if="config.backend.enabled" class="flex flex-col items-center justify-center sm:flex-row gap-4">
+        <ButtonLink size="lg" :to="AuthRoutePaths.login">
+          <LogInIcon class="size-5" />
+          {{ t('auth.login', 'Log In') }}
+        </ButtonLink>
+        <ButtonLink size="lg" variant="outline" :to="AuthRoutePaths.register">
+          <UserPlusIcon class="size-5" />
+          {{ t('auth.register', 'Sign Up') }}
+        </ButtonLink>
       </div>
     </div>
   </LandingLayout>

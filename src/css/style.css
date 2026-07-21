@@ -55,9 +55,9 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.646 0.222 41.116); /* #f64c00 */
+  --primary: oklch(0.585 0.233 277.117); /* indigo, replaces the inherited gear-stack orange */
   --primary-foreground: oklch(0.985 0 0);
-  --primary-light: #feede6;
+  --primary-light: #eef2ff;
 
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -92,8 +92,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.646 0.222 41.116);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.585 0.233 277.117);
+  --primary-foreground: oklch(0.985 0 0);
 
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
