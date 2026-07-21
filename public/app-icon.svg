@@ -1,33 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
-  <!-- Background circle with primary/10 -->
-  <circle cx="250" cy="250" r="240" fill="rgba(97, 95, 255, 0.1)"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <circle cx="256" cy="256" r="240" fill="#d1f5ea" />
+  <g transform="translate(256, 256) scale(14.08) translate(-12, -12)"
+     fill="none" stroke="#007d65" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" />
+    <path d="M14 2v5a1 1 0 0 0 1 1h5" />
+    <path d="M16 22a4 4 0 0 0-8 0" />
+    <circle cx="12" cy="15" r="3" />
 
-  <!-- Lucide File User Icon (scaled and centered) -->
-  <g transform="translate(130, 130) scale(8.5)">
-    <path
-      d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
-      fill="none"
-      stroke="rgb(97, 95, 255)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M14 2v5a1 1 0 0 0 1 1h5"
-      fill="none"
-      stroke="rgb(97, 95, 255)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <path
-      d="M16 22a4 4 0 0 0-8 0"
-      fill="none"
-      stroke="rgb(97, 95, 255)"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-    <circle cx="12" cy="15" r="3" fill="none" stroke="rgb(97, 95, 255)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>
