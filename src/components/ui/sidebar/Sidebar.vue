@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import SheetDescription from '@/components/ui/sheet/SheetDescription.vue'
 import SheetHeader from '@/components/ui/sheet/SheetHeader.vue'
@@ -6,6 +7,7 @@ import SheetTitle from '@/components/ui/sheet/SheetTitle.vue'
 import { cn } from '@/lib/utils'
 import type { SidebarProps } from '.'
 import { SIDEBAR_WIDTH_MOBILE, useSidebar } from './utils'
+import type { HTMLAttributes } from 'vue'
 
 defineOptions({
   inheritAttrs: false,
@@ -18,6 +20,15 @@ const props = withDefaults(defineProps<SidebarProps>(), {
 })
 
 const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+
+// The mobile Sheet's overlay and the glass sidebar panel are both fixed, full-height
+// siblings teleported to <body> - the panel paints on top of the overlay in the same
+// stacking context, so its backdrop-filter would sample the overlay's flat scrim
+// instead of the page. Keeping the scrim off the panel's own footprint lets the blur
+// reach the actual page content behind it.
+const overlayStyle = computed<HTMLAttributes['style']>(() => ({
+  [props.side === 'right' ? 'right' : 'left']: SIDEBAR_WIDTH_MOBILE,
+}))
 </script>
 
 <template>
@@ -41,6 +52,7 @@ const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
       data-slot="sidebar"
       data-mobile="true"
       :side="side"
+      :overlay-style="overlayStyle"
       class="glass-surface bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
       :style="{
         '--sidebar-width': SIDEBAR_WIDTH_MOBILE,
