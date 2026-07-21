@@ -34,14 +34,27 @@ Agreed direction (2026-07-21):
 - Don’t add floating bottom nav in the first pass
 - Don’t rebuild page layouts just to mimic Dimension’s landing composition
 
+### Implemented tokens (`src/css/style.css`)
+
+| Token | Light | Dark | Role |
+|-------|-------|------|------|
+| `--primary` | `oklch(0.52 0.11 175)` | `oklch(0.72 0.12 175)` | Teal brand / CTA |
+| `--warm` | `oklch(0.72 0.15 55)` | `oklch(0.78 0.14 60)` | Yellow–orange accent (logo, highlights) |
+| `--app-canvas` | teal → green → soft warm | same stops, lowered L | Fixed body gradient |
+| `--glass` | white @ 62% | teal-tinted dark @ 55% | Frosted panel fill |
+| `--glass-blur` | 16px | 18px | Backdrop blur |
+| `--card` / `--sidebar` | translucent | translucent | Elevated surfaces over canvas |
+
+Utility: `.glass-surface` (blur + glass fill + glass border). Shell layouts use it on header, sidebar, page card.
+
 ### Open (later)
 
-- Exact hex tokens for teal / green / yellow-orange (light + dark)
-- How strong the app gradient is vs marketing
-- Fonts: keep current stack vs borrow Dimension’s DM Sans / Geist restraint
-- Which shadcn/ui tokens map to glass surfaces
+- Stronger marketing gradient vs calm app (currently one calm canvas everywhere)
+- Fonts: keep current stack vs DM Sans / Geist restraint
+- Pill radius on primary buttons (optional Dimension silhouette)
 
 ---
+
 
 ## Reference extract — Dimension.dev
 

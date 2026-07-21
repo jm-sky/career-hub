@@ -5,9 +5,9 @@ import LocaleToggle from '@/shared/i18n/components/LocaleToggle.vue'
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col bg-linear-to-br from-background to-muted relative">
+  <div class="relative flex min-h-screen flex-col bg-transparent">
     <!-- Fixed controls in top right -->
-    <nav class="fixed top-2 right-2 flex gap-2 rounded-lg p-2 bg-card/50 backdrop-blur-sm z-10">
+    <nav class="glass-surface fixed top-2 right-2 z-10 flex gap-2 rounded-xl border border-border bg-card/70 p-2">
       <LocaleToggle />
       <DarkModeToggle />
     </nav>

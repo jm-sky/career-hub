@@ -12,16 +12,21 @@ defineProps<{
 </script>
 
 <template>
-  <SidebarProvider>
-    <AppSidebar class="mt-(--header-height) shadow-[0_0_.6rem_#0002]" />
-    <SidebarInset class="min-w-0 pt-14 bg-background">
-      <div class="flex min-h-screen min-w-0 flex-col bg-muted bg-radial from-card to-muted w-full max-w-full overflow-x-hidden">
+  <SidebarProvider class="bg-transparent">
+    <AppSidebar class="mt-(--header-height)" />
+    <SidebarInset class="min-w-0 bg-transparent pt-14">
+      <div class="flex min-h-screen min-w-0 w-full max-w-full flex-col overflow-x-hidden bg-transparent">
         <!-- Top Bar -->
         <AppHeader />
 
         <!-- Main Content -->
-        <main class="w-full min-w-0 max-w-7xl mx-auto flex-1 py-6 px-2 sm:px-6 lg:px-8">
-          <div :class="cn('border border-border rounded-xl bg-card p-4 sm:p-6 shadow-lg w-full min-w-0 max-w-full', cardClass)">
+        <main class="mx-auto w-full min-w-0 max-w-7xl flex-1 px-2 py-6 sm:px-6 lg:px-8">
+          <div
+            :class="cn(
+              'glass-surface w-full min-w-0 max-w-full rounded-2xl border border-border bg-glass p-4 shadow-none sm:p-6',
+              cardClass,
+            )"
+          >
             <slot />
           </div>
         </main>

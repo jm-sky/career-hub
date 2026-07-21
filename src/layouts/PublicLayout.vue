@@ -8,10 +8,10 @@ import LocaleToggle from '@/shared/i18n/components/LocaleToggle.vue'
 </script>
 
 <template>
-  <div class="min-h-screen bg-background">
-    <nav class="bg-card shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+  <div class="min-h-screen bg-transparent">
+    <nav class="glass-surface border-b border-border bg-card/70">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 justify-between">
           <div class="flex items-center">
             <RouterLink :to="{ name: PublicRouteNames.landing }" class="text-xl font-bold text-card-foreground">
               <LogoText />
@@ -27,7 +27,7 @@ import LocaleToggle from '@/shared/i18n/components/LocaleToggle.vue'
             </RouterLink>
             <RouterLink
               to="/auth/register"
-              class="text-sm bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/80"
+              class="rounded-full bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/80"
             >
               Zarejestruj się
             </RouterLink>

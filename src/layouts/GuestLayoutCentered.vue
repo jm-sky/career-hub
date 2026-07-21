@@ -12,8 +12,8 @@ const layoutActionsComponent = route.meta.layoutActionsComponent
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-blue-200 via-slate-100 to-purple-200 dark:from-gray-950 dark:via-gray-800 dark:to-gray-950 flex flex-col">
-    <nav class="fixed top-2 right-2 flex gap-2 rounded-lg p-2 bg-card/50 backdrop-blur-sm z-10">
+  <div class="relative flex min-h-screen flex-col bg-transparent">
+    <nav class="glass-surface fixed top-2 right-2 z-10 flex gap-2 rounded-xl border border-border bg-card/70 p-2">
       <slot name="actions">
         <component :is="layoutActionsComponent" v-if="layoutActionsComponent" />
       </slot>

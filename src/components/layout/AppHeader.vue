@@ -71,7 +71,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <header class="fixed left-0 top-0 z-50 w-full border-b bg-background/75 backdrop-blur-sm">
+  <header class="glass-surface fixed left-0 top-0 z-50 w-full border-b border-border bg-card/80">
     <div class="mx-auto flex h-(--header-height) items-center">
       <div class="flex min-w-0 items-center justify-start gap-2 px-2 sm:gap-4 md:w-(--sidebar-width) md:gap-6 md:px-0">
         <SidebarTrigger class="ml-2.5 opacity-80" />
