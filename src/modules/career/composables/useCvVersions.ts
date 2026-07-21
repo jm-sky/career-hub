@@ -43,8 +43,19 @@ export function useDeleteCvVersion(service?: ICvVersionService) {
 }
 
 export function useGenerateCvVersion(service?: ICvVersionService) {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: (id: string) => (service ?? cvVersionApiService).generate(id),
+    // Generation sets pdfUrl on the version — refetch so the UI reflects it
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: cvVersionQueryKeys.all }),
+    retry: profileMutationRetryFunction,
+  })
+}
+
+export function useDownloadCvVersionPdf(service?: ICvVersionService) {
+  return useMutation({
+    mutationFn: (id: string) => (service ?? cvVersionApiService).downloadPdf(id),
     retry: profileMutationRetryFunction,
   })
 }
@@ -55,6 +66,7 @@ export function useCvVersions(service?: ICvVersionService) {
   const updateMutation = useUpdateCvVersion(service)
   const deleteMutation = useDeleteCvVersion(service)
   const generateMutation = useGenerateCvVersion(service)
+  const downloadMutation = useDownloadCvVersionPdf(service)
 
   return {
     cvVersionsQuery,
@@ -70,5 +82,7 @@ export function useCvVersions(service?: ICvVersionService) {
     isDeleting: deleteMutation.isPending,
     generateCvVersion: generateMutation.mutateAsync,
     isGenerating: generateMutation.isPending,
+    downloadCvVersionPdf: downloadMutation.mutateAsync,
+    isDownloading: downloadMutation.isPending,
   }
 }

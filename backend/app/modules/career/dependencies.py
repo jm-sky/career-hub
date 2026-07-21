@@ -7,6 +7,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.storage import get_storage_adapter
 from app.modules.auth.auth_utils import verify_token
 from app.modules.auth.dependencies import CurrentUser
 from app.modules.auth.repositories import get_user_repository
@@ -151,4 +152,5 @@ def get_cv_version_service(
         AchievementRepository(db),
         LanguageRepository(db),
         billing_service,
+        get_storage_adapter(),
     )

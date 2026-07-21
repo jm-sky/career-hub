@@ -25,6 +25,8 @@ const {
   deleteCvVersion,
   isDeleting,
   generateCvVersion,
+  isGenerating,
+  downloadCvVersionPdf,
 } = useCvVersions()
 
 const formOpen = ref(false)
@@ -74,15 +76,33 @@ async function handleDelete() {
 
 async function handleGenerate(cvVersion: CvVersion) {
   try {
-    await generateCvVersion(cvVersion.id)
-    toast.info(t('career.cvVersions.page.generateStub'))
+    const result = await generateCvVersion(cvVersion.id)
+    toast.success(
+      result.watermark
+        ? t('career.cvVersions.page.generateSuccessWatermarked')
+        : t('career.cvVersions.page.generateSuccess'),
+    )
   } catch {
     toast.error(t('errors.generic'))
   }
 }
 
-function handleDownload() {
-  toast.info(t('career.cvVersions.page.downloadStub'))
+async function handleDownload(cvVersion: CvVersion) {
+  if (!cvVersion.pdfUrl) {
+    toast.info(t('career.cvVersions.page.downloadNotGenerated'))
+    return
+  }
+  try {
+    const blob = await downloadCvVersionPdf(cvVersion.id)
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${cvVersion.name}.pdf`
+    link.click()
+    URL.revokeObjectURL(url)
+  } catch {
+    toast.error(t('errors.generic'))
+  }
 }
 </script>
 
@@ -138,6 +158,7 @@ function handleDownload() {
               <Button
                 variant="ghost"
                 size="icon"
+                :disabled="isGenerating"
                 :title="t('career.cvVersions.page.generate')"
                 @click="handleGenerate(cvVersion)"
               >
@@ -146,8 +167,9 @@ function handleDownload() {
               <Button
                 variant="ghost"
                 size="icon"
+                :disabled="!cvVersion.pdfUrl"
                 :title="t('career.cvVersions.page.download')"
-                @click="handleDownload"
+                @click="handleDownload(cvVersion)"
               >
                 <Download class="size-4" />
               </Button>

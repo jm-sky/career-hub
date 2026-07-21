@@ -30,6 +30,9 @@ python-magic>=0.4.27  # MIME type validation
 aiofiles>=24.1.0  # Async file operations
 aioboto3>=13.3.0  # Async S3 client (optional, for S3 storage)
 
+# PDF Rendering (career CV export)
+weasyprint>=63.0  # HTML/CSS -> PDF; needs pango/cairo system libs (see Dockerfile)
+
 # CLI Management (for cli.py)
 typer[all]>=0.20.0
 rich>=14.2.0

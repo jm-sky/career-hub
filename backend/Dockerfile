@@ -44,10 +44,17 @@ WORKDIR /app
 # Install system dependencies
 # libmagic1 is required for python-magic (MIME type detection)
 # libjpeg-dev, zlib1g-dev are recommended for Pillow image processing
+# libpango/libcairo/libgdk-pixbuf/libffi are required by WeasyPrint (CV PDF rendering)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libmagic1 \
     libjpeg-dev \
     zlib1g-dev \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libffi8 \
+    fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a non-privileged user

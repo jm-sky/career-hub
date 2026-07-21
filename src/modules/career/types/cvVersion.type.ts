@@ -37,11 +37,13 @@ export interface UpdateCvVersionData {
   isDefault?: boolean
 }
 
-export type GenerateCvVersionStatus = 'queued'
+export type GenerateCvVersionStatus = 'queued' | 'completed'
 
 export interface GenerateCvVersionResult {
   jobId: string
   status: GenerateCvVersionStatus
+  watermark: boolean
+  pdfUrl: string | null
 }
 
 export interface ICvVersionService {
@@ -50,5 +52,5 @@ export interface ICvVersionService {
   update(id: string, data: UpdateCvVersionData): Promise<CvVersion>
   delete(id: string): Promise<void>
   generate(id: string): Promise<GenerateCvVersionResult>
-  getDownloadUrl(id: string): Promise<string>
+  downloadPdf(id: string): Promise<Blob>
 }

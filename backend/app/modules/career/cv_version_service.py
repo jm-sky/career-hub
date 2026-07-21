@@ -1,13 +1,18 @@
 """Business logic for CV versions (career module, Phase 5)."""
 
+import asyncio
+from typing import Any
+
 from app.common.id_utils import generate_id
+from app.core.storage import StorageAdapter
 from app.modules.billing.exceptions import SubscriptionNotFoundError
 from app.modules.billing.service import BillingService
 
 from .achievement_repository import AchievementRepository
 from .certification_repository import CertificationRepository
+from .cv_renderer import CvRenderData, build_cv_html, render_pdf
 from .cv_version_repository import CvVersionRepository
-from .db_models import CvVersionDB
+from .db_models import CvVersionDB, ProfileDB
 from .education_repository import EducationRepository
 from .experience_repository import ExperienceRepository
 from .language_repository import LanguageRepository
@@ -24,7 +29,7 @@ from .skill_repository import SkillRepository
 
 class CvVersionService:
     """Business logic for CV version CRUD, single-default enforcement, and the
-    (stubbed) generate/download pipeline."""
+    WeasyPrint generate/download pipeline."""
 
     def __init__(
         self,
@@ -37,6 +42,7 @@ class CvVersionService:
         achievement_repository: AchievementRepository,
         language_repository: LanguageRepository,
         billing_service: BillingService,
+        storage: StorageAdapter,
     ):
         self.repository = repository
         self.experience_repository = experience_repository
@@ -47,6 +53,7 @@ class CvVersionService:
         self.achievement_repository = achievement_repository
         self.language_repository = language_repository
         self.billing_service = billing_service
+        self.storage = storage
 
     async def _validate_sections_config(self, profile_id: str, sections: CvSectionsConfig) -> None:
         checks = (
@@ -108,14 +115,64 @@ class CvVersionService:
     async def delete(self, cv_version: CvVersionDB) -> None:
         await self.repository.delete(cv_version)
 
-    async def generate(self, cv_version: CvVersionDB, user_id: str) -> GenerateCvVersionResponse:
-        """Stub — accepts the request but does not render a PDF yet. No PDF
-        rendering engine has been chosen (open question in career-module-plan.md
-        Phase 5). Watermark gating is wired ahead of the renderer itself: the
-        tier's `pdfWatermark` limit is resolved here so the real renderer, once
-        built, only has to read this flag rather than re-derive it from billing."""
-        watermark = await self._should_watermark(user_id)
-        return GenerateCvVersionResponse(jobId=generate_id(), status="queued", watermark=watermark)
+    async def _collect_render_data(self, cv_version: CvVersionDB, profile: ProfileDB, user_name: str) -> CvRenderData:
+        """Load the profile content this CV version selects, in display order.
+
+        An empty id list for a section means "include everything in that section"
+        rather than "include nothing" — a CV whose selection was never edited
+        should still render the full profile instead of an empty page. To leave a
+        section out, the CV must select a non-empty subset of the others.
+        """
+        sections = CvSectionsConfig.model_validate(cv_version.sections_config or {})
+        profile_id = profile.id
+
+        async def pick(repository: Any, ids: list[str], order_key: str = "display_order") -> list[Any]:
+            rows = await repository.get_by_ids_and_profile(ids, profile_id) if ids else await repository.list_by_profile(profile_id)
+            return sorted(rows, key=lambda row: getattr(row, order_key, 0))
+
+        skill_rows = await self.skill_repository.list_by_profile(profile_id) if not sections.skillIds else [(skill, technology) for skill, technology in await self.skill_repository.list_by_profile(profile_id) if skill.id in set(sections.skillIds)]
+
+        return CvRenderData(
+            user_name=user_name,
+            profile=profile,
+            sections=sections,
+            experiences=await pick(self.experience_repository, sections.experienceIds),
+            projects=await pick(self.project_repository, sections.projectIds),
+            skills=[(skill, technology.name) for skill, technology in skill_rows],
+            education=await pick(self.education_repository, sections.educationIds),
+            certifications=await pick(self.certification_repository, sections.certificationIds),
+            achievements=await pick(self.achievement_repository, sections.achievementIds),
+            languages=await pick(self.language_repository, sections.languageIds),
+        )
+
+    async def generate(self, cv_version: CvVersionDB, profile: ProfileDB, user_name: str) -> GenerateCvVersionResponse:
+        """Render the CV to PDF and store it, synchronously.
+
+        The digest specifies an async job (202 + jobId) for this, but WeasyPrint
+        renders a CV-sized document in well under a second — a queue and a worker
+        would add moving parts without shortening the request. The response keeps
+        the `jobId`/`status` shape so this can move to a background job later
+        without breaking clients; `status` is simply `completed` on arrival.
+        """
+        watermark = await self._should_watermark(profile.user_id)
+        data = await self._collect_render_data(cv_version, profile, user_name)
+        html = build_cv_html(data, cv_version.template, watermark)
+
+        # WeasyPrint is synchronous and CPU-bound — keep it off the event loop.
+        pdf_bytes = await asyncio.to_thread(render_pdf, html)
+
+        destination = f"cv-versions/{profile.id}/{cv_version.id}.pdf"
+        stored_path = await self.storage.upload(pdf_bytes, destination, "application/pdf")
+
+        cv_version.pdf_url = stored_path
+        await self.repository.save(cv_version)
+
+        return GenerateCvVersionResponse(
+            jobId=generate_id(),
+            status="completed",
+            watermark=watermark,
+            pdfUrl=stored_path,
+        )
 
     async def _should_watermark(self, user_id: str) -> bool:
         try:
@@ -124,7 +181,8 @@ class CvVersionService:
             return True  # No subscription yet == free tier == watermarked
         return limits.pdfWatermark
 
-    async def get_pdf_url(self, cv_version: CvVersionDB) -> str:
+    async def get_pdf_bytes(self, cv_version: CvVersionDB) -> bytes:
+        """Read a previously generated PDF back out of storage."""
         if not cv_version.pdf_url:
             raise ValueError("PDF has not been generated for this CV version yet.")
-        return cv_version.pdf_url
+        return await self.storage.download(cv_version.pdf_url)

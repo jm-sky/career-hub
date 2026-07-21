@@ -1,12 +1,12 @@
 """CV version endpoints for the career module (Phase 5).
 
-Generate/download are stubs — no PDF rendering engine has been chosen yet (see
-the open question in `docs/plans/career-module-plan.md` Phase 5). They exist so
-the frontend has a stable contract to build against; the download endpoint 404s
-honestly rather than pretending a PDF exists.
+`generate` renders the CV with WeasyPrint and stores the PDF; `download` streams
+the stored bytes back and 404s if nothing has been generated yet.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+
+from app.modules.auth.dependencies import CurrentUser
 
 from .cv_version_service import CvVersionService
 from .dependencies import CurrentProfile, get_cv_version_service
@@ -76,23 +76,19 @@ async def delete_cv_version(
     await service.delete(cv_version)
 
 
-@router.post(
-    "/cv-versions/{id}/generate",
-    response_model=GenerateCvVersionResponse,
-    status_code=status.HTTP_202_ACCEPTED,
-)
+@router.post("/cv-versions/{id}/generate", response_model=GenerateCvVersionResponse)
 async def generate_cv_version(
     *,
     id: str,
+    current_user: CurrentUser,
     profile: CurrentProfile,
     service: CvVersionService = Depends(get_cv_version_service),
 ) -> GenerateCvVersionResponse:
-    """Queue PDF generation for a CV version. Stub: accepts the request and hands
-    back a job id, but no PDF is actually rendered yet."""
+    """Render this CV version to PDF and store it. Watermarked on the Free tier."""
     cv_version = await service.get_entity_for_profile(id, profile.id)
     if cv_version is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found")
-    return await service.generate(cv_version, profile.user_id)
+    return await service.generate(cv_version, profile, current_user.name)
 
 
 @router.get("/cv-versions/{id}/download")
@@ -101,14 +97,19 @@ async def download_cv_version(
     id: str,
     profile: CurrentProfile,
     service: CvVersionService = Depends(get_cv_version_service),
-) -> dict[str, str]:
-    """Return the generated PDF's URL. 404s if generation hasn't produced one yet
-    (always true for now — no render pipeline exists)."""
+) -> Response:
+    """Stream the generated PDF. 404s if it hasn't been generated yet."""
     cv_version = await service.get_entity_for_profile(id, profile.id)
     if cv_version is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found")
     try:
-        pdf_url = await service.get_pdf_url(cv_version)
+        pdf_bytes = await service.get_pdf_bytes(cv_version)
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    return {"pdfUrl": pdf_url}
+
+    filename = f"{cv_version.name.replace('/', '-')}.pdf"
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

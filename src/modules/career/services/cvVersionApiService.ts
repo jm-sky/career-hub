@@ -26,9 +26,9 @@ class CvVersionApiService implements ICvVersionService {
     return response.data
   }
 
-  async getDownloadUrl(id: string): Promise<string> {
-    const response = await apiClient.get<{ pdfUrl: string }>(`/career/cv-versions/${id}/download`)
-    return response.data.pdfUrl
+  async downloadPdf(id: string): Promise<Blob> {
+    const response = await apiClient.get<Blob>(`/career/cv-versions/${id}/download`, { responseType: 'blob' })
+    return response.data
   }
 }
 
