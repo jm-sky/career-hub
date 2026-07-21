@@ -1,9 +1,21 @@
 """Repository for career module database operations (Phase 1: profiles)."""
 
-from sqlalchemy import select
+from typing import Any
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .db_models import ProfileDB
+from .db_models import (
+    AchievementDB,
+    CertificationDB,
+    CvVersionDB,
+    EducationDB,
+    ExperienceDB,
+    LanguageDB,
+    ProfileDB,
+    ProjectDB,
+    SkillDB,
+)
 
 
 class ProfileRepository:
@@ -34,3 +46,20 @@ class ProfileRepository:
         await self.db.commit()
         await self.db.refresh(profile)
         return profile
+
+    async def count_sections(self, profile_id: str) -> dict[str, int]:
+        """Per-section item counts for one profile, in a single round-trip."""
+        section_models: dict[str, Any] = {
+            "experiences": ExperienceDB,
+            "projects": ProjectDB,
+            "skills": SkillDB,
+            "education": EducationDB,
+            "certifications": CertificationDB,
+            "achievements": AchievementDB,
+            "languages": LanguageDB,
+            "cvVersions": CvVersionDB,
+        }
+        subqueries = {name: (select(func.count()).select_from(model).where(model.profile_id == profile_id).scalar_subquery().label(name)) for name, model in section_models.items()}
+        result = await self.db.execute(select(*subqueries.values()))
+        row = result.one()
+        return {name: int(value) for name, value in zip(section_models, row)}

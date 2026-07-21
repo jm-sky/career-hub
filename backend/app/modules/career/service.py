@@ -2,12 +2,19 @@
 
 import re
 import secrets
+from typing import cast
 
 from app.common.id_utils import generate_id
 
 from .db_models import ProfileDB
 from .repository import ProfileRepository
-from .schemas import ProfileDraftRequest, UpdateProfileRequest
+from .schemas import (
+    CareerOverviewResponse,
+    CareerSectionCounts,
+    ProfileDraftRequest,
+    ProfileVisibility,
+    UpdateProfileRequest,
+)
 
 
 def slugify(value: str) -> str:
@@ -44,6 +51,52 @@ def compute_completeness_score(profile: ProfileDB) -> int:
     if profile.profile_photo_url:
         score += weights["profile_photo_url"]
     return score
+
+
+def compute_overall_completeness(profile_score: int, counts: dict[str, int]) -> int:
+    """Overall completeness (0-100): profile-table fields count for half, the
+    other half comes from actually having career content in the sections.
+
+    This intentionally lives outside the stored ``profiles.completeness_score``
+    (which is recomputed only on profile writes and can't see other tables) —
+    section counts change on every section CRUD, so the combined score is
+    derived per-read instead of persisted.
+    """
+    section_points = 0
+    if counts.get("experiences", 0) >= 1:
+        section_points += 15
+    skills = counts.get("skills", 0)
+    if skills >= 3:
+        section_points += 10
+    elif skills >= 1:
+        section_points += 5
+    if counts.get("projects", 0) >= 1:
+        section_points += 10
+    if counts.get("education", 0) >= 1:
+        section_points += 5
+    if counts.get("languages", 0) >= 1:
+        section_points += 5
+    if counts.get("cvVersions", 0) >= 1:
+        section_points += 5
+    return round(profile_score / 2) + section_points
+
+
+def build_suggestions(profile: ProfileDB, counts: dict[str, int], limit: int = 4) -> list[str]:
+    """Prioritized next-step suggestion keys (most impactful first) for the
+    dashboard. Values are i18n keys under ``career.overview.suggestions.*``."""
+    candidates: list[tuple[bool, str]] = [
+        (not profile.headline, "addHeadline"),
+        (counts.get("experiences", 0) == 0, "addExperience"),
+        (not profile.summary, "addSummary"),
+        (counts.get("skills", 0) < 3, "addSkills"),
+        (counts.get("projects", 0) == 0, "addProject"),
+        (counts.get("education", 0) == 0, "addEducation"),
+        (counts.get("languages", 0) == 0, "addLanguage"),
+        (counts.get("cvVersions", 0) == 0, "createCv"),
+        (not profile.profile_photo_url, "addPhoto"),
+        (profile.visibility != "PUBLIC", "makePublic"),
+    ]
+    return [key for applies, key in candidates if applies][:limit]
 
 
 class ProfileService:
@@ -106,6 +159,19 @@ class ProfileService:
         draft[payload.step] = payload.data
         profile.draft_data = draft
         return await self.repository.save(profile)
+
+    async def get_overview(self, profile: ProfileDB) -> CareerOverviewResponse:
+        """One-call dashboard summary: counts, overall completeness, suggestions."""
+        counts = await self.repository.count_sections(profile.id)
+        return CareerOverviewResponse(
+            slug=profile.slug,
+            headline=profile.headline,
+            visibility=cast(ProfileVisibility, profile.visibility),
+            profileCompleteness=profile.completeness_score,
+            completenessScore=compute_overall_completeness(profile.completeness_score, counts),
+            counts=CareerSectionCounts(**counts),
+            suggestions=build_suggestions(profile, counts),
+        )
 
     async def get_public_profile(self, slug: str, viewer_user_id: str | None) -> ProfileDB | None:
         """Return a profile for public/slug-based viewing, applying visibility rules.

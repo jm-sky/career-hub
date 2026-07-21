@@ -6,6 +6,7 @@ from app.modules.auth.dependencies import CurrentUser
 
 from .dependencies import OptionalUserId, get_profile_service
 from .schemas import (
+    CareerOverviewResponse,
     ProfileDraftRequest,
     ProfileResponse,
     PublicProfileResponse,
@@ -54,6 +55,17 @@ async def save_profile_draft(
     profile = await service.get_or_create_for_user(current_user.id, current_user.name)
     profile = await service.save_draft(profile, payload)
     return ProfileResponse.model_validate(profile)
+
+
+@router.get("/overview", response_model=CareerOverviewResponse)
+async def get_career_overview(
+    *,
+    current_user: CurrentUser,
+    service: ProfileService = Depends(get_profile_service),
+) -> CareerOverviewResponse:
+    """Dashboard summary: section counts, overall completeness, next-step suggestions."""
+    profile = await service.get_or_create_for_user(current_user.id, current_user.name)
+    return await service.get_overview(profile)
 
 
 @router.get("/profile/{slug}", response_model=PublicProfileResponse)

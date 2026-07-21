@@ -225,6 +225,14 @@ class ProjectLinks(BaseModel):
     docs: str | None = None
 
 
+class SubProject(BaseModel):
+    """A client site/instance of a template project (issue 001) — e.g. one
+    deployed customization of a reusable platform."""
+
+    name: str = Field(..., min_length=1, max_length=200)
+    url: str | None = Field(default=None, max_length=500)
+
+
 class ProjectResponse(BaseModel):
     """Full project representation, incl. linked technologies and experience ids."""
 
@@ -243,6 +251,8 @@ class ProjectResponse(BaseModel):
     achievements: list[str] = Field(default_factory=list)
     challenges: list[str] = Field(default_factory=list)
     clients: list[str] = Field(default_factory=list)
+    team: list[str] = Field(default_factory=list)
+    subProjects: list[SubProject] = Field(default_factory=list, alias="sub_projects", serialization_alias="subProjects")
     teamSize: int | None = Field(None, alias="team_size", serialization_alias="teamSize")
     durationMonths: int | None = Field(None, alias="duration_months", serialization_alias="durationMonths")
     usersCount: int | None = Field(None, alias="users_count", serialization_alias="usersCount")
@@ -282,6 +292,8 @@ class CreateProjectRequest(BaseModel):
     achievements: list[str] = Field(default_factory=list)
     challenges: list[str] = Field(default_factory=list)
     clients: list[str] = Field(default_factory=list)
+    team: list[str] = Field(default_factory=list)
+    subProjects: list[SubProject] = Field(default_factory=list)
     teamSize: int | None = Field(default=None, ge=0)
     durationMonths: int | None = Field(default=None, ge=0)
     usersCount: int | None = Field(default=None, ge=0)
@@ -311,6 +323,8 @@ class UpdateProjectRequest(BaseModel):
     achievements: list[str] | None = Field(default=None)
     challenges: list[str] | None = Field(default=None)
     clients: list[str] | None = Field(default=None)
+    team: list[str] | None = Field(default=None)
+    subProjects: list[SubProject] | None = Field(default=None)
     teamSize: int | None = Field(default=None, ge=0)
     durationMonths: int | None = Field(default=None, ge=0)
     usersCount: int | None = Field(default=None, ge=0)
@@ -552,10 +566,43 @@ class UpdateCvVersionRequest(BaseModel):
 
 
 class GenerateCvVersionResponse(BaseModel):
-    """Stub response — no PDF render pipeline exists yet (PDF engine choice is
-    still an open question per the plan doc). Confirms the request was accepted
-    without pretending a PDF was actually produced."""
+    """Result of a PDF generation request. Rendering is synchronous (WeasyPrint
+    is fast for CV-sized documents), so the normal outcome is ``completed`` with
+    the PDF stored and downloadable; ``queued`` is kept in the contract for a
+    future move to a background job without breaking clients."""
 
     jobId: str
-    status: Literal["queued"]
-    watermark: bool = Field(description="Whether the eventual PDF will carry a watermark, per the requester's subscription tier (Free tier only)")
+    status: Literal["queued", "completed"]
+    watermark: bool = Field(description="Whether the PDF carries a watermark, per the requester's subscription tier (Free tier only)")
+    pdfUrl: str | None = Field(default=None, description="Storage path of the rendered PDF once completed — download via the download endpoint, not directly")
+
+
+# --- Career overview (dashboard) -------------------------------------------------
+
+
+class CareerSectionCounts(BaseModel):
+    """Item counts per career section — powers the dashboard cards."""
+
+    experiences: int = 0
+    projects: int = 0
+    skills: int = 0
+    education: int = 0
+    certifications: int = 0
+    achievements: int = 0
+    languages: int = 0
+    cvVersions: int = 0
+
+
+class CareerOverviewResponse(BaseModel):
+    """One-call dashboard summary: profile essentials, per-section counts, an
+    overall completeness score that (unlike ``profiles.completeness_score``)
+    also weighs in section contents, and prioritized next-step suggestion keys
+    the frontend translates."""
+
+    slug: str
+    headline: str | None = None
+    visibility: ProfileVisibility
+    profileCompleteness: int = Field(description="Profile-table-only score (0-100), as stored")
+    completenessScore: int = Field(description="Overall score (0-100): profile fields + section contents")
+    counts: CareerSectionCounts
+    suggestions: list[str] = Field(default_factory=list, description="Ordered i18n suggestion keys, most impactful first")
