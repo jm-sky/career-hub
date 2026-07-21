@@ -15,6 +15,8 @@ import type { HTMLAttributes } from 'vue'
 interface SheetContentProps extends DialogContentProps {
   class?: HTMLAttributes['class']
   side?: 'top' | 'right' | 'bottom' | 'left'
+  /** Inline style forwarded to the overlay - lets callers keep the scrim off an area (e.g. a glass panel) that sits in front of it. */
+  overlayStyle?: HTMLAttributes['style']
 }
 
 defineOptions({
@@ -26,14 +28,14 @@ const props = withDefaults(defineProps<SheetContentProps>(), {
 })
 const emits = defineEmits<DialogContentEmits>()
 
-const delegatedProps = reactiveOmit(props, 'class', 'side')
+const delegatedProps = reactiveOmit(props, 'class', 'side', 'overlayStyle')
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
   <DialogPortal>
-    <SheetOverlay />
+    <SheetOverlay :style="overlayStyle" />
     <DialogContent
       data-slot="sheet-content"
       :class="cn(
