@@ -24,10 +24,11 @@ import SelectTrigger from '@/components/ui/select/SelectTrigger.vue'
 import SelectValue from '@/components/ui/select/SelectValue.vue'
 import { Textarea } from '@/components/ui/textarea'
 import StringListInput from '@/modules/career/components/StringListInput.vue'
+import SubProjectListInput from '@/modules/career/components/SubProjectListInput.vue'
 import TechnologyTagInput from '@/modules/career/components/TechnologyTagInput.vue'
 import { useExperiencesQuery } from '@/modules/career/composables/useExperiences'
 import { projectSchema } from '@/modules/career/validation/project.schema'
-import type { CreateProjectData, Project, UpdateProjectData } from '@/modules/career/types/project.type'
+import type { CreateProjectData, Project, SubProject, UpdateProjectData } from '@/modules/career/types/project.type'
 
 const { t } = useI18n()
 
@@ -47,6 +48,8 @@ const isEditing = computed(() => !!props.project)
 const achievements = ref<string[]>([])
 const challenges = ref<string[]>([])
 const clients = ref<string[]>([])
+const team = ref<string[]>([])
+const subProjects = ref<SubProject[]>([])
 const technologies = ref<string[]>([])
 const experienceIds = ref<string[]>([])
 
@@ -104,6 +107,8 @@ watch(open, (isOpen) => {
   achievements.value = project?.achievements ? [...project.achievements] : []
   challenges.value = project?.challenges ? [...project.challenges] : []
   clients.value = project?.clients ? [...project.clients] : []
+  team.value = project?.team ? [...project.team] : []
+  subProjects.value = project?.subProjects ? project.subProjects.map(subProject => ({ ...subProject })) : []
   technologies.value = project?.technologies ? project.technologies.map(technology => technology.name) : []
   experienceIds.value = project?.experienceIds ? [...project.experienceIds] : []
 })
@@ -129,6 +134,10 @@ const onSubmit = handleSubmit((formValues) => {
     achievements: achievements.value,
     challenges: challenges.value,
     clients: clients.value,
+    team: team.value,
+    subProjects: subProjects.value
+      .filter(subProject => subProject.name.trim())
+      .map(subProject => ({ name: subProject.name.trim(), url: subProject.url?.trim() || null })),
     teamSize: formValues.teamSize ?? null,
     durationMonths: formValues.durationMonths ?? null,
     usersCount: formValues.usersCount ?? null,
@@ -319,6 +328,16 @@ const onSubmit = handleSubmit((formValues) => {
         <div class="space-y-2">
           <Label>{{ t('career.projects.fields.clients') }}</Label>
           <StringListInput v-model="clients" :placeholder="t('career.projects.fields.clientsPlaceholder')" />
+        </div>
+
+        <div class="space-y-2">
+          <Label>{{ t('career.projects.fields.team') }}</Label>
+          <StringListInput v-model="team" :placeholder="t('career.projects.fields.teamPlaceholder')" />
+        </div>
+
+        <div class="space-y-2">
+          <Label>{{ t('career.projects.fields.subProjects') }}</Label>
+          <SubProjectListInput v-model="subProjects" />
         </div>
 
         <div class="grid gap-6 md:grid-cols-2">

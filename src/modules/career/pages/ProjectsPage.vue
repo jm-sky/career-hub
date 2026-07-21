@@ -172,6 +172,29 @@ async function move(index: number, direction: -1 | 1) {
                 {{ technology.name }}
               </Badge>
             </div>
+            <p v-if="project.team.length" class="text-sm text-muted-foreground">
+              <span class="font-medium">{{ t('career.projects.fields.team') }}:</span>
+              {{ project.team.join(', ') }}
+            </p>
+            <div v-if="project.subProjects.length" class="space-y-1">
+              <p class="text-sm font-medium text-muted-foreground">
+                {{ t('career.projects.fields.subProjects') }}
+              </p>
+              <ul class="text-sm">
+                <li v-for="(subProject, subIndex) in project.subProjects" :key="subIndex">
+                  <a
+                    v-if="subProject.url"
+                    :href="subProject.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-primary hover:underline"
+                  >
+                    {{ subProject.name }}
+                  </a>
+                  <span v-else>{{ subProject.name }}</span>
+                </li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
       </div>

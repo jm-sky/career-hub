@@ -11,6 +11,7 @@ from .schemas import (
     CreateProjectRequest,
     ProjectLinks,
     ProjectResponse,
+    SubProject,
     TechnologyResponse,
     UpdateProjectRequest,
 )
@@ -37,6 +38,8 @@ def _build_response(project: ProjectDB, technologies: list[TechnologyDB], experi
         achievements=list(project.achievements or []),
         challenges=list(project.challenges or []),
         clients=list(project.clients or []),
+        team=list(project.team or []),
+        sub_projects=[SubProject.model_validate(sp) for sp in project.sub_projects or []],
         team_size=project.team_size,
         duration_months=project.duration_months,
         users_count=project.users_count,
@@ -137,6 +140,8 @@ class ProjectService:
             achievements=list(payload.achievements),
             challenges=list(payload.challenges),
             clients=list(payload.clients),
+            team=list(payload.team),
+            sub_projects=[sp.model_dump(exclude_none=True) for sp in payload.subProjects],
             team_size=payload.teamSize,
             duration_months=payload.durationMonths,
             users_count=payload.usersCount,
@@ -183,6 +188,10 @@ class ProjectService:
             project.challenges = list(payload.challenges)
         if payload.clients is not None:
             project.clients = list(payload.clients)
+        if payload.team is not None:
+            project.team = list(payload.team)
+        if payload.subProjects is not None:
+            project.sub_projects = [sp.model_dump(exclude_none=True) for sp in payload.subProjects]
         if payload.teamSize is not None:
             project.team_size = payload.teamSize
         if payload.durationMonths is not None:

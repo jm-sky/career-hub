@@ -10,6 +10,11 @@ export interface ProjectLinks {
   docs?: string | null
 }
 
+export interface SubProject {
+  name: string
+  url?: string | null
+}
+
 export interface Project {
   id: string
   profileId: string
@@ -26,6 +31,8 @@ export interface Project {
   achievements: string[]
   challenges: string[]
   clients: string[]
+  team: string[]
+  subProjects: SubProject[]
   teamSize: number | null
   durationMonths: number | null
   usersCount: number | null
@@ -53,6 +60,8 @@ export interface CreateProjectData {
   achievements?: string[]
   challenges?: string[]
   clients?: string[]
+  team?: string[]
+  subProjects?: SubProject[]
   teamSize?: number | null
   durationMonths?: number | null
   usersCount?: number | null
@@ -77,6 +86,8 @@ export interface UpdateProjectData {
   achievements?: string[]
   challenges?: string[]
   clients?: string[]
+  team?: string[]
+  subProjects?: SubProject[]
   teamSize?: number | null
   durationMonths?: number | null
   usersCount?: number | null

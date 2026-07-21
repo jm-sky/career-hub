@@ -1,6 +1,8 @@
 # 001 — Projects have no `team` or `subProjects` fields
 
-**Status:** Open
+**Status:** Fields implemented 2026-07-21 (schema, API, frontend). Seeding the
+actual historical values from `madeyski.org/src/data/projects.ts` is still
+open — that source file isn't available in this checkout.
 **Found:** 2026-07-21, while writing `cli db seed career-projects` to load real
 project history from `madeyski.org/src/data/projects.ts` into the `projects` table.
 
@@ -20,16 +22,31 @@ Neither field appears anywhere in `docs/plans/*.md` as planned work. The seed
 script drops both rather than force-fitting them into an existing column
 (`clients`, `description`, etc.).
 
-## Proposed follow-up
+## Resolution (2026-07-21)
 
-If this data is wanted in the UI later:
+Implemented in full:
 
-- Add `team` (JSONB list of strings) and `sub_projects` (JSONB list of
-  `{name, url}`) columns to `projects`, with a migration.
-- Extend `ProjectResponse` / `CreateProjectRequest` / `UpdateProjectRequest`
-  (`backend/app/modules/career/schemas.py`) with `team` / `subProjects`.
-- Extend the frontend `src/modules/career/types/project.type.ts` and the
-  project form/detail components to expose them.
+- `team` (JSONB list of strings) and `sub_projects` (JSONB list of
+  `{name, url}`) columns added to `projects` via migration `007`.
+- `ProjectResponse` / `CreateProjectRequest` / `UpdateProjectRequest`
+  (`backend/app/modules/career/schemas.py`) extended with `team` / `subProjects`
+  (new `SubProject` schema).
+- `ProjectService` (`project_service.py`) reads/writes both fields on
+  create/update.
+- Frontend `src/modules/career/types/project.type.ts` gained `team: string[]`
+  and `subProjects: SubProject[]`; `ProjectFormDialog.vue` exposes both
+  (`StringListInput` for team, new `SubProjectListInput.vue` for sub-projects);
+  `ProjectsPage.vue` displays both on the project card, with sub-project URLs
+  rendered as links.
+- i18n keys added for `en`/`pl`.
+- Verified end-to-end against the live API (create → list → field values
+  round-trip correctly, including non-ASCII names).
 
-Not urgent — no current UI need beyond preserving the historical seed data
-faithfully.
+## Remaining follow-up
+
+Seeding the *actual* historical `team`/`subProjects` values (e.g. "DEV Made IT
+Template" → WIARBUD/SAVA GROUP/Kraina Snów) from
+`madeyski.org/src/data/projects.ts` into `app/seeders/career_projects.py` is
+still open — that source file is not present in this checkout. Once available,
+extend the seeder's project dicts with `team`/`sub_projects` keys and pass them
+through in `career_projects.py`.
