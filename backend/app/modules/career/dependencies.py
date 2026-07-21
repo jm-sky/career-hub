@@ -11,6 +11,8 @@ from app.modules.auth.auth_utils import verify_token
 from app.modules.auth.dependencies import CurrentUser
 from app.modules.auth.repositories import get_user_repository
 from app.modules.auth.types.repository import UserRepositoryInterface
+from app.modules.billing.dependencies import get_billing_service
+from app.modules.billing.service import BillingService
 
 from .achievement_repository import AchievementRepository
 from .achievement_service import AchievementService
@@ -135,7 +137,10 @@ def get_language_service(db: AsyncSession = Depends(get_db)) -> LanguageService:
     return LanguageService(LanguageRepository(db))
 
 
-def get_cv_version_service(db: AsyncSession = Depends(get_db)) -> CvVersionService:
+def get_cv_version_service(
+    db: AsyncSession = Depends(get_db),
+    billing_service: BillingService = Depends(get_billing_service),
+) -> CvVersionService:
     return CvVersionService(
         CvVersionRepository(db),
         ExperienceRepository(db),
@@ -145,4 +150,5 @@ def get_cv_version_service(db: AsyncSession = Depends(get_db)) -> CvVersionServi
         CertificationRepository(db),
         AchievementRepository(db),
         LanguageRepository(db),
+        billing_service,
     )

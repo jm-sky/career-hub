@@ -92,7 +92,7 @@ async def generate_cv_version(
     cv_version = await service.get_entity_for_profile(id, profile.id)
     if cv_version is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found")
-    return await service.generate(cv_version)
+    return await service.generate(cv_version, profile.user_id)
 
 
 @router.get("/cv-versions/{id}/download")

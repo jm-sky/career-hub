@@ -558,3 +558,4 @@ class GenerateCvVersionResponse(BaseModel):
 
     jobId: str
     status: Literal["queued"]
+    watermark: bool = Field(description="Whether the eventual PDF will carry a watermark, per the requester's subscription tier (Free tier only)")

@@ -98,8 +98,8 @@ export function useSubscription() {
   const currentPlanFeatures = computed(() => PLAN_FEATURES[currentPlan.value])
   const isFreeTier = computed(() => currentPlan.value === 'free')
   const isProTier = computed(() => currentPlan.value === 'pro')
-  const isProPlusTier = computed(() => currentPlan.value === 'pro_plus')
-  const isPaidTier = computed(() => isProTier.value || isProPlusTier.value)
+  const isExpertTier = computed(() => currentPlan.value === 'expert')
+  const isPaidTier = computed(() => isProTier.value || isExpertTier.value)
   const isGrandfathered = computed(() => subscription.value?.isGrandfathered || false)
   const isCanceled = computed(() => subscription.value?.status === 'canceled')
   const isPastDue = computed(() => subscription.value?.status === 'past_due')
@@ -113,13 +113,13 @@ export function useSubscription() {
   const canUpgradeTo = (targetPlan: PlanTier) => {
     if (isGrandfathered.value) return false
     if (currentPlan.value === 'free') return targetPlan !== 'free'
-    if (currentPlan.value === 'pro') return targetPlan === 'pro_plus'
+    if (currentPlan.value === 'pro') return targetPlan === 'expert'
     return false
   }
 
   const canDowngradeTo = (targetPlan: PlanTier) => {
     if (isGrandfathered.value) return false
-    if (currentPlan.value === 'pro_plus') return targetPlan !== 'pro_plus'
+    if (currentPlan.value === 'expert') return targetPlan !== 'expert'
     if (currentPlan.value === 'pro') return targetPlan === 'free'
     return false
   }
@@ -170,7 +170,7 @@ export function useSubscription() {
     // Computed flags
     isFreeTier,
     isProTier,
-    isProPlusTier,
+    isExpertTier,
     isPaidTier,
     isGrandfathered,
     isCanceled,

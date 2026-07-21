@@ -203,7 +203,7 @@ export const adminPl = {
       plans: {
         free: 'Darmowy',
         pro: 'Pro',
-        pro_plus: 'Pro Plus',
+        expert: 'Expert',
       },
       billing: {
         monthly: 'Miesięczne',
@@ -219,7 +219,7 @@ export const adminPl = {
       changeTo: {
         free: 'Zmień na Darmowy',
         pro: 'Zmień na Pro',
-        pro_plus: 'Zmień na Pro Plus',
+        expert: 'Zmień na Expert',
       },
       changePlan: {
         confirm: 'Czy na pewno chcesz zmienić plan na {plan}?',

@@ -109,9 +109,16 @@ Tables (all ULID PK unless noted, `created_at`/`updated_at` timestamps on all):
 **DONE 2026-07-21 (CRUD only, deliberately split from the above):** table/migration,
 full CRUD, single-default enforcement, `sectionsConfig` ownership validation. `generate`
 returns 202+jobId but never renders a PDF; `download` 404s honestly. See
-`career-phase5-cv-versions-log.md`. The PDF engine choice and the billing-tier rename
-(blocking watermark gating) are both still open — pick this up as a separate follow-up
-task, not bundled into whichever phase is "next" by number.
+`career-phase5-cv-versions-log.md`.
+
+**Billing-tier rename + watermark gating — DONE 2026-07-21** (separate follow-up task,
+not bundled into the CRUD work above): `pro_plus` → `expert` renamed everywhere, limits
+redesigned to CareerHub dimensions, `generate` now resolves and returns a `watermark:
+bool` flag from the caller's subscription tier via `BillingService.get_subscription_limits`
+(defaults to `true`/watermarked if no subscription row exists yet). Still open: the
+PDF engine (WeasyPrint, decided but not implemented) — `generate`/`download` remain
+stubs until that's wired up, at which point the renderer should just read this flag
+rather than re-deriving it.
 
 **Phase 6 — Import/Export:**
 - `import_history` table/migration. `POST /import/linkedin` (multipart, async 202),
@@ -131,10 +138,21 @@ task, not bundled into whichever phase is "next" by number.
 
 ## Open questions (flag before the relevant phase, don't block earlier phases on these)
 
-- PDF rendering engine (WeasyPrint/ReportLab/other) — Phase 5.
-- Feature-limits tier rename (`free`/`pro`/`pro_plus` → `Free`/`Pro`/`Expert` with real
-  CareerHub limits) — blocks Phase 5's watermark gating and any AI usage gating in
-  Phase 7. Should probably be done as its own small task before Phase 5, not bundled in.
+- PDF rendering engine — **DECIDED: WeasyPrint.** Not yet implemented; `generate`/
+  `download` are still stubs. This is the next open item for Phase 5.
+- ~~Feature-limits tier rename~~ — **DONE 2026-07-21.** `free`/`pro`/`pro_plus` →
+  `free`/`pro`/`expert` end-to-end (backend + frontend + Stripe env vars), and the
+  limits redesigned to `cvVersionsLimit`/`pdfWatermark`/`customDomain`/`apiAccess`
+  per the Free/Pro/Expert table below. Watermark gating is wired into the
+  `generate` stub (see Status section). See `gear-module-strip-log.md` for full detail.
+
+  | | Free | Pro | Expert |
+  |---|---|---|---|
+  | CV versions | 1 | 10 | Unlimited |
+  | Watermarked PDF | Yes | No | No |
+  | AI features | No | Yes | Yes |
+  | Custom domain | No | No | Yes |
+  | API access | No | No | Yes |
 - LinkedIn import parsing approach (official API vs. HTML scrape vs. user-exported data
   archive) — Phase 6, genuinely undecided per the old ROADMAP.
 - Sensitive numeric fields (`usersCount`, `teamSize`) on shared/public profiles may need

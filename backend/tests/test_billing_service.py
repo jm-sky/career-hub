@@ -248,6 +248,10 @@ class TestGetSubscriptionLimits:
         assert response.aiMonthlyTokenLimit == 0
         assert response.requiresByok is True
         assert response.canUseAdvancedFeatures is False
+        assert response.cvVersionsLimit == 1
+        assert response.pdfWatermark is True
+        assert response.customDomain is False
+        assert response.apiAccess is False
 
     @pytest.mark.asyncio
     async def test_get_limits_pro_tier(
@@ -266,21 +270,29 @@ class TestGetSubscriptionLimits:
         assert response.aiMonthlyTokenLimit == 1_000_000
         assert response.requiresByok is False
         assert response.canUseAdvancedFeatures is True
+        assert response.cvVersionsLimit == 10
+        assert response.pdfWatermark is False
+        assert response.customDomain is False
+        assert response.apiAccess is False
 
     @pytest.mark.asyncio
-    async def test_get_limits_business_tier(
+    async def test_get_limits_expert_tier(
         self,
         billing_service: BillingService,
         mock_repository: AsyncMock,
         sample_subscription: SubscriptionDB,
     ) -> None:
-        """Test limits for business tier."""
-        sample_subscription.plan_tier = "business"
+        """Test limits for expert tier."""
+        sample_subscription.plan_tier = "expert"
         mock_repository.get_subscription_by_user_id.return_value = sample_subscription
 
         response = await billing_service.get_subscription_limits("user123")
 
-        assert response.planTier == "business"
+        assert response.planTier == "expert"
         assert response.aiMonthlyTokenLimit == 10_000_000
         assert response.requiresByok is False
         assert response.canUseAdvancedFeatures is True
+        assert response.cvVersionsLimit is None
+        assert response.pdfWatermark is False
+        assert response.customDomain is True
+        assert response.apiAccess is True

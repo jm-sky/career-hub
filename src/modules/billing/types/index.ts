@@ -2,7 +2,7 @@
  * TypeScript types for Stripe billing module
  */
 
-export type PlanTier = 'free' | 'pro' | 'pro_plus'
+export type PlanTier = 'free' | 'pro' | 'expert'
 
 export type BillingInterval = 'monthly' | 'annual'
 
@@ -31,6 +31,10 @@ export interface SubscriptionLimits {
   canExportData: boolean
   canUseAdvancedFeatures: boolean
   requiresByok: boolean
+  cvVersionsLimit: number | null
+  pdfWatermark: boolean
+  customDomain: boolean
+  apiAccess: boolean
 }
 
 export interface CreateCheckoutSessionRequest {
@@ -67,10 +71,11 @@ export interface PlanFeatures {
   }
   features: string[]
   limits: {
-    aiTokens: number
-    storage: number
-    items: number
-    containers: number
+    cvVersionsLimit: number | null // null = unlimited
+    pdfWatermark: boolean
+    aiAccess: boolean
+    customDomain: boolean
+    apiAccess: boolean
   }
   popular?: boolean
 }
@@ -88,15 +93,15 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
       'Basic profile management',
       'Data export (JSON/Markdown)',
       'BYOK: Bring Your Own API Key (OpenRouter)',
-      '100 MB storage',
-      '2,000 items limit',
-      '100 containers limit',
+      '1 CV version',
+      'Watermarked PDF export',
     ],
     limits: {
-      aiTokens: 0, // BYOK required
-      storage: 100 * 1024 * 1024, // 100 MB
-      items: 2000,
-      containers: 100,
+      cvVersionsLimit: 1,
+      pdfWatermark: true,
+      aiAccess: false,
+      customDomain: false,
+      apiAccess: false,
     },
   },
   pro: {
@@ -111,22 +116,21 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
       'Everything in Free',
       'AI-powered suggestions',
       '~$1 worth of AI tokens/month',
-      'Advanced features',
-      '5 GB storage',
-      '10,000 items limit',
-      '250 containers limit',
+      'Up to 10 CV versions',
+      'No watermark on PDF export',
     ],
     limits: {
-      aiTokens: 1_000_000,
-      storage: 5 * 1024 * 1024 * 1024, // 5 GB
-      items: 10000,
-      containers: 250,
+      cvVersionsLimit: 10,
+      pdfWatermark: false,
+      aiAccess: true,
+      customDomain: false,
+      apiAccess: false,
     },
     popular: true,
   },
-  pro_plus: {
-    tier: 'pro_plus',
-    name: 'Pro Plus',
+  expert: {
+    tier: 'expert',
+    name: 'Expert',
     price: {
       monthly: 15.0,
       annual: 150,
@@ -136,16 +140,16 @@ export const PLAN_FEATURES: Record<PlanTier, PlanFeatures> = {
       'Everything in Pro',
       'Priority AI processing',
       '~$10 worth of AI tokens/month',
-      'Premium support',
-      '50 GB storage',
-      '50,000 items limit',
-      '500 containers limit',
+      'Unlimited CV versions',
+      'Custom domain for your public profile',
+      'API access',
     ],
     limits: {
-      aiTokens: 10_000_000,
-      storage: 50 * 1024 * 1024 * 1024, // 50 GB
-      items: 50000,
-      containers: 500,
+      cvVersionsLimit: null,
+      pdfWatermark: false,
+      aiAccess: true,
+      customDomain: true,
+      apiAccess: true,
     },
   },
 }

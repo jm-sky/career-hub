@@ -1,6 +1,8 @@
 """Business logic for CV versions (career module, Phase 5)."""
 
 from app.common.id_utils import generate_id
+from app.modules.billing.exceptions import SubscriptionNotFoundError
+from app.modules.billing.service import BillingService
 
 from .achievement_repository import AchievementRepository
 from .certification_repository import CertificationRepository
@@ -34,6 +36,7 @@ class CvVersionService:
         certification_repository: CertificationRepository,
         achievement_repository: AchievementRepository,
         language_repository: LanguageRepository,
+        billing_service: BillingService,
     ):
         self.repository = repository
         self.experience_repository = experience_repository
@@ -43,6 +46,7 @@ class CvVersionService:
         self.certification_repository = certification_repository
         self.achievement_repository = achievement_repository
         self.language_repository = language_repository
+        self.billing_service = billing_service
 
     async def _validate_sections_config(self, profile_id: str, sections: CvSectionsConfig) -> None:
         checks = (
@@ -104,11 +108,21 @@ class CvVersionService:
     async def delete(self, cv_version: CvVersionDB) -> None:
         await self.repository.delete(cv_version)
 
-    async def generate(self, cv_version: CvVersionDB) -> GenerateCvVersionResponse:
-        """Stub — accepts the request but does not render a PDF. No PDF rendering
-        engine has been chosen yet (open question in career-module-plan.md Phase 5);
-        this only confirms the request shape and hands back a job id."""
-        return GenerateCvVersionResponse(jobId=generate_id(), status="queued")
+    async def generate(self, cv_version: CvVersionDB, user_id: str) -> GenerateCvVersionResponse:
+        """Stub — accepts the request but does not render a PDF yet. No PDF
+        rendering engine has been chosen (open question in career-module-plan.md
+        Phase 5). Watermark gating is wired ahead of the renderer itself: the
+        tier's `pdfWatermark` limit is resolved here so the real renderer, once
+        built, only has to read this flag rather than re-derive it from billing."""
+        watermark = await self._should_watermark(user_id)
+        return GenerateCvVersionResponse(jobId=generate_id(), status="queued", watermark=watermark)
+
+    async def _should_watermark(self, user_id: str) -> bool:
+        try:
+            limits = await self.billing_service.get_subscription_limits(user_id)
+        except SubscriptionNotFoundError:
+            return True  # No subscription yet == free tier == watermarked
+        return limits.pdfWatermark
 
     async def get_pdf_url(self, cv_version: CvVersionDB) -> str:
         if not cv_version.pdf_url:

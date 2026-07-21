@@ -1,4 +1,7 @@
+import type { BillingInterval, PlanTier, SubscriptionStatus } from '@/modules/billing/types'
 import type { TDateTime, TUUID } from '@/shared/types/base.type'
+
+export type { BillingInterval, PlanTier, SubscriptionStatus }
 
 export type TUserRole = 'user' | 'admin' | 'premium'
 
@@ -16,10 +19,6 @@ export interface IAdminUser {
   createdAt: TDateTime
   updatedAt: TDateTime
 }
-
-export type SubscriptionStatus = 'active' | 'canceled' | 'past_due' | 'unpaid' | 'incomplete'
-export type PlanTier = 'free' | 'pro' | 'pro_plus'
-export type BillingInterval = 'monthly' | 'annual'
 
 export interface IAdminSubscription {
   id: TUUID
@@ -47,7 +46,7 @@ export interface IAdminSubscriptionStats {
   pastDueSubscriptions: number
   freeUsers: number
   proUsers: number
-  proPlusUsers: number
+  expertUsers: number
   grandfatheredUsers: number
   monthlyRevenue: number
   annualRevenue: number

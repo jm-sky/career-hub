@@ -90,7 +90,7 @@ class SubscriptionDB(Base):
     # Constraints
     __table_args__ = (
         CheckConstraint(
-            "plan_tier IN ('free', 'pro', 'pro_plus')", name="valid_plan_tier"
+            "plan_tier IN ('free', 'pro', 'expert')", name="valid_plan_tier"
         ),
         CheckConstraint(
             "billing_interval IN ('month', 'year')", name="valid_billing_interval"

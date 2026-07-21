@@ -46,7 +46,7 @@ async function loadData() {
   }
 }
 
-async function updateSubscriptionPlan(subscription: IAdminSubscription, newPlan: 'free' | 'pro' | 'pro_plus') {
+async function updateSubscriptionPlan(subscription: IAdminSubscription, newPlan: 'free' | 'pro' | 'expert') {
   const planName = t(`admin.subscriptions.plans.${newPlan}`, newPlan)
 
   if (!confirm(t('admin.subscriptions.changePlan.confirm', { plan: planName }, `Are you sure you want to change plan to ${planName}?`))) {
@@ -226,7 +226,7 @@ onMounted(() => {
 
         <template #planTier="{ row }">
           <Badge
-            :variant="row.original.planTier === 'pro_plus' ? 'default' : row.original.planTier === 'pro' ? 'secondary' : 'outline'"
+            :variant="row.original.planTier === 'expert' ? 'default' : row.original.planTier === 'pro' ? 'secondary' : 'outline'"
           >
             {{ t(`admin.subscriptions.plans.${row.original.planTier}`, row.original.planTier) }}
           </Badge>
@@ -276,13 +276,13 @@ onMounted(() => {
                 <Shield class="size-4" />
                 <span>{{ t('admin.subscriptions.changeTo.pro', 'Change to Pro') }}</span>
               </DropdownMenuItem>
-              <!-- Change to Pro Plus -->
+              <!-- Change to Expert -->
               <DropdownMenuItem
-                :disabled="row.original.planTier === 'pro_plus'"
-                @click="updateSubscriptionPlan(row.original, 'pro_plus')"
+                :disabled="row.original.planTier === 'expert'"
+                @click="updateSubscriptionPlan(row.original, 'expert')"
               >
                 <CreditCard class="size-4" />
-                <span>{{ t('admin.subscriptions.changeTo.pro_plus', 'Change to Pro Plus') }}</span>
+                <span>{{ t('admin.subscriptions.changeTo.expert', 'Change to Expert') }}</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <!-- Cancel Subscription -->

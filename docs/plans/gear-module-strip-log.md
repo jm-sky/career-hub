@@ -102,13 +102,18 @@ exists on disk):
   feature keys to show.** Plan copy in `types/index.ts` / `utils/planTranslations.ts` /
   `i18n/locales/{en,pl}.ts` said "Basic gear management" / "AI-powered gear
   recommendations" — reworded to "Basic profile management" / "AI-powered suggestions"
-  (translation-key mappings updated to match). **Left untouched, flagged for a real
-  decision:** the plan tiers are still named `free`/`pro`/`pro_plus` (not the
-  `Free`/`Pro`/`Expert` from `requirements-digest.md`), and the numeric limits
-  (`items`/`containers`/storage/aiTokens) are still gear-shaped, not
-  `cvVersions`/watermark/custom-domain/API-access as the digest specifies. This is a
-  business-model decision, not a mechanical strip — do it deliberately when building the
-  `career` module's billing integration, not by find-replacing numbers.
+  (translation-key mappings updated to match). **RESOLVED 2026-07-21** (see
+  `career-phase5-cv-versions-log.md` follow-up work): plan tiers renamed
+  `free`/`pro`/`pro_plus` → `free`/`pro`/`expert` across backend (DB CHECK
+  constraint, schemas, service, webhook handler, Stripe env vars) and frontend (3
+  duplicate `PlanTier` type declarations consolidated to one source of truth in
+  `billing/types`, admin module now imports it instead of redeclaring). The
+  `itemsLimit`/`containersLimit` gear-shaped limits were replaced with
+  `cvVersionsLimit`/`pdfWatermark`/`customDomain`/`apiAccess` per the digest's
+  Free/Pro/Expert table. Watermark gating is wired into `POST
+  /career/cv-versions/{id}/generate` (returns a `watermark: bool` resolved from
+  the requester's subscription tier) ahead of the PDF renderer itself, which is
+  still not built.
 - **`src/modules/settings/`**: deleted `BrandsSettingsCard.vue`, `CategoriesSettingsCard.vue`,
   `ContainerTypesSettingsCard.vue` — all three were already orphaned (not imported by
   `SettingsPage.vue` or anywhere else), so this is pure dead-code removal, not a behavior

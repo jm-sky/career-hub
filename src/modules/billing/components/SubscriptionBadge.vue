@@ -10,7 +10,7 @@ const { currentPlan, isGrandfathered, isLoadingSubscription } = useSubscription(
 
 const badgeVariant = computed(() => {
   if (isGrandfathered.value) return 'premium'
-  if (currentPlan.value === 'pro_plus') return 'premium'
+  if (currentPlan.value === 'expert') return 'premium'
   if (currentPlan.value === 'pro') return 'default'
   return 'secondary'
 })

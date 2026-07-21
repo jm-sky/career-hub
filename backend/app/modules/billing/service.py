@@ -94,7 +94,7 @@ class BillingService:
             StripeAPIError: If Stripe API call fails
         """
         # Validate plan tier
-        if plan_tier not in ["pro", "pro_plus"]:
+        if plan_tier not in ["pro", "expert"]:
             raise InvalidPlanTierError(f"Invalid plan tier: {plan_tier}")
 
         # Validate billing interval
@@ -109,7 +109,7 @@ class BillingService:
         # If user has active paid subscription, cancel it first to allow upgrade/downgrade
         if (
             subscription
-            and subscription.plan_tier in ["pro", "pro_plus"]
+            and subscription.plan_tier in ["pro", "expert"]
             and subscription.status == "active"
         ):
             logger.info(
@@ -344,42 +344,41 @@ class BillingService:
 
         plan_tier = subscription.plan_tier
 
-        # Define limits based on plan tier
-        # Limits are designed to protect database storage, not restrict normal usage
-        # Estimated size: ~1-2 KB per item, ~0.5-1 KB per container (with PostgreSQL overhead)
-        limits: dict[str, dict[str, int | bool]] = {
+        # Define limits based on plan tier (CareerHub dimensions — CV version count,
+        # PDF watermark, AI access, custom domain, API access)
+        limits: dict[str, dict[str, int | bool | None]] = {
             "free": {
                 "aiMonthlyTokenLimit": 0,  # 0 = BYOK required
-                "storageLimit": 100 * 1024 * 1024,  # 100 MB (for images/storage)
+                "storageLimit": 100 * 1024 * 1024,  # 100 MB (for profile photo/storage)
                 "canExportData": True,
                 "canUseAdvancedFeatures": False,
                 "requiresByok": True,
-                # Free tier: ~2-4 MB database space protection
-                # Enough for typical users (multiple gear lists), protects against abuse
-                "itemsLimit": 2000,  # ~2-4 MB database space
-                "containersLimit": 100,  # ~50-100 KB database space (containers are lightweight)
+                "cvVersionsLimit": 1,
+                "pdfWatermark": True,
+                "customDomain": False,
+                "apiAccess": False,
             },
             "pro": {
                 "aiMonthlyTokenLimit": 1_000_000,  # ~$1 worth
-                "storageLimit": 5 * 1024 * 1024 * 1024,  # 5 GB (for images/storage)
+                "storageLimit": 5 * 1024 * 1024 * 1024,  # 5 GB (for profile photo/storage)
                 "canExportData": True,
                 "canUseAdvancedFeatures": True,
                 "requiresByok": False,
-                # Pro tier: ~10-20 MB database space
-                # For power users with extensive gear collections
-                "itemsLimit": 10000,  # ~10-20 MB database space
-                "containersLimit": 250,  # ~125-250 KB database space
+                "cvVersionsLimit": 10,
+                "pdfWatermark": False,
+                "customDomain": False,
+                "apiAccess": False,
             },
-            "pro_plus": {
+            "expert": {
                 "aiMonthlyTokenLimit": 10_000_000,  # ~$10 worth
-                "storageLimit": 50 * 1024 * 1024 * 1024,  # 50 GB (for images/storage)
+                "storageLimit": 50 * 1024 * 1024 * 1024,  # 50 GB (for profile photo/storage)
                 "canExportData": True,
                 "canUseAdvancedFeatures": True,
                 "requiresByok": False,
-                # Pro Plus tier: ~50-100 MB database space
-                # For professional users, gear shops, or very large collections
-                "itemsLimit": 50000,  # ~50-100 MB database space
-                "containersLimit": 500,  # ~250-500 KB database space
+                "cvVersionsLimit": None,  # unlimited
+                "pdfWatermark": False,
+                "customDomain": True,
+                "apiAccess": True,
             },
         }
 
@@ -388,17 +387,19 @@ class BillingService:
         # Type cast plan_tier to Literal and dict bool values to proper types
         from typing import cast, Literal
 
-        plan_tier_typed = cast(Literal["free", "pro", "pro_plus"], plan_tier)
+        plan_tier_typed = cast(Literal["free", "pro", "expert"], plan_tier)
 
         return SubscriptionLimitsResponse(
             planTier=plan_tier_typed,
-            aiMonthlyTokenLimit=plan_limits["aiMonthlyTokenLimit"],
-            storageLimit=plan_limits["storageLimit"],
+            aiMonthlyTokenLimit=cast(int, plan_limits["aiMonthlyTokenLimit"]),
+            storageLimit=cast(int, plan_limits["storageLimit"]),
             canExportData=cast(bool, plan_limits["canExportData"]),
             canUseAdvancedFeatures=cast(bool, plan_limits["canUseAdvancedFeatures"]),
             requiresByok=cast(bool, plan_limits["requiresByok"]),
-            itemsLimit=plan_limits["itemsLimit"],
-            containersLimit=plan_limits["containersLimit"],
+            cvVersionsLimit=plan_limits["cvVersionsLimit"],
+            pdfWatermark=cast(bool, plan_limits["pdfWatermark"]),
+            customDomain=cast(bool, plan_limits["customDomain"]),
+            apiAccess=cast(bool, plan_limits["apiAccess"]),
         )
 
     async def check_ai_access(
@@ -422,7 +423,7 @@ class BillingService:
             return False
 
         # Paid tiers have AI access
-        if subscription.plan_tier in ["pro", "pro_plus"]:
+        if subscription.plan_tier in ["pro", "expert"]:
             return True
 
         # Free tier requires BYOK
@@ -455,9 +456,9 @@ class BillingService:
                 "monthly": settings.stripe.pro_monthly_price_id,
                 "annual": settings.stripe.pro_annual_price_id,
             },
-            "pro_plus": {
-                "monthly": settings.stripe.pro_plus_monthly_price_id,
-                "annual": settings.stripe.pro_plus_annual_price_id,
+            "expert": {
+                "monthly": settings.stripe.expert_monthly_price_id,
+                "annual": settings.stripe.expert_annual_price_id,
             },
         }
 
@@ -564,7 +565,7 @@ class BillingService:
         # Count by plan tier
         free_count = sum(1 for s in subscriptions if s.plan_tier == "free")
         pro_count = sum(1 for s in subscriptions if s.plan_tier == "pro")
-        pro_plus_count = sum(1 for s in subscriptions if s.plan_tier == "pro_plus")
+        expert_count = sum(1 for s in subscriptions if s.plan_tier == "expert")
 
         # Count grandfathered users
         grandfathered_count = sum(1 for s in subscriptions if s.is_grandfathered)
@@ -580,7 +581,7 @@ class BillingService:
                         monthly_revenue += 5.0
                     elif sub.billing_interval == "annual":
                         annual_revenue += 50.0
-                elif sub.plan_tier == "pro_plus":
+                elif sub.plan_tier == "expert":
                     if sub.billing_interval == "monthly":
                         monthly_revenue += 15.0
                     elif sub.billing_interval == "annual":
@@ -601,7 +602,7 @@ class BillingService:
             "pastDueSubscriptions": past_due_count,
             "freeUsers": free_count,
             "proUsers": pro_count,
-            "proPlusUsers": pro_plus_count,
+            "expertUsers": expert_count,
             "grandfatheredUsers": grandfathered_count,
             "monthlyRevenue": monthly_revenue,
             "annualRevenue": annual_revenue,
@@ -650,7 +651,7 @@ class BillingService:
 
         # Update fields
         if plan_tier is not None and plan_tier != subscription.plan_tier:
-            if plan_tier not in ["free", "pro", "pro_plus"]:
+            if plan_tier not in ["free", "pro", "expert"]:
                 raise InvalidPlanTierError(f"Invalid plan tier: {plan_tier}")
             changes.append(("plan_tier", subscription.plan_tier, plan_tier))
             subscription.plan_tier = plan_tier

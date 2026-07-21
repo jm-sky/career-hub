@@ -15,9 +15,9 @@ from pydantic import BaseModel, Field, HttpUrl, field_validator
 class CreateCheckoutSessionRequest(BaseModel):
     """Request schema for creating a Stripe Checkout session."""
 
-    planTier: Literal["pro", "pro_plus"] = Field(
+    planTier: Literal["pro", "expert"] = Field(
         ...,
-        description="Subscription plan tier (pro or pro_plus)",
+        description="Subscription plan tier (pro or expert)",
     )
     billingInterval: Literal["monthly", "annual"] = Field(
         ...,
@@ -68,7 +68,7 @@ class SubscriptionResponse(BaseModel):
     stripeSubscriptionId: str | None = Field(
         None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId"
     )
-    planTier: Literal["free", "pro", "pro_plus"] = Field(
+    planTier: Literal["free", "pro", "expert"] = Field(
         alias="plan_tier", serialization_alias="planTier"
     )
     billingInterval: Literal["month", "year"] | None = Field(
@@ -120,17 +120,27 @@ class PortalSessionResponse(BaseModel):
 
 
 class SubscriptionLimitsResponse(BaseModel):
-    """Response schema for subscription feature limits."""
+    """Response schema for subscription feature limits (CareerHub dimensions —
+    CV version count, PDF watermark, custom domain, API access — replacing the
+    inherited gear-stack dimensions of items/containers)."""
 
-    planTier: Literal["free", "pro", "pro_plus"]
+    planTier: Literal["free", "pro", "expert"]
     aiMonthlyTokenLimit: int
     storageLimit: int
     canExportData: bool
     canUseAdvancedFeatures: bool
     requiresByok: bool
-    itemsLimit: int = Field(..., description="Maximum number of items allowed")
-    containersLimit: int = Field(
-        ..., description="Maximum number of containers allowed"
+    cvVersionsLimit: int | None = Field(
+        ..., description="Maximum number of CV versions allowed, or null for unlimited"
+    )
+    pdfWatermark: bool = Field(
+        ..., description="Whether generated CV PDFs are watermarked on this tier"
+    )
+    customDomain: bool = Field(
+        ..., description="Whether this tier can serve the public profile on a custom domain"
+    )
+    apiAccess: bool = Field(
+        ..., description="Whether this tier has access to the (not yet built) public API"
     )
 
 
@@ -218,7 +228,7 @@ class AdminSubscriptionResponse(BaseModel):
     stripeSubscriptionId: str | None = Field(
         None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId"
     )
-    planTier: Literal["free", "pro", "pro_plus"] = Field(
+    planTier: Literal["free", "pro", "expert"] = Field(
         alias="plan_tier", serialization_alias="planTier"
     )
     billingInterval: Literal["month", "year"] | None = Field(
@@ -266,7 +276,7 @@ class AdminSubscriptionStatsResponse(BaseModel):
     pastDueSubscriptions: int
     freeUsers: int
     proUsers: int
-    proPlusUsers: int
+    expertUsers: int
     grandfatheredUsers: int
     monthlyRevenue: float
     annualRevenue: float
@@ -275,7 +285,7 @@ class AdminSubscriptionStatsResponse(BaseModel):
 class AdminUpdateSubscriptionRequest(BaseModel):
     """Request schema for admin subscription modifications."""
 
-    planTier: Literal["free", "pro", "pro_plus"] | None = Field(
+    planTier: Literal["free", "pro", "expert"] | None = Field(
         None,
         description="Update subscription plan tier",
     )

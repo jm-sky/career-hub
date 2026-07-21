@@ -16,7 +16,7 @@ const { currentPlan, upgradeToPlan, isUpgrading } = useSubscription()
 
 const billingInterval = ref<BillingInterval>('monthly')
 
-const handleSelectPlan = async (planTier: 'pro' | 'pro_plus') => {
+const handleSelectPlan = async (planTier: 'pro' | 'expert') => {
   await upgradeToPlan(planTier, billingInterval.value)
 }
 </script>
@@ -66,11 +66,11 @@ const handleSelectPlan = async (planTier: 'pro' | 'pro_plus') => {
                     :on-select-plan="() => handleSelectPlan('pro')"
                   />
                   <PlanCard
-                    :plan="PLAN_FEATURES.pro_plus"
+                    :plan="PLAN_FEATURES.expert"
                     billing-interval="monthly"
-                    :is-current-plan="currentPlan === 'pro_plus'"
+                    :is-current-plan="currentPlan === 'expert'"
                     :is-loading="isUpgrading"
-                    :on-select-plan="() => handleSelectPlan('pro_plus')"
+                    :on-select-plan="() => handleSelectPlan('expert')"
                   />
                 </div>
               </TabsContent>
@@ -85,11 +85,11 @@ const handleSelectPlan = async (planTier: 'pro' | 'pro_plus') => {
                     :on-select-plan="() => handleSelectPlan('pro')"
                   />
                   <PlanCard
-                    :plan="PLAN_FEATURES.pro_plus"
+                    :plan="PLAN_FEATURES.expert"
                     billing-interval="annual"
-                    :is-current-plan="currentPlan === 'pro_plus'"
+                    :is-current-plan="currentPlan === 'expert'"
                     :is-loading="isUpgrading"
-                    :on-select-plan="() => handleSelectPlan('pro_plus')"
+                    :on-select-plan="() => handleSelectPlan('expert')"
                   />
                 </div>
               </TabsContent>
