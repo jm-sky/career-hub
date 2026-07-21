@@ -20,8 +20,12 @@ const { t } = useI18n()
 </script>
 
 <template>
-  <Sidebar collapsible="icon">
-    <SidebarContent class="overflow-x-hidden max-h-[90vh] overflow-y-auto">
+  <Sidebar
+    collapsible="icon"
+    variant="floating"
+    class="mt-(--header-height) h-[calc(100svh-var(--header-height))] px-3 py-3"
+  >
+    <SidebarContent class="overflow-x-hidden overflow-y-auto">
       <SidebarGroup>
         <SidebarGroupContent>
           <SidebarMenu>

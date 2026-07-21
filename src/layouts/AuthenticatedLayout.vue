@@ -13,7 +13,7 @@ defineProps<{
 
 <template>
   <SidebarProvider class="bg-transparent">
-    <AppSidebar class="mt-(--header-height)" />
+    <AppSidebar />
     <SidebarInset class="min-w-0 bg-transparent pt-14">
       <div class="flex min-h-screen min-w-0 w-full max-w-full flex-col overflow-x-hidden bg-transparent">
         <!-- Top Bar -->

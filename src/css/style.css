@@ -206,6 +206,16 @@
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
   }
+
+}
+
+/* Floating sidebar reads as a glassy dock: rounder corners + soft ambient shadow.
+   Unlayered on purpose — must override the shared Sidebar's rounded-lg/shadow-none utilities. */
+[data-slot="sidebar"][data-variant="floating"] [data-sidebar="sidebar"] {
+  border-radius: 1rem;
+  box-shadow:
+    0 4px 16px oklch(0.2 0.03 175 / 0.08),
+    0 12px 40px oklch(0.2 0.03 175 / 0.06);
 }
 
 /* Hide reCAPTCHA badge (required notice is shown in footer) */
