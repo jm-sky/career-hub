@@ -77,9 +77,7 @@ class ProfileService:
         )
         return await self.repository.create(profile)
 
-    async def update_profile(
-        self, profile: ProfileDB, payload: UpdateProfileRequest
-    ) -> ProfileDB:
+    async def update_profile(self, profile: ProfileDB, payload: UpdateProfileRequest) -> ProfileDB:
         """Apply a partial update, then recompute the completeness score."""
         if payload.headline is not None:
             profile.headline = payload.headline
@@ -102,9 +100,7 @@ class ProfileService:
         profile.completeness_score = compute_completeness_score(profile)
         return await self.repository.save(profile)
 
-    async def save_draft(
-        self, profile: ProfileDB, payload: ProfileDraftRequest
-    ) -> ProfileDB:
+    async def save_draft(self, profile: ProfileDB, payload: ProfileDraftRequest) -> ProfileDB:
         """Step-scoped autosave — merges into draft_data[step], leaves other steps intact."""
         draft = dict(profile.draft_data or {})
         draft[payload.step] = payload.data

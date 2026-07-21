@@ -7,6 +7,20 @@ export const profileQueryKeys = {
   public: (slug: string) => [...profileQueryKeys.all, 'public', slug] as const,
 } as const
 
+export const experienceQueryKeys = {
+  all: ['career', 'experiences'] as const,
+} as const
+
+export const skillQueryKeys = {
+  all: ['career', 'skills'] as const,
+  suggestions: (role?: string) => [...skillQueryKeys.all, 'suggestions', role ?? null] as const,
+} as const
+
+export const technologyQueryKeys = {
+  all: ['career', 'technologies'] as const,
+  search: (query?: string) => [...technologyQueryKeys.all, 'search', query ?? ''] as const,
+} as const
+
 export function createProfileRetryFunction(maxAttempts = 2) {
   return (failureCount: number, error: unknown) => {
     if (isAuthError(error)) return false

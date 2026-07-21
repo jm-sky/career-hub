@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Info, UserRound } from 'lucide-vue-next'
+import { Briefcase, Info, Sparkles, UserRound } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'
 import {
@@ -31,6 +31,34 @@ const { t } = useI18n()
             >
               <UserRound class="size-4" />
               <span>{{ t('career.profile.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.experiences" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <Briefcase class="size-4" />
+              <span>{{ t('career.experiences.page.title') }}</span>
+            </SidebarMenuButton>
+          </RouterLink>
+        </SidebarMenuItem>
+
+        <SidebarMenuItem>
+          <RouterLink v-slot="{ href, navigate, isActive }" :to="CareerRoutePaths.skills" custom>
+            <SidebarMenuButton
+              :is-active="isActive"
+              as="a"
+              :href="href"
+              @click="navigate"
+            >
+              <Sparkles class="size-4" />
+              <span>{{ t('career.skills.page.title') }}</span>
             </SidebarMenuButton>
           </RouterLink>
         </SidebarMenuItem>

@@ -13,6 +13,8 @@ export default {
     cancel: 'Cancel',
     save: 'Save',
     create: 'Create',
+    add: 'Add',
+    remove: 'Remove',
     delete: 'Delete',
     edit: 'Edit',
     preview: 'Preview',

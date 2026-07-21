@@ -49,5 +49,63 @@ export const careerEn = {
       not_found: 'This profile does not exist or is not public.',
       error: 'Failed to load this profile.',
     },
+    experiences: {
+      page: {
+        title: 'Experience',
+        subtitle: 'Your work history — this feeds every CV you generate.',
+        add: 'Add experience',
+        empty: 'No experience entries yet. Add your first one.',
+        error: 'Failed to load your experience entries.',
+      },
+      form: {
+        createTitle: 'Add experience',
+        editTitle: 'Edit experience',
+        subtitle: 'Describe a role you held, its dates, and the technologies you used.',
+      },
+      fields: {
+        companyName: 'Company',
+        position: 'Position',
+        employmentType: 'Employment type',
+        employmentTypePlaceholder: 'e.g. full_time, contract, freelance',
+        startDate: 'Start date',
+        endDate: 'End date',
+        isCurrent: 'I currently work here',
+        description: 'Description',
+        responsibilities: 'Responsibilities',
+        responsibilitiesPlaceholder: 'Add a responsibility and press Enter',
+        technologies: 'Technologies',
+        technologiesPlaceholder: 'Search or add a technology',
+      },
+      deleteConfirm: {
+        title: 'Delete this experience?',
+        description: 'This will permanently remove this experience entry from your profile.',
+      },
+    },
+    skills: {
+      page: {
+        title: 'Skills',
+        subtitle: 'Rate your proficiency in the technologies you know.',
+        add: 'Add skill',
+        empty: 'No skills yet. Add your first one.',
+        error: 'Failed to load your skills.',
+      },
+      form: {
+        createTitle: 'Add skill',
+        editTitle: 'Edit skill',
+        subtitle: 'Pick a technology and rate your proficiency in it.',
+      },
+      fields: {
+        technology: 'Technology',
+        level: 'Proficiency (1-5)',
+        yearsOfExperience: 'Years of experience',
+        yearsOfExperienceShort: '{years} yrs',
+        startedUsingYear: 'Started using (year)',
+        isPrimary: 'Primary skill',
+      },
+      deleteConfirm: {
+        title: 'Delete this skill?',
+        description: 'This will permanently remove this skill from your profile.',
+      },
+    },
   },
 }

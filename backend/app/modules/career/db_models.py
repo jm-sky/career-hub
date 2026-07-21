@@ -1,8 +1,19 @@
-"""Database models for the career module (Phase 1: profiles only)."""
+"""Database models for the career module (Phase 1: profiles. Phase 2: experiences,
+technologies, skills)."""
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import (
+    CheckConstraint,
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -19,25 +30,109 @@ class ProfileDB(Base):
     __tablename__ = "profiles"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    user_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("users.id"), unique=True, nullable=False, index=True
-    )
+    user_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"), unique=True, nullable=False, index=True)
     slug: Mapped[str] = mapped_column(String(80), unique=True, nullable=False, index=True)
     headline: Mapped[str | None] = mapped_column(String(200), nullable=True)
     summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     location: Mapped[str | None] = mapped_column(String(120), nullable=True)
-    visibility: Mapped[str] = mapped_column(
-        String(10), nullable=False, default="PRIVATE"
-    )
+    visibility: Mapped[str] = mapped_column(String(10), nullable=False, default="PRIVATE")
     # Shape: {email?, phone?, linkedin?, website?}
     contact: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     # Wizard-in-progress storage, keyed by step name: {stepName: {...}}
     draft_data: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     profile_photo_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     completeness_score: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
     )
+
+
+class TechnologyDB(Base):
+    """A global, de-duplicated reference to a technology/tool/skill name.
+
+    Shared across all profiles' experiences/skills — not owned by any one profile.
+    """
+
+    __tablename__ = "technologies"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    category: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    layer: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class ExperienceDB(Base):
+    """A profile's work experience entry."""
+
+    __tablename__ = "experiences"
+    __table_args__ = (CheckConstraint("end_date IS NULL OR end_date > start_date", name="ck_experiences_end_after_start"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    company_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    position: Mapped[str] = mapped_column(String(200), nullable=False)
+    employment_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    is_current: Mapped[bool] = mapped_column(default=False, nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    responsibilities: Mapped[list] = mapped_column(JSONB, nullable=False, default=list)
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
+class ExperienceTechnologyDB(Base):
+    """M:N junction between experiences and technologies.
+
+    ``experience_id`` cascades on delete — removing an experience should drop its
+    junction rows automatically. ``technology_id`` does not — technologies are
+    shared reference data, never deleted as a side effect of unlinking one experience.
+    """
+
+    __tablename__ = "experience_technologies"
+
+    experience_id: Mapped[str] = mapped_column(String(36), ForeignKey("experiences.id", ondelete="CASCADE"), primary_key=True)
+    technology_id: Mapped[str] = mapped_column(String(36), ForeignKey("technologies.id"), primary_key=True)
+
+
+class SkillDB(Base):
+    """A profile's self-rated proficiency in a technology.
+
+    Unique per (profile_id, technology_id) — a profile has at most one skill
+    entry per technology.
+    """
+
+    __tablename__ = "skills"
+    __table_args__ = (
+        UniqueConstraint("profile_id", "technology_id", name="uq_skills_profile_technology"),
+        CheckConstraint("level >= 1 AND level <= 5", name="ck_skills_level_range"),
+    )
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    profile_id: Mapped[str] = mapped_column(String(36), ForeignKey("profiles.id"), nullable=False, index=True)
+    technology_id: Mapped[str] = mapped_column(String(36), ForeignKey("technologies.id"), nullable=False, index=True)
+    level: Mapped[int] = mapped_column(Integer, nullable=False)
+    years_of_experience: Mapped[float | None] = mapped_column(Float, nullable=True)
+    started_using_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    is_primary: Mapped[bool] = mapped_column(default=False, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
