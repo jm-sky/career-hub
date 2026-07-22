@@ -7,14 +7,15 @@ from urllib.parse import urlparse
 
 from webauthn import (
     generate_registration_options,
-    verify_registration_response,
     options_to_json,
+    verify_registration_response,
 )
 from webauthn.helpers import (
     base64url_to_bytes,
     bytes_to_base64url,
     parse_registration_credential_json,
 )
+
 from app.core.config import settings
 
 
@@ -54,9 +55,7 @@ def _get_timeout() -> int:
     return 60000
 
 
-def create_registration_options(
-    user_id: str, user_email: str, user_name: str
-) -> tuple[str, str]:
+def create_registration_options(user_id: str, user_email: str, user_name: str) -> tuple[str, str]:
     """
     Create WebAuthn registration options.
 

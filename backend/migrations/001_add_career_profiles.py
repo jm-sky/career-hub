@@ -20,9 +20,7 @@ async def upgrade() -> None:
     print("Creating profiles table...")
 
     async with engine.begin() as conn:
-        await conn.run_sync(
-            lambda sync_conn: ProfileDB.__table__.create(sync_conn, checkfirst=True)
-        )
+        await conn.run_sync(lambda sync_conn: ProfileDB.__table__.create(sync_conn, checkfirst=True))
 
     print("✓ profiles table created successfully")
 
@@ -32,9 +30,7 @@ async def downgrade() -> None:
     print("Dropping profiles table...")
 
     async with engine.begin() as conn:
-        await conn.run_sync(
-            lambda sync_conn: ProfileDB.__table__.drop(sync_conn, checkfirst=True)
-        )
+        await conn.run_sync(lambda sync_conn: ProfileDB.__table__.drop(sync_conn, checkfirst=True))
 
     print("✓ profiles table dropped successfully")
 

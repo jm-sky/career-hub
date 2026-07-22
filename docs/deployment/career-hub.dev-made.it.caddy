@@ -1,0 +1,84 @@
+# CareerHub - Caddy Configuration
+# Deploy:
+#   sudo cp docs/deployment/career-hub.dev-made.it.caddy /etc/caddy/sites-available/
+#   sudo ln -sf /etc/caddy/sites-available/career-hub.dev-made.it.caddy \
+#              /etc/caddy/sites-enabled/career-hub.dev-made.it.caddy
+#   sudo mkdir -p /var/www/career-hub && sudo chown caddy:deploy /var/www/career-hub
+#   sudo systemctl reload caddy
+#
+# Domains (DNS already points at this VPS):
+#   - career-hub.dev-made.it      — frontend SPA + /api proxy
+#   - api.career-hub.dev-made.it  — FastAPI backend
+#
+# Backend listens on 127.0.0.1:8004 (APP_PORT in backend/.env)
+
+career-hub.dev-made.it {
+  root * /var/www/career-hub
+  tls jan.madeyski@dev-made.it
+
+  header {
+    >Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' blob: https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.career-hub.dev-made.it https://www.google.com https://*.sentry.io https://s3.gear-stack.ovh; worker-src 'self' blob:; frame-src 'self' https://www.google.com https://www.gstatic.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    >X-Frame-Options "DENY"
+    >X-Content-Type-Options "nosniff"
+    >X-XSS-Protection "1; mode=block"
+    >Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    >Referrer-Policy "strict-origin-when-cross-origin"
+    >Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    -Server
+  }
+
+  encode gzip zstd
+
+  @hashed_assets {
+    path /assets/*.js
+    path /assets/*.css
+    path /assets/*.woff2
+    path /assets/*.woff
+    path /assets/*.ttf
+    path /assets/*.eot
+    path /webfonts/*
+  }
+  header @hashed_assets Cache-Control "public, max-age=31536000, immutable"
+
+  @html {
+    path /
+    path /*.html
+  }
+  header @html {
+    Cache-Control "no-cache, no-store, must-revalidate"
+    Pragma "no-cache"
+    Expires "0"
+  }
+
+  @static {
+    path /favicon.ico
+    path /robots.txt
+    path /*.png
+    path /*.jpg
+    path /*.jpeg
+    path /*.gif
+    path /*.svg
+    path /*.ico
+    path /pwa-*.png
+    path /manifest.webmanifest
+  }
+  header @static Cache-Control "public, max-age=3600"
+
+  handle /api/* {
+    reverse_proxy 127.0.0.1:8004 {
+      header_up X-Real-IP {remote_host}
+      header_up X-Forwarded-For {remote_host}
+      header_up X-Forwarded-Proto {scheme}
+    }
+  }
+
+  handle {
+    try_files {path} /index.html
+    file_server
+  }
+}
+
+api.career-hub.dev-made.it {
+  reverse_proxy http://127.0.0.1:8004
+  tls jan.madeyski@dev-made.it
+}

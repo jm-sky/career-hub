@@ -62,4 +62,4 @@ class ProfileRepository:
         subqueries = {name: (select(func.count()).select_from(model).where(model.profile_id == profile_id).scalar_subquery().label(name)) for name, model in section_models.items()}
         result = await self.db.execute(select(*subqueries.values()))
         row = result.one()
-        return {name: int(value) for name, value in zip(section_models, row)}
+        return {name: int(value) for name, value in zip(section_models, row, strict=False)}

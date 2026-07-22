@@ -17,10 +17,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2021-11-01",
         "endDate": None,
         "isCurrent": True,
-        "description": (
-            "Lead the programming team delivering internal products, client-facing portals, "
-            "ERP integrations, and AI-assisted back-office tools. Hybrid work, Poland."
-        ),
+        "description": ("Lead the programming team delivering internal products, client-facing portals, " "ERP integrations, and AI-assisted back-office tools. Hybrid work, Poland."),
         "responsibilities": [
             "Own technical direction and delivery for the programming team",
             "Architect and ship full-stack products (Vue, Python/PHP, SQL Server/Postgres)",
@@ -50,11 +47,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2025-04-01",
         "endDate": None,
         "isCurrent": True,
-        "description": (
-            "Personal brand for independent product and client work (not a registered company): "
-            "SaaS prototypes, company websites, ops tooling, and full-stack apps shipped under "
-            "the DEV Made IT name."
-        ),
+        "description": ("Personal brand for independent product and client work (not a registered company): " "SaaS prototypes, company websites, ops tooling, and full-stack apps shipped under " "the DEV Made IT name."),
         "responsibilities": [
             "Design and build end-to-end web products (Vue/Nuxt/Astro + FastAPI/Laravel)",
             "Ship multi-tenant and AI-assisted tools for niche domains",
@@ -84,10 +77,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2019-11-01",
         "endDate": "2024-10-01",
         "isCurrent": False,
-        "description": (
-            "Creating a microERP application — PHP 8 + Laravel 10 + Vue.js 3 + PostgreSQL. "
-            "Hybrid work, Warsaw, Mazowieckie."
-        ),
+        "description": ("Creating a microERP application — PHP 8 + Laravel 10 + Vue.js 3 + PostgreSQL. " "Hybrid work, Warsaw, Mazowieckie."),
         "responsibilities": [
             "Design and develop microERP features end-to-end",
             "Build Vue.js 3 frontends and Laravel/PHP 8 backends",
@@ -110,10 +100,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2018-03-01",
         "endDate": "2019-10-01",
         "isCurrent": False,
-        "description": (
-            "PHP/JavaScript/SQL development. Projecting, designing, programming, developing, "
-            "training, reviewing, consulting, presenting. Vue.js, T-SQL, security, financial documents."
-        ),
+        "description": ("PHP/JavaScript/SQL development. Projecting, designing, programming, developing, " "training, reviewing, consulting, presenting. Vue.js, T-SQL, security, financial documents."),
         "responsibilities": [
             "Full-stack development of financial and portal features",
             "Security-conscious handling of financial documents",
@@ -135,10 +122,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2016-01-01",
         "endDate": "2021-11-01",
         "isCurrent": False,
-        "description": (
-            "Creating original MES application. Developing and implementing original ERP features. "
-            "Product presentations, training, customer support, international arrangements."
-        ),
+        "description": ("Creating original MES application. Developing and implementing original ERP features. " "Product presentations, training, customer support, international arrangements."),
         "responsibilities": [
             "Build and implement original MES / ERP features",
             "Deliver product presentations, training, and customer support",
@@ -174,10 +158,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2014-12-01",
         "endDate": "2015-12-01",
         "isCurrent": False,
-        "description": (
-            "Implementation of original ERP features. SQL Server, PHP, JavaScript, EDI. "
-            "Based in Marki, Poland."
-        ),
+        "description": ("Implementation of original ERP features. SQL Server, PHP, JavaScript, EDI. " "Based in Marki, Poland."),
         "responsibilities": [
             "Implement ERP customizations for client operations",
             "Support EDI and SQL Server–based integrations",
@@ -191,10 +172,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2011-05-01",
         "endDate": "2014-09-01",
         "isCurrent": False,
-        "description": (
-            "Praca z dziećmi i rodzinami marginalizowanymi społecznie oraz współpraca ze szkołami "
-            "i urzędami w środowiskowej świetlicy terapeutyczno-opiekuńczej. Warszawa, praca stacjonarna."
-        ),
+        "description": ("Praca z dziećmi i rodzinami marginalizowanymi społecznie oraz współpraca ze szkołami " "i urzędami w środowiskowej świetlicy terapeutyczno-opiekuńczej. Warszawa, praca stacjonarna."),
         "responsibilities": [
             "Prowadzenie zajęć i opieki w świetlicy terapeutyczno-opiekuńczej",
             "Współpraca ze szkołami i urzędami",
@@ -209,10 +187,7 @@ RAW_EXPERIENCES: list[dict] = [
         "startDate": "2009-06-01",
         "endDate": "2014-05-01",
         "isCurrent": False,
-        "description": (
-            "Web development with PHP, JavaScript, MySQL, and Visual Basic. "
-            "Hybrid work, Warsaw, Mazowieckie."
-        ),
+        "description": ("Web development with PHP, JavaScript, MySQL, and Visual Basic. " "Hybrid work, Warsaw, Mazowieckie."),
         "responsibilities": [
             "Build and maintain web applications",
             "Work with PHP, JavaScript, MySQL, and Visual Basic",

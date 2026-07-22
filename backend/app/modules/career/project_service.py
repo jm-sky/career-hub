@@ -1,6 +1,7 @@
 """Business logic for projects (career module, Phase 3)."""
 
 from datetime import date
+from typing import cast
 
 from app.common.id_utils import generate_id
 
@@ -9,8 +10,11 @@ from .experience_repository import ExperienceRepository
 from .project_repository import ProjectExperienceRepository, ProjectRepository, ProjectTechnologyRepository
 from .schemas import (
     CreateProjectRequest,
+    ProfileVisibility,
+    ProjectCategory,
     ProjectLinks,
     ProjectResponse,
+    ProjectStatus,
     SubProject,
     TechnologyResponse,
     UpdateProjectRequest,
@@ -33,8 +37,8 @@ def _build_response(project: ProjectDB, technologies: list[TechnologyDB], experi
         is_ongoing=project.is_ongoing,
         is_anonymized=project.is_anonymized,
         anonymized_company=project.anonymized_company,
-        status=project.status,
-        category=project.category,
+        status=cast(ProjectStatus, project.status),
+        category=cast(ProjectCategory | None, project.category),
         achievements=list(project.achievements or []),
         challenges=list(project.challenges or []),
         clients=list(project.clients or []),
@@ -45,7 +49,7 @@ def _build_response(project: ProjectDB, technologies: list[TechnologyDB], experi
         users_count=project.users_count,
         budget_range=project.budget_range,
         links=ProjectLinks(**(project.links or {})),
-        visibility=project.visibility,
+        visibility=cast(ProfileVisibility, project.visibility),
         display_order=project.display_order,
         technologies=[TechnologyResponse.model_validate(t) for t in technologies],
         experienceIds=experience_ids,

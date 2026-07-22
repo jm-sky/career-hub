@@ -3,7 +3,6 @@
 import asyncio
 import importlib.util
 import sys
-from datetime import UTC, datetime
 from importlib import import_module
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -66,9 +65,8 @@ def init_database(force: bool = typer.Option(False, "--force", "-f", help="Recre
         _import_model_modules()
 
         # Import SchemaMigration model to ensure it's included in metadata
-        from app.core.migrations import SchemaMigration  # noqa: F401
-
         from app.core.database import Base, engine, init_db
+        from app.core.migrations import SchemaMigration  # noqa: F401
 
         if force:
             async with engine.begin() as conn:
@@ -113,9 +111,10 @@ def init_test_database(
         _import_model_modules()
 
         # Import SchemaMigration model to ensure it's included in metadata
-        from app.core.migrations import SchemaMigration  # noqa: F401
-        from app.core.database import Base
         from sqlalchemy.ext.asyncio import create_async_engine
+
+        from app.core.database import Base
+        from app.core.migrations import SchemaMigration  # noqa: F401
 
         # Get database password from environment
         db_password = os.getenv("POSTGRES_PASSWORD", "changeme")
@@ -180,8 +179,8 @@ def migrate_database(
                 console.print("[yellow]Database is not initialized. Running 'db init' first...[/yellow]")
                 # Run init logic
                 _import_model_modules()
+                from app.core.database import init_db
                 from app.core.migrations import SchemaMigration  # noqa: F401
-                from app.core.database import Base, engine, init_db
 
                 await init_db()
 
@@ -254,7 +253,7 @@ def migrate_database(
 
             except Exception as e:
                 console.print(f"[red]✗ Migration {version} failed:[/red] {e}")
-                raise typer.Exit(1)
+                raise typer.Exit(1) from None
 
         console.print("\n[bold green]✓ All pending migrations completed[/bold green]")
 
@@ -352,8 +351,8 @@ def migrate_graceful(
                 console.print("[yellow]Database is not initialized. Running 'db init' first...[/yellow]")
                 # Run init logic
                 _import_model_modules()
+                from app.core.database import init_db
                 from app.core.migrations import SchemaMigration  # noqa: F401
-                from app.core.database import Base, engine, init_db
 
                 await init_db()
 
@@ -486,7 +485,7 @@ def migrate_graceful(
             console.print(f"  [yellow]⚠ Errors (ignored): {error_count}[/yellow]")
         if skipped_count > 0:
             console.print(f"  [yellow]○ Skipped (already applied): {skipped_count}[/yellow]")
-        console.print(f"\n[bold green]✓ Graceful migration completed[/bold green]")
+        console.print("\n[bold green]✓ Graceful migration completed[/bold green]")
 
     asyncio.run(_migrate_graceful())
 
@@ -646,6 +645,7 @@ async def _seed_career(
 
     from app.core.database import get_db
     from app.modules.career.achievement_repository import AchievementRepository
+    from app.modules.career.certification_repository import CertificationRepository
     from app.modules.career.dependencies import (
         get_achievement_service,
         get_certification_service,
@@ -656,10 +656,11 @@ async def _seed_career(
         get_project_service,
         get_skill_service,
     )
+    from app.modules.career.education_repository import EducationRepository
     from app.modules.career.experience_repository import ExperienceRepository
     from app.modules.career.language_repository import LanguageRepository
     from app.modules.career.project_repository import ProjectRepository
-    from app.modules.career.schemas import UpdateAchievementRequest, UpdateProfileRequest
+    from app.modules.career.schemas import UpdateAchievementRequest, UpdateCertificationRequest, UpdateEducationRequest, UpdateProfileRequest
     from app.modules.career.skill_repository import SkillRepository
     from app.seeders.career_achievements import (
         OBSOLETE_ACHIEVEMENT_TITLES,
@@ -678,9 +679,6 @@ async def _seed_career(
         build_update_experience_request,
         experience_key,
     )
-    from app.modules.career.certification_repository import CertificationRepository
-    from app.modules.career.education_repository import EducationRepository
-    from app.modules.career.schemas import UpdateCertificationRequest, UpdateEducationRequest
     from app.seeders.career_languages import (
         RAW_LANGUAGES,
         build_create_language_request,
@@ -731,9 +729,7 @@ async def _seed_career(
             created = updated = 0
             for raw in RAW_EXPERIENCES:
                 key = experience_key(raw)
-                entity = existing_exps.get(key) or existing_exps_by_company_start.get(
-                    (raw["companyName"], raw["startDate"])
-                )
+                entity = existing_exps.get(key) or existing_exps_by_company_start.get((raw["companyName"], raw["startDate"]))
                 if entity is not None:
                     await experience_service.update(entity, build_update_experience_request(raw))
                     updated += 1
@@ -759,9 +755,7 @@ async def _seed_career(
 
             education_service = get_education_service(db)
             education_repo = EducationRepository(db)
-            existing_edu = {
-                (e.institution, e.degree, e.start_date.isoformat()): e for e in await education_repo.list_by_profile(profile.id)
-            }
+            existing_edu = {(e.institution, e.degree, e.start_date.isoformat()): e for e in await education_repo.list_by_profile(profile.id)}
             created = updated = 0
             for raw in RAW_EDUCATION:
                 entity = existing_edu.get(education_key(raw))
@@ -787,9 +781,7 @@ async def _seed_career(
 
             certification_service = get_certification_service(db)
             certification_repo = CertificationRepository(db)
-            existing_certs = {
-                (c.name, c.issuing_organization): c for c in await certification_repo.list_by_profile(profile.id)
-            }
+            existing_certs = {(c.name, c.issuing_organization): c for c in await certification_repo.list_by_profile(profile.id)}
             created = updated = 0
             for raw in RAW_CERTIFICATIONS:
                 entity = existing_certs.get(certification_key(raw))
@@ -894,6 +886,8 @@ async def _seed_career(
 async def _seed_remove_career(email: str, *, projects_only: bool, seeder_label: str) -> None:
     """Remove seeded career entities that match seed keys. Does not delete the user."""
     from app.core.database import get_db
+    from app.modules.career.achievement_repository import AchievementRepository
+    from app.modules.career.certification_repository import CertificationRepository
     from app.modules.career.dependencies import (
         get_achievement_service,
         get_certification_service,
@@ -904,13 +898,11 @@ async def _seed_remove_career(email: str, *, projects_only: bool, seeder_label: 
         get_project_service,
         get_skill_service,
     )
+    from app.modules.career.education_repository import EducationRepository
     from app.modules.career.experience_repository import ExperienceRepository
+    from app.modules.career.language_repository import LanguageRepository
     from app.modules.career.project_repository import ProjectRepository
     from app.modules.career.skill_repository import SkillRepository
-    from app.modules.career.education_repository import EducationRepository
-    from app.modules.career.certification_repository import CertificationRepository
-    from app.modules.career.achievement_repository import AchievementRepository
-    from app.modules.career.language_repository import LanguageRepository
     from app.seeders.career_achievements import OBSOLETE_ACHIEVEMENT_TITLES, RAW_ACHIEVEMENTS
     from app.seeders.career_certifications import RAW_CERTIFICATIONS, certification_key
     from app.seeders.career_education import RAW_EDUCATION, education_key

@@ -111,10 +111,7 @@ RAW_PROJECTS: list[dict] = [
         "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-02-01",
         "date_end": "2016-07-01",
-        "description": (
-            "Contributed to the development and implementation of a custom WMS module within Asseco "
-            "Softlab ERP, adapted to the operational needs of three different companies."
-        ),
+        "description": ("Contributed to the development and implementation of a custom WMS module within Asseco " "Softlab ERP, adapted to the operational needs of three different companies."),
         "role": "ERP Developer & Implementation Specialist",
         "technologies": ["Microsoft SQL Server", "Asseco Softlab ERP"],
     },
@@ -126,10 +123,7 @@ RAW_PROJECTS: list[dict] = [
         "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2015-01-01",
         "date_end": "2018-01-01",
-        "description": (
-            "EDI integration between a major international retailer and their suppliers, integrated "
-            "with Asseco Softlab ERP."
-        ),
+        "description": ("EDI integration between a major international retailer and their suppliers, integrated " "with Asseco Softlab ERP."),
         "role": "Integration Support Developer",
         "achievements": [
             "Integrated supplier EDI flows with Asseco Softlab ERP for a major retailer chain",
@@ -144,11 +138,7 @@ RAW_PROJECTS: list[dict] = [
         "experience_companies": ["Skłodowscy Sp. z o.o."],
         "date_start": "2016-02-01",
         "date_end": "2017-02-01",
-        "description": (
-            "A manufacturing execution system tailored to production floor operations, integrated "
-            "with ERP, and extended with modules for service tracking and time & attendance (RCP). "
-            "Supported RFID and barcode-based workflows."
-        ),
+        "description": ("A manufacturing execution system tailored to production floor operations, integrated " "with ERP, and extended with modules for service tracking and time & attendance (RCP). " "Supported RFID and barcode-based workflows."),
         "role": "Lead Developer & System Architect",
         "achievements": [
             "Led design of a custom MES with RFID/barcode shop-floor workflows",
@@ -456,11 +446,7 @@ RAW_PROJECTS: list[dict] = [
         "experience_companies": ["DEV Made IT"],
         "date_start": "2025-07-01",
         "date_end": None,
-        "description": (
-            "A reusable template for building company websites with modern technologies. Multiple "
-            "client websites have been built using this template, featuring responsive design, "
-            "performance optimization, and SEO-friendly structure."
-        ),
+        "description": ("A reusable template for building company websites with modern technologies. Multiple " "client websites have been built using this template, featuring responsive design, " "performance optimization, and SEO-friendly structure."),
         "role": "Frontend Developer",
         "achievements": [
             "Reused one Nuxt template across multiple client sites (WIARBUD, SAVA GROUP, Kraina Snów)",

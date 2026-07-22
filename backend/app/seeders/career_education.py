@@ -12,10 +12,7 @@ RAW_EDUCATION: list[dict] = [
         "startDate": "2005-10-01",
         "endDate": "2011-06-01",
         "grade": None,
-        "description": (
-            "Psychology at Uniwersytet Warszawski (2005–2011), completed without a Master's Degree. "
-            "Activities: SKN Psychologii Uzależnień (Student Scientific Circle for Addiction Psychology)."
-        ),
+        "description": ("Psychology at Uniwersytet Warszawski (2005–2011), completed without a Master's Degree. " "Activities: SKN Psychologii Uzależnień (Student Scientific Circle for Addiction Psychology)."),
     },
 ]
 

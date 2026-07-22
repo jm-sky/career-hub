@@ -6,7 +6,6 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 
-
 # ---------------------------------------------------------
 # Request Schemas
 # ---------------------------------------------------------
@@ -62,33 +61,15 @@ class SubscriptionResponse(BaseModel):
 
     id: str = Field(alias="id", serialization_alias="id")
     userId: str = Field(alias="user_id", serialization_alias="userId")
-    stripeCustomerId: str | None = Field(
-        None, alias="stripe_customer_id", serialization_alias="stripeCustomerId"
-    )
-    stripeSubscriptionId: str | None = Field(
-        None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId"
-    )
-    planTier: Literal["free", "pro", "expert"] = Field(
-        alias="plan_tier", serialization_alias="planTier"
-    )
-    billingInterval: Literal["month", "year"] | None = Field(
-        None, alias="billing_interval", serialization_alias="billingInterval"
-    )
-    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] = Field(
-        alias="status", serialization_alias="status"
-    )
-    currentPeriodStart: datetime | None = Field(
-        None, alias="current_period_start", serialization_alias="currentPeriodStart"
-    )
-    currentPeriodEnd: datetime | None = Field(
-        None, alias="current_period_end", serialization_alias="currentPeriodEnd"
-    )
-    cancelAtPeriodEnd: bool = Field(
-        False, alias="cancel_at_period_end", serialization_alias="cancelAtPeriodEnd"
-    )
-    isGrandfathered: bool = Field(
-        False, alias="is_grandfathered", serialization_alias="isGrandfathered"
-    )
+    stripeCustomerId: str | None = Field(None, alias="stripe_customer_id", serialization_alias="stripeCustomerId")
+    stripeSubscriptionId: str | None = Field(None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId")
+    planTier: Literal["free", "pro", "expert"] = Field(alias="plan_tier", serialization_alias="planTier")
+    billingInterval: Literal["month", "year"] | None = Field(None, alias="billing_interval", serialization_alias="billingInterval")
+    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] = Field(alias="status", serialization_alias="status")
+    currentPeriodStart: datetime | None = Field(None, alias="current_period_start", serialization_alias="currentPeriodStart")
+    currentPeriodEnd: datetime | None = Field(None, alias="current_period_end", serialization_alias="currentPeriodEnd")
+    cancelAtPeriodEnd: bool = Field(False, alias="cancel_at_period_end", serialization_alias="cancelAtPeriodEnd")
+    isGrandfathered: bool = Field(False, alias="is_grandfathered", serialization_alias="isGrandfathered")
     createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
     updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
 
@@ -130,18 +111,10 @@ class SubscriptionLimitsResponse(BaseModel):
     canExportData: bool
     canUseAdvancedFeatures: bool
     requiresByok: bool
-    cvVersionsLimit: int | None = Field(
-        ..., description="Maximum number of CV versions allowed, or null for unlimited"
-    )
-    pdfWatermark: bool = Field(
-        ..., description="Whether generated CV PDFs are watermarked on this tier"
-    )
-    customDomain: bool = Field(
-        ..., description="Whether this tier can serve the public profile on a custom domain"
-    )
-    apiAccess: bool = Field(
-        ..., description="Whether this tier has access to the (not yet built) public API"
-    )
+    cvVersionsLimit: int | None = Field(..., description="Maximum number of CV versions allowed, or null for unlimited")
+    pdfWatermark: bool = Field(..., description="Whether generated CV PDFs are watermarked on this tier")
+    customDomain: bool = Field(..., description="Whether this tier can serve the public profile on a custom domain")
+    apiAccess: bool = Field(..., description="Whether this tier has access to the (not yet built) public API")
 
 
 class MessageResponse(BaseModel):
@@ -216,39 +189,17 @@ class AdminSubscriptionResponse(BaseModel):
 
     id: str = Field(alias="id", serialization_alias="id")
     userId: str = Field(alias="user_id", serialization_alias="userId")
-    userName: str | None = Field(
-        None, alias="user_name", serialization_alias="userName"
-    )
-    userEmail: str | None = Field(
-        None, alias="user_email", serialization_alias="userEmail"
-    )
-    stripeCustomerId: str | None = Field(
-        None, alias="stripe_customer_id", serialization_alias="stripeCustomerId"
-    )
-    stripeSubscriptionId: str | None = Field(
-        None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId"
-    )
-    planTier: Literal["free", "pro", "expert"] = Field(
-        alias="plan_tier", serialization_alias="planTier"
-    )
-    billingInterval: Literal["month", "year"] | None = Field(
-        None, alias="billing_interval", serialization_alias="billingInterval"
-    )
-    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] = Field(
-        alias="status", serialization_alias="status"
-    )
-    currentPeriodStart: datetime | None = Field(
-        None, alias="current_period_start", serialization_alias="currentPeriodStart"
-    )
-    currentPeriodEnd: datetime | None = Field(
-        None, alias="current_period_end", serialization_alias="currentPeriodEnd"
-    )
-    cancelAtPeriodEnd: bool = Field(
-        False, alias="cancel_at_period_end", serialization_alias="cancelAtPeriodEnd"
-    )
-    isGrandfathered: bool = Field(
-        False, alias="is_grandfathered", serialization_alias="isGrandfathered"
-    )
+    userName: str | None = Field(None, alias="user_name", serialization_alias="userName")
+    userEmail: str | None = Field(None, alias="user_email", serialization_alias="userEmail")
+    stripeCustomerId: str | None = Field(None, alias="stripe_customer_id", serialization_alias="stripeCustomerId")
+    stripeSubscriptionId: str | None = Field(None, alias="stripe_subscription_id", serialization_alias="stripeSubscriptionId")
+    planTier: Literal["free", "pro", "expert"] = Field(alias="plan_tier", serialization_alias="planTier")
+    billingInterval: Literal["month", "year"] | None = Field(None, alias="billing_interval", serialization_alias="billingInterval")
+    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] = Field(alias="status", serialization_alias="status")
+    currentPeriodStart: datetime | None = Field(None, alias="current_period_start", serialization_alias="currentPeriodStart")
+    currentPeriodEnd: datetime | None = Field(None, alias="current_period_end", serialization_alias="currentPeriodEnd")
+    cancelAtPeriodEnd: bool = Field(False, alias="cancel_at_period_end", serialization_alias="cancelAtPeriodEnd")
+    isGrandfathered: bool = Field(False, alias="is_grandfathered", serialization_alias="isGrandfathered")
     createdAt: datetime = Field(alias="created_at", serialization_alias="createdAt")
     updatedAt: datetime = Field(alias="updated_at", serialization_alias="updatedAt")
 
@@ -289,11 +240,9 @@ class AdminUpdateSubscriptionRequest(BaseModel):
         None,
         description="Update subscription plan tier",
     )
-    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] | None = (
-        Field(
-            None,
-            description="Update subscription status",
-        )
+    status: Literal["active", "canceled", "past_due", "unpaid", "incomplete"] | None = Field(
+        None,
+        description="Update subscription status",
     )
     isGrandfathered: bool | None = Field(
         None,
