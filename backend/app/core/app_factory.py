@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
+from app.core.limiter import setup_limiter
 from app.core.middleware import setup_middleware
 
 logger = logging.getLogger(__name__)
@@ -175,6 +176,7 @@ def create_app() -> FastAPI:
 
     # Setup middleware
     setup_middleware(app)
+    setup_limiter(app)
 
     # Setup static file serving
     from app.core.static import setup_static_routes
