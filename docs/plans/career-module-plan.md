@@ -171,5 +171,12 @@ rather than re-deriving it.
 - [x] Phase 4 — Education/Certifications/Achievements (see `career-phase4-education-log.md`)
 - [x] Phase 5 — CV versions, CRUD only (see `career-phase5-cv-versions-log.md`; PDF generation/watermark gating deliberately deferred)
 - [ ] Phase 6 — Import/Export
-- [ ] Phase 7 — AI features
+- [x] Phase 7 — AI features (`POST /career/ai/optimize-description`, `/suggest-responsibilities`,
+      `/analyze-profile`; `GET /career/skills/suggestions` un-stubbed. `responsibilities_library`
+      table + seed data added. Gated via `BillingService.check_ai_access` — Pro/Expert or
+      Free+BYOK, same policy as the `ai` module's chat access, applied at the FastAPI-dependency
+      level (`require_career_ai_access` in `career/dependencies.py`) rather than reusing
+      `ai.dependencies.require_ai_access` (which checks the legacy `User.isPremium` flag).
+      Reuses `ai.providers.openrouter.OpenRouterProvider` + `ai.repositories.HistoryRepository`
+      for the one-shot completion + token-accounting plumbing.)
 - [ ] Phase 8 — Public profile polish

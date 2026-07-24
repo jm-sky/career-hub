@@ -26,8 +26,8 @@ class SkillApiService implements ISkillService {
     await apiClient.delete(`/career/skills/${id}`)
   }
 
-  async suggestions(role?: string): Promise<string[]> {
-    const response = await apiClient.get<string[]>('/career/skills/suggestions', { params: { role } })
+  async suggestions(role: string, seniorityLevel?: string): Promise<string[]> {
+    const response = await apiClient.get<string[]>('/career/skills/suggestions', { params: { role, seniorityLevel } })
     return response.data
   }
 }

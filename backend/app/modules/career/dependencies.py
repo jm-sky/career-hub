@@ -2,21 +2,26 @@
 
 from typing import Annotated
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.storage import get_storage_adapter
+from app.modules.ai.repositories import HistoryRepository, SettingsRepository
+from app.modules.ai.services.settings_service import SettingsService as AiSettingsService
 from app.modules.auth.auth_utils import verify_token
 from app.modules.auth.dependencies import CurrentUser
+from app.modules.auth.models import User
 from app.modules.auth.repositories import get_user_repository
 from app.modules.auth.types.repository import UserRepositoryInterface
 from app.modules.billing.dependencies import get_billing_service
+from app.modules.billing.exceptions import FreeTrierRequiresBYOKError
 from app.modules.billing.service import BillingService
 
 from .achievement_repository import AchievementRepository
 from .achievement_service import AchievementService
+from .ai_service import CareerAiService
 from .certification_repository import CertificationRepository
 from .certification_service import CertificationService
 from .cv_version_repository import CvVersionRepository
@@ -35,6 +40,7 @@ from .project_repository import (
 )
 from .project_service import ProjectService
 from .repository import ProfileRepository
+from .responsibilities_library_repository import ResponsibilitiesLibraryRepository
 from .service import ProfileService
 from .skill_repository import SkillRepository
 from .skill_service import SkillService
@@ -153,4 +159,50 @@ def get_cv_version_service(
         LanguageRepository(db),
         billing_service,
         get_storage_adapter(),
+    )
+
+
+async def require_career_ai_access(
+    current_user: CurrentUser,
+    db: AsyncSession = Depends(get_db),
+    billing_service: BillingService = Depends(get_billing_service),
+) -> User:
+    """Gate for the career module's AI endpoints (optimize/suggest/analyze).
+
+    Same policy as the ``ai`` module's own chat access: paid (Pro/Expert) plans
+    always have access; Free tier requires a user-configured OpenRouter token
+    (BYOK). Uses ``BillingService.check_ai_access`` — the plan-tier-based check —
+    rather than ``ai.dependencies.require_ai_access``, which gates on the legacy
+    ``User.isPremium`` flag instead of ``billing.plan_tier``.
+    """
+    ai_settings_repo = SettingsRepository(db)
+    ai_settings_service = AiSettingsService(ai_settings_repo)
+    openrouter_token = await ai_settings_service.get_api_token(current_user.id)
+
+    try:
+        has_access = await billing_service.check_ai_access(current_user.id, openrouter_token=openrouter_token)
+    except FreeTrierRequiresBYOKError as exc:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="AI features require a Pro or Expert subscription, or your own OpenRouter API token.",
+        )
+
+    return current_user
+
+
+CareerAiUser = Annotated[User, Depends(require_career_ai_access)]
+
+
+def get_career_ai_service(db: AsyncSession = Depends(get_db)) -> CareerAiService:
+    ai_settings_service = AiSettingsService(SettingsRepository(db))
+    return CareerAiService(
+        ai_settings_service,
+        HistoryRepository(db),
+        ResponsibilitiesLibraryRepository(db),
+        ExperienceRepository(db),
+        ProjectRepository(db),
+        SkillRepository(db),
     )

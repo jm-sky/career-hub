@@ -404,5 +404,36 @@ export const careerPl = {
         viewPublic: 'Zobacz profil publiczny',
       },
     },
+    ai: {
+      optimizeDescription: {
+        button: 'Optymalizuj z AI',
+        success: 'Opis zoptymalizowany',
+      },
+      suggestResponsibilities: {
+        button: 'Zasugeruj z AI',
+        success: 'Dodano {count} obowiązków',
+        needsRole: 'Najpierw podaj stanowisko',
+      },
+      suggestSkills: {
+        title: 'Zasugeruj umiejętności dla stanowiska',
+        button: 'Zasugeruj z AI',
+        rolePlaceholder: 'np. Senior Backend Engineer',
+        empty: 'Podaj stanowisko i kliknij Zasugeruj, aby otrzymać propozycje umiejętności — kliknij sugestię, aby ją dodać.',
+      },
+      gapAnalysis: {
+        title: 'Analiza luk kompetencyjnych (AI)',
+        subtitle: 'Sprawdź, jak Twój profil pasuje do docelowego stanowiska — mocne strony, luki i rekomendacje wygenerowane przez AI.',
+        targetRolePlaceholder: 'np. Senior Backend Engineer',
+        button: 'Analizuj',
+        matchScore: 'Dopasowanie',
+        strengths: 'Mocne strony',
+        gaps: 'Luki',
+        recommendations: 'Rekomendacje',
+        empty: 'Podaj docelowe stanowisko i kliknij Analizuj.',
+      },
+      error: {
+        accessDenied: 'Funkcje AI wymagają subskrypcji Pro lub Expert albo własnego klucza API OpenRouter w ustawieniach AI.',
+      },
+    },
   },
 }

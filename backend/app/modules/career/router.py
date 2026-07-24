@@ -8,6 +8,7 @@ module keeps growing (projects, education, cv_versions, ... in later phases).
 from fastapi import APIRouter
 
 from .achievement_router import router as achievement_router
+from .ai_router import router as ai_router
 from .certification_router import router as certification_router
 from .cv_version_router import router as cv_version_router
 from .education_router import router as education_router
@@ -29,3 +30,4 @@ router.include_router(certification_router)
 router.include_router(achievement_router)
 router.include_router(language_router)
 router.include_router(cv_version_router)
+router.include_router(ai_router)
