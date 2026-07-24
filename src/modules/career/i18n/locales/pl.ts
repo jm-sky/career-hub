@@ -320,6 +320,8 @@ export const careerPl = {
         name: 'Nazwa',
         template: 'Szablon',
         customAccentColor: 'Niestandardowy kolor akcentu',
+        fontFamily: 'Czcionka',
+        density: 'Odstępy',
         customSummary: 'Niestandardowe podsumowanie (opcjonalnie)',
         customSummaryPlaceholder: 'Nadpisz podsumowanie profilu dla tego CV',
         includeSummary: 'Uwzględnij podsumowanie',
@@ -345,6 +347,19 @@ export const careerPl = {
         modern: 'Nowoczesny',
         classic: 'Klasyczny',
         minimal: 'Minimalistyczny',
+        sidebar: 'Panel boczny',
+      },
+      fontOptions: {
+        sans: 'Sans',
+        'modern-sans': 'Nowoczesny bezszeryfowy',
+        serif: 'Szeryfowy',
+        'minimal-sans': 'Minimalistyczny bezszeryfowy',
+        mono: 'Maszynowy',
+      },
+      densityOptions: {
+        compact: 'Kompaktowy',
+        standard: 'Standardowy',
+        spacious: 'Przestronny',
       },
       deleteConfirm: {
         title: 'Usunąć tę wersję CV?',

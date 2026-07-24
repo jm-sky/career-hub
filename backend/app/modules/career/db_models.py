@@ -332,6 +332,8 @@ class CvVersionDB(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     template: Mapped[str] = mapped_column(String(50), nullable=False, default="default")
     accent_color: Mapped[str | None] = mapped_column(String(7), nullable=True)
+    font_family: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    density: Mapped[str | None] = mapped_column(String(20), nullable=True)
     sections_config: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
     pdf_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_default: Mapped[bool] = mapped_column(default=False, nullable=False)

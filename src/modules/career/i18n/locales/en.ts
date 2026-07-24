@@ -320,6 +320,8 @@ export const careerEn = {
         name: 'Name',
         template: 'Template',
         customAccentColor: 'Custom accent color',
+        fontFamily: 'Font',
+        density: 'Spacing',
         customSummary: 'Custom summary (optional)',
         customSummaryPlaceholder: 'Override your profile summary for this CV',
         includeSummary: 'Include summary',
@@ -345,6 +347,19 @@ export const careerEn = {
         modern: 'Modern',
         classic: 'Classic',
         minimal: 'Minimal',
+        sidebar: 'Sidebar',
+      },
+      fontOptions: {
+        sans: 'Sans',
+        'modern-sans': 'Modern Sans',
+        serif: 'Serif',
+        'minimal-sans': 'Minimal Sans',
+        mono: 'Monospace',
+      },
+      densityOptions: {
+        compact: 'Compact',
+        standard: 'Standard',
+        spacious: 'Spacious',
       },
       deleteConfirm: {
         title: 'Delete this CV version?',

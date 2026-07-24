@@ -91,6 +91,8 @@ class CvVersionService:
             name=payload.name,
             template=payload.template,
             accent_color=payload.accentColor,
+            font_family=payload.fontFamily,
+            density=payload.density,
             sections_config=payload.sectionsConfig.model_dump(),
             is_default=payload.isDefault,
         )
@@ -107,6 +109,10 @@ class CvVersionService:
             cv_version.template = payload.template
         if "accentColor" in payload.model_fields_set:
             cv_version.accent_color = payload.accentColor
+        if "fontFamily" in payload.model_fields_set:
+            cv_version.font_family = payload.fontFamily
+        if "density" in payload.model_fields_set:
+            cv_version.density = payload.density
         if payload.isDefault is not None:
             if payload.isDefault:
                 await self.repository.clear_default(cv_version.profile_id, except_id=cv_version.id)
@@ -159,7 +165,7 @@ class CvVersionService:
         """
         watermark = await self._should_watermark(profile.user_id)
         data = await self._collect_render_data(cv_version, profile, user_name)
-        html = build_cv_html(data, cv_version.template, watermark, cv_version.accent_color)
+        html = build_cv_html(data, cv_version.template, watermark, cv_version.accent_color, cv_version.font_family, cv_version.density)
 
         # WeasyPrint is synchronous and CPU-bound — keep it off the event loop.
         pdf_bytes = await asyncio.to_thread(render_pdf, html)
@@ -183,7 +189,7 @@ class CvVersionService:
         the preview matches what a subsequent PDF generate would produce."""
         watermark = await self._should_watermark(profile.user_id)
         data = await self._collect_render_data(cv_version, profile, user_name)
-        return build_cv_html(data, cv_version.template, watermark, cv_version.accent_color)
+        return build_cv_html(data, cv_version.template, watermark, cv_version.accent_color, cv_version.font_family, cv_version.density)
 
     async def _should_watermark(self, user_id: str) -> bool:
         try:

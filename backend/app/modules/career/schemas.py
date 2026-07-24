@@ -530,6 +530,11 @@ class CvSectionsConfig(BaseModel):
 
 _ACCENT_COLOR_PATTERN = r"^#[0-9A-Fa-f]{6}$"
 
+# Kept in sync with cv_renderer.FONT_STACKS / DENSITY_PRESETS keys — duplicated
+# here (rather than imported) to avoid a schemas -> cv_renderer -> schemas cycle.
+CvFontFamily = Literal["sans", "modern-sans", "serif", "minimal-sans", "mono"]
+CvDensity = Literal["compact", "standard", "spacious"]
+
 
 class CvVersionResponse(BaseModel):
     """Full CV version representation. ``pdfUrl`` is null until Phase 5's follow-up
@@ -540,6 +545,8 @@ class CvVersionResponse(BaseModel):
     name: str = Field(alias="name", serialization_alias="name")
     template: str = Field(alias="template", serialization_alias="template")
     accentColor: str | None = Field(None, alias="accent_color", serialization_alias="accentColor")
+    fontFamily: CvFontFamily | None = Field(None, alias="font_family", serialization_alias="fontFamily")
+    density: CvDensity | None = Field(None, alias="density", serialization_alias="density")
     sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig, alias="sections_config", serialization_alias="sectionsConfig")
     pdfUrl: str | None = Field(None, alias="pdf_url", serialization_alias="pdfUrl")
     isDefault: bool = Field(alias="is_default", serialization_alias="isDefault")
@@ -556,6 +563,8 @@ class CreateCvVersionRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     template: str = Field(default="default", max_length=50)
     accentColor: str | None = Field(default=None, pattern=_ACCENT_COLOR_PATTERN, description="Hex color (#rrggbb) overriding the template's default accent; null uses the template default.")
+    fontFamily: CvFontFamily | None = Field(default=None, description="Font stack overriding the template's default; null uses the template default.")
+    density: CvDensity | None = Field(default=None, description="Spacing/size preset; null uses the standard density.")
     sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig)
     isDefault: bool = Field(default=False)
 
@@ -563,13 +572,15 @@ class CreateCvVersionRequest(BaseModel):
 class UpdateCvVersionRequest(BaseModel):
     """Partial update — only fields present in the request body change.
     ``sectionsConfig``, when provided, fully replaces the existing selection.
-    ``accentColor`` is tri-state: omitted leaves it unchanged, ``null`` clears it
-    back to the template default, and a hex string sets a custom accent — see
-    ``model_fields_set`` usage in the service."""
+    ``accentColor``/``fontFamily``/``density`` are each tri-state: omitted leaves
+    the field unchanged, ``null`` clears it back to the template default, and a
+    value sets a custom override — see ``model_fields_set`` usage in the service."""
 
     name: str | None = Field(default=None, min_length=1, max_length=200)
     template: str | None = Field(default=None, max_length=50)
     accentColor: str | None = Field(default=None, pattern=_ACCENT_COLOR_PATTERN)
+    fontFamily: CvFontFamily | None = Field(default=None)
+    density: CvDensity | None = Field(default=None)
     sectionsConfig: CvSectionsConfig | None = Field(default=None)
     isDefault: bool | None = Field(default=None)
 
