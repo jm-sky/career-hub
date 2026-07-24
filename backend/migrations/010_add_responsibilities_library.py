@@ -7,6 +7,7 @@ Usage:
 
 import asyncio
 import sys
+from datetime import UTC, datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -96,13 +97,20 @@ async def upgrade() -> None:
         if existing.scalar_one() == 0:
             print(f"Seeding {len(SEED_RESPONSIBILITIES)} responsibilities_library rows...")
             for role_category, seniority_level, responsibility in SEED_RESPONSIBILITIES:
+                now = datetime.now(UTC)
                 await conn.execute(
-                    text("INSERT INTO responsibilities_library " "(id, role_category, responsibility, seniority_level, usage_count) " "VALUES (:id, :role_category, :responsibility, :seniority_level, 0)"),
+                    text(
+                        "INSERT INTO responsibilities_library "
+                        "(id, role_category, responsibility, seniority_level, usage_count, created_at, updated_at) "
+                        "VALUES (:id, :role_category, :responsibility, :seniority_level, 0, :created_at, :updated_at)"
+                    ),
                     {
                         "id": generate_id(),
                         "role_category": role_category,
                         "responsibility": responsibility,
                         "seniority_level": seniority_level,
+                        "created_at": now,
+                        "updated_at": now,
                     },
                 )
 
