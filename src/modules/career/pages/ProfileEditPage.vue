@@ -19,6 +19,7 @@ import SelectValue from '@/components/ui/select/SelectValue.vue'
 import Separator from '@/components/ui/separator/Separator.vue'
 import { Textarea } from '@/components/ui/textarea'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
+import AiGapAnalysisCard from '@/modules/career/components/AiGapAnalysisCard.vue'
 import { publicProfilePath } from '@/modules/career/routes'
 import { profileSchema } from '@/modules/career/validation/profile.schema'
 import { useProfile } from '../composables/useProfile'
@@ -235,6 +236,8 @@ const onSubmit = handleSubmit(async (values) => {
           </form>
         </CardContent>
       </Card>
+
+      <AiGapAnalysisCard />
     </div>
   </AuthenticatedLayout>
 </template>

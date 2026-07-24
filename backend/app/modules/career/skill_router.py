@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from .dependencies import CurrentProfile, get_skill_service
+from .ai_service import CareerAiService
+from .dependencies import CareerAiUser, CurrentProfile, get_career_ai_service, get_skill_service
 from .schemas import (
     BulkSkillsRequest,
     CreateSkillRequest,
@@ -27,12 +28,13 @@ async def list_skills(
 @router.get("/skills/suggestions", response_model=list[str])
 async def suggest_skills(
     *,
-    profile: CurrentProfile,
-    role: str | None = None,
-    service: SkillService = Depends(get_skill_service),
+    user: CareerAiUser,
+    role: str,
+    seniorityLevel: str | None = None,
+    ai_service: CareerAiService = Depends(get_career_ai_service),
 ) -> list[str]:
-    """AI-backed skill suggestions for the given role — stubbed until Phase 7."""
-    return await service.suggestions(role)
+    """AI-backed skill suggestions for the given role (Pro/Expert or BYOK Free)."""
+    return await ai_service.suggest_skills(user.id, role, seniorityLevel)
 
 
 @router.post("/skills", response_model=SkillResponse, status_code=status.HTTP_201_CREATED)

@@ -312,6 +312,28 @@ class LanguageDB(Base):
     )
 
 
+class ResponsibilitiesLibraryDB(Base):
+    """Global, cross-profile seed/reference data for AI responsibility suggestions
+    (Phase 7). Not owned by any one profile — seeded up front and grown organically
+    as ``CareerAiService.suggest_responsibilities`` persists new AI-generated entries
+    for role/seniority combinations not yet in the library."""
+
+    __tablename__ = "responsibilities_library"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    role_category: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    responsibility: Mapped[str] = mapped_column(Text, nullable=False)
+    seniority_level: Mapped[str | None] = mapped_column(String(30), nullable=True, index=True)
+    usage_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        onupdate=lambda: datetime.now(UTC),
+        nullable=False,
+    )
+
+
 class CvVersionDB(Base):
     """A named, curated selection of a profile's data for CV export.
 

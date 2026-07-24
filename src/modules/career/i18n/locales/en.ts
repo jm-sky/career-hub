@@ -404,5 +404,36 @@ export const careerEn = {
         viewPublic: 'View public profile',
       },
     },
+    ai: {
+      optimizeDescription: {
+        button: 'Optimize with AI',
+        success: 'Description optimized',
+      },
+      suggestResponsibilities: {
+        button: 'Suggest with AI',
+        success: '{count} responsibilities added',
+        needsRole: 'Enter a position first',
+      },
+      suggestSkills: {
+        title: 'Suggest skills for a role',
+        button: 'Suggest with AI',
+        rolePlaceholder: 'e.g. Senior Backend Engineer',
+        empty: 'Enter a role and click Suggest to get skill ideas — click a suggestion to add it.',
+      },
+      gapAnalysis: {
+        title: 'AI gap analysis',
+        subtitle: 'See how your profile matches a target role, with AI-generated strengths, gaps, and recommendations.',
+        targetRolePlaceholder: 'e.g. Senior Backend Engineer',
+        button: 'Analyze',
+        matchScore: 'Match score',
+        strengths: 'Strengths',
+        gaps: 'Gaps',
+        recommendations: 'Recommendations',
+        empty: 'Enter a target role and click Analyze.',
+      },
+      error: {
+        accessDenied: 'AI features require a Pro or Expert subscription, or your own OpenRouter API key in AI settings.',
+      },
+    },
   },
 }

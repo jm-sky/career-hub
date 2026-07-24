@@ -13,7 +13,6 @@ export const experienceQueryKeys = {
 
 export const skillQueryKeys = {
   all: ['career', 'skills'] as const,
-  suggestions: (role?: string) => [...skillQueryKeys.all, 'suggestions', role ?? null] as const,
 } as const
 
 export const technologyQueryKeys = {

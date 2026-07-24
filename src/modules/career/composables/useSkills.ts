@@ -52,12 +52,10 @@ export function useDeleteSkill(service?: ISkillService) {
   })
 }
 
-export function useSkillSuggestions(role?: string, service?: ISkillService) {
-  return useQuery({
-    queryKey: skillQueryKeys.suggestions(role),
-    queryFn: () => (service ?? skillApiService).suggestions(role),
-    staleTime: 60 * 1000,
-    retry: profileRetryFunction,
+export function useSuggestSkills(service?: ISkillService) {
+  return useMutation({
+    mutationFn: ({ role, seniorityLevel }: { role: string, seniorityLevel?: string }) => (service ?? skillApiService).suggestions(role, seniorityLevel),
+    retry: profileMutationRetryFunction,
   })
 }
 
@@ -67,6 +65,7 @@ export function useSkills(service?: ISkillService) {
   const bulkUpsertMutation = useBulkUpsertSkills(service)
   const updateMutation = useUpdateSkill(service)
   const deleteMutation = useDeleteSkill(service)
+  const suggestMutation = useSuggestSkills(service)
 
   return {
     skillsQuery,
@@ -82,5 +81,7 @@ export function useSkills(service?: ISkillService) {
     isUpdating: updateMutation.isPending,
     deleteSkill: deleteMutation.mutateAsync,
     isDeleting: deleteMutation.isPending,
+    suggestSkills: suggestMutation.mutateAsync,
+    isSuggestingSkills: suggestMutation.isPending,
   }
 }
