@@ -304,6 +304,7 @@ export const careerPl = {
         add: 'Dodaj wersję CV',
         empty: 'Brak wersji CV. Dodaj pierwszą.',
         error: 'Nie udało się wczytać Twoich wersji CV.',
+        preview: 'Podgląd',
         generate: 'Wygeneruj PDF',
         download: 'Pobierz PDF',
         generateSuccess: 'PDF wygenerowany — gotowy do pobrania.',
@@ -318,6 +319,7 @@ export const careerPl = {
       fields: {
         name: 'Nazwa',
         template: 'Szablon',
+        customAccentColor: 'Niestandardowy kolor akcentu',
         customSummary: 'Niestandardowe podsumowanie (opcjonalnie)',
         customSummaryPlaceholder: 'Nadpisz podsumowanie profilu dla tego CV',
         includeSummary: 'Uwzględnij podsumowanie',

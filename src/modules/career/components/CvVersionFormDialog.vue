@@ -35,6 +35,13 @@ import type { CreateCvVersionData, CvVersion, UpdateCvVersionData } from '@/modu
 
 const { t } = useI18n()
 
+const TEMPLATE_DEFAULT_ACCENTS: Record<string, string> = {
+  default: '#0f766e',
+  modern: '#0369a1',
+  classic: '#1f2937',
+  minimal: '#374151',
+}
+
 const open = defineModel<boolean>('open', { required: true })
 
 const props = defineProps<{
@@ -72,11 +79,12 @@ const certificationItems = computed(() => (certificationsQuery.data.value ?? [])
 const achievementItems = computed(() => (achievementsQuery.data.value ?? []).map(a => ({ id: a.id, label: a.title })))
 const languageItems = computed(() => (languagesQuery.data.value ?? []).map(l => ({ id: l.id, label: `${l.name} · ${l.level}` })))
 
-const { handleSubmit, resetForm } = useForm({
+const { handleSubmit, resetForm, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(cvVersionSchema),
   initialValues: {
     name: '',
     template: 'default',
+    accentColor: '',
     customSummary: '',
     includePhoto: true,
     includeSummary: true,
@@ -84,13 +92,17 @@ const { handleSubmit, resetForm } = useForm({
   },
 })
 
+const useCustomAccent = ref(false)
+
 watch(open, (isOpen) => {
   if (!isOpen) return
   const cv = props.cvVersion
+  useCustomAccent.value = !!cv?.accentColor
   resetForm({
     values: {
       name: cv?.name ?? '',
       template: cv?.template ?? 'default',
+      accentColor: cv?.accentColor ?? '',
       customSummary: cv?.sectionsConfig.customSummary ?? '',
       includePhoto: cv?.sectionsConfig.includePhoto ?? true,
       includeSummary: cv?.sectionsConfig.includeSummary ?? true,
@@ -106,10 +118,18 @@ watch(open, (isOpen) => {
   languageIds.value = cv?.sectionsConfig.languageIds ? [...cv.sectionsConfig.languageIds] : []
 })
 
+function toggleCustomAccent(enabled: boolean) {
+  useCustomAccent.value = enabled
+  if (enabled && !values.accentColor) {
+    setFieldValue('accentColor', TEMPLATE_DEFAULT_ACCENTS[values.template ?? 'default'] ?? '#0f766e')
+  }
+}
+
 const onSubmit = handleSubmit((values) => {
   emit('submit', {
     name: values.name,
     template: values.template,
+    accentColor: useCustomAccent.value ? (values.accentColor || TEMPLATE_DEFAULT_ACCENTS[values.template] || null) : null,
     isDefault: values.isDefault,
     sectionsConfig: {
       experienceIds: experienceIds.value,
@@ -176,6 +196,21 @@ const onSubmit = handleSubmit((values) => {
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <Checkbox :model-value="useCustomAccent" @update:model-value="(value) => toggleCustomAccent(!!value)" />
+            <span class="text-sm font-normal">{{ t('career.cvVersions.fields.customAccentColor') }}</span>
+          </div>
+          <FormField v-if="useCustomAccent" v-slot="{ componentField }" name="accentColor">
+            <FormItem class="flex items-center gap-2 space-y-0">
+              <FormControl>
+                <Input type="color" class="h-9 w-16 p-1" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>

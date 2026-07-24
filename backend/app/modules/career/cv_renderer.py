@@ -136,10 +136,17 @@ def _languages_html(languages: list[LanguageDB]) -> str:
     return f'<div class="chips">{chips}</div>'
 
 
-def build_cv_html(data: CvRenderData, template: str, watermark: bool) -> str:
+def build_cv_html(data: CvRenderData, template: str, watermark: bool, accent_color: str | None = None) -> str:
     """Render the full, self-contained CV document (inline CSS only — WeasyPrint
-    gets no network access and must not need any)."""
+    gets no network access and must not need any).
+
+    ``accent_color`` overrides the template's default accent when set. It is
+    trusted to already be a validated ``#rrggbb`` string (enforced by the
+    ``CreateCvVersionRequest``/``UpdateCvVersionRequest`` schemas) since it is
+    interpolated directly into inline CSS here.
+    """
     style = TEMPLATE_STYLES.get(template, TEMPLATE_STYLES["default"])
+    accent = accent_color or style["accent"]
     profile = data.profile
     sections = data.sections
 
@@ -181,11 +188,11 @@ def build_cv_html(data: CvRenderData, template: str, watermark: bool) -> str:
   @page {{ size: A4; margin: 18mm 16mm; }}
   * {{ box-sizing: border-box; }}
   body {{ font-family: {style['font']}; color: #1f2430; font-size: 10.5pt; line-height: 1.45; margin: 0; }}
-  header {{ border-bottom: 2px solid {style['accent']}; padding-bottom: 4mm; margin-bottom: 6mm; }}
-  h1 {{ font-size: 20pt; margin: 0 0 1mm; color: {style['accent']}; }}
+  header {{ border-bottom: 2px solid {accent}; padding-bottom: 4mm; margin-bottom: 6mm; }}
+  h1 {{ font-size: 20pt; margin: 0 0 1mm; color: {accent}; }}
   .headline {{ font-size: 12pt; margin: 0 0 2mm; color: #374151; }}
   .contact {{ font-size: 9pt; color: #6b7280; }}
-  h2 {{ font-size: 11pt; text-transform: uppercase; letter-spacing: 0.08em; color: {style['accent']};
+  h2 {{ font-size: 11pt; text-transform: uppercase; letter-spacing: 0.08em; color: {accent};
        border-bottom: 1px solid #e5e7eb; padding-bottom: 1mm; margin: 5mm 0 2.5mm; }}
   section {{ page-break-inside: auto; }}
   .entry {{ margin-bottom: 3.5mm; page-break-inside: avoid; }}
@@ -198,7 +205,7 @@ def build_cv_html(data: CvRenderData, template: str, watermark: bool) -> str:
   li {{ margin-bottom: 0.5mm; }}
   .chips {{ display: flex; flex-wrap: wrap; gap: 1.5mm; }}
   .chip {{ background: #f3f4f6; border-radius: 2mm; padding: 0.8mm 2.5mm; font-size: 9pt; }}
-  .dots {{ color: {style['accent']}; letter-spacing: 0.1em; }}
+  .dots {{ color: {accent}; letter-spacing: 0.1em; }}
   .watermark {{ position: fixed; bottom: 4mm; right: 0; font-size: 8pt; color: #9ca3af; }}
 </style>
 </head>

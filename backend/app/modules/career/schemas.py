@@ -528,6 +528,9 @@ class CvSectionsConfig(BaseModel):
     includeSummary: bool = Field(default=True)
 
 
+_ACCENT_COLOR_PATTERN = r"^#[0-9A-Fa-f]{6}$"
+
+
 class CvVersionResponse(BaseModel):
     """Full CV version representation. ``pdfUrl`` is null until Phase 5's follow-up
     (PDF render pipeline) actually generates one."""
@@ -536,6 +539,7 @@ class CvVersionResponse(BaseModel):
     profileId: str = Field(alias="profile_id", serialization_alias="profileId")
     name: str = Field(alias="name", serialization_alias="name")
     template: str = Field(alias="template", serialization_alias="template")
+    accentColor: str | None = Field(None, alias="accent_color", serialization_alias="accentColor")
     sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig, alias="sections_config", serialization_alias="sectionsConfig")
     pdfUrl: str | None = Field(None, alias="pdf_url", serialization_alias="pdfUrl")
     isDefault: bool = Field(alias="is_default", serialization_alias="isDefault")
@@ -551,16 +555,21 @@ class CvVersionResponse(BaseModel):
 class CreateCvVersionRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)
     template: str = Field(default="default", max_length=50)
+    accentColor: str | None = Field(default=None, pattern=_ACCENT_COLOR_PATTERN, description="Hex color (#rrggbb) overriding the template's default accent; null uses the template default.")
     sectionsConfig: CvSectionsConfig = Field(default_factory=CvSectionsConfig)
     isDefault: bool = Field(default=False)
 
 
 class UpdateCvVersionRequest(BaseModel):
-    """Partial update — only provided fields change. ``sectionsConfig``, when
-    provided, fully replaces the existing selection."""
+    """Partial update — only fields present in the request body change.
+    ``sectionsConfig``, when provided, fully replaces the existing selection.
+    ``accentColor`` is tri-state: omitted leaves it unchanged, ``null`` clears it
+    back to the template default, and a hex string sets a custom accent — see
+    ``model_fields_set`` usage in the service."""
 
     name: str | None = Field(default=None, min_length=1, max_length=200)
     template: str | None = Field(default=None, max_length=50)
+    accentColor: str | None = Field(default=None, pattern=_ACCENT_COLOR_PATTERN)
     sectionsConfig: CvSectionsConfig | None = Field(default=None)
     isDefault: bool | None = Field(default=None)
 

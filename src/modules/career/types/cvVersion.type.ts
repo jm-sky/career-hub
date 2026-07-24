@@ -16,6 +16,7 @@ export interface CvVersion {
   profileId: string
   name: string
   template: string
+  accentColor: string | null
   sectionsConfig: CvSectionsConfig
   pdfUrl: string | null
   isDefault: boolean
@@ -26,6 +27,7 @@ export interface CvVersion {
 export interface CreateCvVersionData {
   name: string
   template?: string
+  accentColor?: string | null
   sectionsConfig?: Partial<CvSectionsConfig>
   isDefault?: boolean
 }
@@ -33,6 +35,7 @@ export interface CreateCvVersionData {
 export interface UpdateCvVersionData {
   name?: string
   template?: string
+  accentColor?: string | null
   sectionsConfig?: Partial<CvSectionsConfig>
   isDefault?: boolean
 }
@@ -53,4 +56,5 @@ export interface ICvVersionService {
   delete(id: string): Promise<void>
   generate(id: string): Promise<GenerateCvVersionResult>
   downloadPdf(id: string): Promise<Blob>
+  preview(id: string): Promise<string>
 }

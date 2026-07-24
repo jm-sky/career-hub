@@ -304,6 +304,7 @@ export const careerEn = {
         add: 'Add CV version',
         empty: 'No CV versions yet. Add your first one.',
         error: 'Failed to load your CV versions.',
+        preview: 'Preview',
         generate: 'Generate PDF',
         download: 'Download PDF',
         generateSuccess: 'PDF generated — ready to download.',
@@ -318,6 +319,7 @@ export const careerEn = {
       fields: {
         name: 'Name',
         template: 'Template',
+        customAccentColor: 'Custom accent color',
         customSummary: 'Custom summary (optional)',
         customSummaryPlaceholder: 'Override your profile summary for this CV',
         includeSummary: 'Include summary',
