@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
+import { Sparkles } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { toast } from 'vue-sonner'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
@@ -17,10 +19,14 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import TechnologyTagInput from '@/modules/career/components/TechnologyTagInput.vue'
+import { useCareerAi } from '@/modules/career/composables/useCareerAi'
 import { experienceSchema } from '@/modules/career/validation/experience.schema'
+import { useHandleError } from '@/shared/composables/useHandleError'
 import type { CreateExperienceData, Experience, UpdateExperienceData } from '@/modules/career/types/experience.type'
 
 const { t } = useI18n()
+const { handleError } = useHandleError()
+const { optimizeDescription, isOptimizing, suggestResponsibilities, isSuggestingResponsibilities } = useCareerAi()
 
 const open = defineModel<boolean>('open', { required: true })
 
@@ -39,7 +45,7 @@ const responsibilities = ref<string[]>([])
 const responsibilityDraft = ref('')
 const technologies = ref<string[]>([])
 
-const { handleSubmit, resetForm, values } = useForm({
+const { handleSubmit, resetForm, setFieldValue, values } = useForm({
   validationSchema: toTypedSchema(experienceSchema),
   initialValues: {
     companyName: '',
@@ -80,6 +86,35 @@ function addResponsibility() {
 
 function removeResponsibility(index: number) {
   responsibilities.value = responsibilities.value.filter((_, i) => i !== index)
+}
+
+async function handleOptimizeDescription() {
+  const text = (values.description ?? '').trim()
+  if (!text) return
+  try {
+    const result = await optimizeDescription({ text, targetRole: values.position || null })
+    setFieldValue('description', result.optimizedText)
+    toast.success(t('career.ai.optimizeDescription.success'))
+  } catch (error) {
+    handleError(error, { fallbackMessage: t('career.ai.error.accessDenied') })
+  }
+}
+
+async function handleSuggestResponsibilities() {
+  const roleCategory = (values.position ?? '').trim()
+  if (!roleCategory) {
+    toast.error(t('career.ai.suggestResponsibilities.needsRole'))
+    return
+  }
+  try {
+    const result = await suggestResponsibilities({ roleCategory })
+    const existing = new Set(responsibilities.value.map(item => item.toLowerCase()))
+    const additions = result.suggestions.filter(item => !existing.has(item.toLowerCase()))
+    responsibilities.value = [...responsibilities.value, ...additions]
+    toast.success(t('career.ai.suggestResponsibilities.success', { count: additions.length }))
+  } catch (error) {
+    handleError(error, { fallbackMessage: t('career.ai.error.accessDenied') })
+  }
 }
 
 const onSubmit = handleSubmit((values) => {
@@ -180,7 +215,20 @@ const onSubmit = handleSubmit((values) => {
 
         <FormField v-slot="{ componentField }" name="description">
           <FormItem>
-            <FormLabel>{{ t('career.experiences.fields.description') }}</FormLabel>
+            <div class="flex items-center justify-between gap-2">
+              <FormLabel>{{ t('career.experiences.fields.description') }}</FormLabel>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                :disabled="!values.description?.trim()"
+                :loading="isOptimizing"
+                @click="handleOptimizeDescription"
+              >
+                <Sparkles class="size-4" />
+                {{ t('career.ai.optimizeDescription.button') }}
+              </Button>
+            </div>
             <FormControl>
               <Textarea v-bind="componentField" rows="3" />
             </FormControl>
@@ -189,9 +237,22 @@ const onSubmit = handleSubmit((values) => {
         </FormField>
 
         <div class="space-y-2">
-          <p class="text-sm font-medium">
-            {{ t('career.experiences.fields.responsibilities') }}
-          </p>
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-sm font-medium">
+              {{ t('career.experiences.fields.responsibilities') }}
+            </p>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              :disabled="!values.position?.trim()"
+              :loading="isSuggestingResponsibilities"
+              @click="handleSuggestResponsibilities"
+            >
+              <Sparkles class="size-4" />
+              {{ t('career.ai.suggestResponsibilities.button') }}
+            </Button>
+          </div>
           <ul v-if="responsibilities.length" class="space-y-1">
             <li v-for="(item, index) in responsibilities" :key="index" class="flex items-center gap-2 text-sm">
               <span class="flex-1">{{ item }}</span>

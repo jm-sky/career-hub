@@ -115,8 +115,3 @@ class SkillService:
 
     async def delete(self, skill: SkillDB) -> None:
         await self.repository.delete(skill)
-
-    async def suggestions(self, role: str | None) -> list[str]:
-        """Stubbed AI-backed skill suggestions — real implementation lands in Phase 7
-        (AI features), once responsibilities_library seed data exists."""
-        return []

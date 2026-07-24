@@ -626,3 +626,47 @@ class CareerOverviewResponse(BaseModel):
     completenessScore: int = Field(description="Overall score (0-100): profile fields + section contents")
     counts: CareerSectionCounts
     suggestions: list[str] = Field(default_factory=list, description="Ordered i18n suggestion keys, most impactful first")
+
+
+# --- AI features (Phase 7, Pro/Expert) --------------------------------------------
+
+
+class OptimizeDescriptionRequest(BaseModel):
+    """Rewrite a responsibility or description into a stronger, achievement-oriented
+    version. Optional role/seniority context steers tone and terminology."""
+
+    text: str = Field(..., min_length=1, max_length=4000)
+    targetRole: str | None = Field(default=None, max_length=200)
+    seniorityLevel: str | None = Field(default=None, max_length=30)
+
+
+class OptimizeDescriptionResponse(BaseModel):
+    optimizedText: str
+
+
+class SuggestResponsibilitiesRequest(BaseModel):
+    """Suggest responsibilities for a role/seniority — served from
+    ``responsibilities_library`` when enough matches exist, else generated via AI
+    and persisted back into the library for future reuse."""
+
+    roleCategory: str = Field(..., min_length=1, max_length=100)
+    seniorityLevel: str | None = Field(default=None, max_length=30)
+
+
+class SuggestResponsibilitiesResponse(BaseModel):
+    suggestions: list[str]
+    source: Literal["library", "ai"]
+
+
+class AnalyzeProfileRequest(BaseModel):
+    """Gap analysis of the authenticated user's profile against a target role."""
+
+    targetRole: str = Field(..., min_length=1, max_length=200)
+
+
+class AnalyzeProfileResponse(BaseModel):
+    matchScore: int = Field(..., ge=0, le=100)
+    strengths: list[str] = Field(default_factory=list)
+    gaps: list[str] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list, description="Ordered i18n suggestion keys, most impactful first")
