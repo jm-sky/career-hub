@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { Download, FileStack, Pencil, Play, Plus, Trash2 } from 'lucide-vue-next'
+import { Download, Eye, FileStack, Pencil, Play, Plus, Trash2 } from 'lucide-vue-next'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import AuthenticatedLayout from '@/layouts/AuthenticatedLayout.vue'
 import CvVersionFormDialog from '@/modules/career/components/CvVersionFormDialog.vue'
 import DeleteConfirmDialog from '@/modules/career/components/DeleteConfirmDialog.vue'
@@ -27,6 +28,8 @@ const {
   generateCvVersion,
   isGenerating,
   downloadCvVersionPdf,
+  previewCvVersion,
+  isPreviewing,
 } = useCvVersions()
 
 const formOpen = ref(false)
@@ -34,6 +37,9 @@ const editingCvVersion = ref<CvVersion | null>(null)
 
 const deleteOpen = ref(false)
 const deletingCvVersion = ref<CvVersion | null>(null)
+
+const previewOpen = ref(false)
+const previewHtml = ref('')
 
 function openCreate() {
   editingCvVersion.value = null
@@ -82,6 +88,15 @@ async function handleGenerate(cvVersion: CvVersion) {
         ? t('career.cvVersions.page.generateSuccessWatermarked')
         : t('career.cvVersions.page.generateSuccess'),
     )
+  } catch {
+    toast.error(t('errors.generic'))
+  }
+}
+
+async function handlePreview(cvVersion: CvVersion) {
+  try {
+    previewHtml.value = await previewCvVersion(cvVersion.id)
+    previewOpen.value = true
   } catch {
     toast.error(t('errors.generic'))
   }
@@ -158,6 +173,15 @@ async function handleDownload(cvVersion: CvVersion) {
               <Button
                 variant="ghost"
                 size="icon"
+                :disabled="isPreviewing"
+                :title="t('career.cvVersions.page.preview')"
+                @click="handlePreview(cvVersion)"
+              >
+                <Eye class="size-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 :disabled="isGenerating"
                 :title="t('career.cvVersions.page.generate')"
                 @click="handleGenerate(cvVersion)"
@@ -199,5 +223,18 @@ async function handleDownload(cvVersion: CvVersion) {
       :loading="isDeleting"
       @confirm="handleDelete"
     />
+
+    <Dialog v-model:open="previewOpen">
+      <DialogContent class="max-h-[90vh] max-w-4xl overflow-hidden p-0">
+        <DialogHeader class="p-4 pb-0">
+          <DialogTitle>{{ t('career.cvVersions.page.preview') }}</DialogTitle>
+        </DialogHeader>
+        <iframe
+          :srcdoc="previewHtml"
+          class="h-[75vh] w-full border-0"
+          :title="t('career.cvVersions.page.preview')"
+        />
+      </DialogContent>
+    </Dialog>
   </AuthenticatedLayout>
 </template>

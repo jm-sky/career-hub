@@ -30,6 +30,11 @@ class CvVersionApiService implements ICvVersionService {
     const response = await apiClient.get<Blob>(`/career/cv-versions/${id}/download`, { responseType: 'blob' })
     return response.data
   }
+
+  async preview(id: string): Promise<string> {
+    const response = await apiClient.get<string>(`/career/cv-versions/${id}/preview`, { responseType: 'text' })
+    return response.data
+  }
 }
 
 export const cvVersionApiService = new CvVersionApiService()
