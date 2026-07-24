@@ -348,6 +348,8 @@ export const careerEn = {
         classic: 'Classic',
         minimal: 'Minimal',
         sidebar: 'Sidebar',
+        timeline: 'Timeline',
+        compact: 'Compact (ATS-friendly)',
       },
       fontOptions: {
         sans: 'Sans',

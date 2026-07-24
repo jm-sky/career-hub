@@ -348,6 +348,8 @@ export const careerPl = {
         classic: 'Klasyczny',
         minimal: 'Minimalistyczny',
         sidebar: 'Panel boczny',
+        timeline: 'Oś czasu',
+        compact: 'Kompaktowy (ATS)',
       },
       fontOptions: {
         sans: 'Sans',

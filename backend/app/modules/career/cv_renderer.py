@@ -25,14 +25,18 @@ from .schemas import CvSectionsConfig
 
 # Per-template defaults. ``layout`` picks the structural HTML/CSS a template
 # renders with ("single" — one stacked column; "sidebar" — banner header plus
-# a two-column body); "accent"/"font" are just the starting point a CV version
-# can override independently via accent_color/font_family.
+# a two-column body; "timeline" — single column with a dotted accent line
+# beside chronological entries; "compact" — flat, monochrome, ATS-friendly);
+# "accent"/"font" are just the starting point a CV version can override
+# independently via accent_color/font_family.
 TEMPLATE_DEFAULTS: dict[str, dict[str, str]] = {
     "default": {"accent": "#0f766e", "font": "sans", "layout": "single"},
     "modern": {"accent": "#0369a1", "font": "modern-sans", "layout": "single"},
     "classic": {"accent": "#1f2937", "font": "serif", "layout": "single"},
     "minimal": {"accent": "#374151", "font": "minimal-sans", "layout": "single"},
     "sidebar": {"accent": "#0f766e", "font": "modern-sans", "layout": "sidebar"},
+    "timeline": {"accent": "#7c3aed", "font": "modern-sans", "layout": "timeline"},
+    "compact": {"accent": "#111827", "font": "minimal-sans", "layout": "compact"},
 }
 
 # Curated, print-safe font stacks — kept as a fixed set (rather than free text)
@@ -157,6 +161,49 @@ def _languages_html(languages: list[LanguageDB]) -> str:
     return f'<div class="chips">{chips}</div>'
 
 
+def _skills_plain_html(skills: list[tuple[SkillDB, str]]) -> str:
+    """Comma-separated plain text — no pill/dot decoration, for the compact/ATS template."""
+    names = ", ".join(escape(technology_name) for _, technology_name in skills)
+    return f'<p class="plain-list">{names}</p>'
+
+
+def _languages_plain_html(languages: list[LanguageDB]) -> str:
+    parts = ", ".join(f"{escape(language.name)} ({escape(language.level)})" for language in languages)
+    return f'<p class="plain-list">{parts}</p>'
+
+
+def _experience_timeline_html(experiences: list[ExperienceDB]) -> str:
+    items = []
+    for exp in experiences:
+        responsibilities = "".join(f"<li>{escape(str(r))}</li>" for r in exp.responsibilities or [])
+        items.append(
+            '<div class="tl-item">'
+            '<span class="tl-dot"></span>'
+            f'<div class="tl-date">{escape(_date_range(exp.start_date, exp.end_date, exp.is_current))}</div>'
+            f"<strong>{escape(exp.position)}</strong>"
+            f'<div class="entry-sub">{escape(exp.company_name)}'
+            + (f" · {escape(exp.employment_type)}" if exp.employment_type else "")
+            + "</div>"
+            + (f"<p>{escape(exp.description)}</p>" if exp.description else "")
+            + (f"<ul>{responsibilities}</ul>" if responsibilities else "")
+            + "</div>"
+        )
+    return f'<div class="timeline">{"".join(items)}</div>'
+
+
+def _education_timeline_html(education: list[EducationDB]) -> str:
+    items = []
+    for entry in education:
+        items.append(
+            '<div class="tl-item">'
+            '<span class="tl-dot"></span>'
+            f'<div class="tl-date">{escape(_date_range(entry.start_date, entry.end_date, False))}</div>'
+            f"<strong>{escape(entry.degree)}</strong>"
+            f'<div class="entry-sub">{escape(entry.institution)}' + (f" · {escape(entry.field_of_study)}" if entry.field_of_study else "") + "</div></div>"
+        )
+    return f'<div class="timeline">{"".join(items)}</div>'
+
+
 def _shared_css(font_stack: str, accent: str, dens: dict[str, str]) -> str:
     """CSS rules common to every layout — typography, entries, chips."""
     return f"""
@@ -265,6 +312,89 @@ def _render_sidebar(data: CvRenderData, contact_line: str, summary: str | None, 
     return css, body_html
 
 
+def _render_timeline(data: CvRenderData, contact_line: str, summary: str | None, accent: str, font_stack: str, dens: dict[str, str]) -> tuple[str, str]:
+    """Returns (css, body_html) for the timeline layout — a dotted accent
+    line runs beside the chronological sections (experience, education)."""
+    sections = data.sections
+    body_sections = []
+    if sections.includeSummary and summary:
+        body_sections.append(_section("Summary", f"<p>{escape(summary)}</p>"))
+    if data.experiences:
+        body_sections.append(_section("Experience", _experience_timeline_html(data.experiences)))
+    if data.projects:
+        body_sections.append(_section("Projects", _project_html(data.projects)))
+    if data.skills:
+        body_sections.append(_section("Skills", _skills_html(data.skills)))
+    if data.education:
+        body_sections.append(_section("Education", _education_timeline_html(data.education)))
+    if data.certifications:
+        body_sections.append(_section("Certifications", _certifications_html(data.certifications)))
+    if data.achievements:
+        body_sections.append(_section("Achievements", _achievements_html(data.achievements)))
+    if data.languages:
+        body_sections.append(_section("Languages", _languages_html(data.languages)))
+
+    css = _shared_css(font_stack, accent, dens) + f"""
+  header {{ border-bottom: 2px solid {accent}; padding-bottom: 4mm; margin-bottom: 6mm; }}
+  h1 {{ color: {accent}; }}
+  .headline {{ color: #374151; }}
+  .contact {{ color: #6b7280; }}
+  .timeline {{ position: relative; border-left: 1.5px solid {accent}; margin-left: 1.5mm; padding-left: 6mm; }}
+  .tl-item {{ position: relative; margin-bottom: {dens['entry_gap']}; page-break-inside: avoid; }}
+  .tl-dot {{ position: absolute; left: -8.1mm; top: 1mm; width: 2.6mm; height: 2.6mm;
+             border-radius: 50%; background: {accent}; box-shadow: 0 0 0 2px #fff; }}
+  .tl-date {{ color: {accent}; font-size: 8.5pt; font-weight: 700; text-transform: uppercase;
+              letter-spacing: 0.05em; margin-bottom: 0.5mm; }}
+"""
+    body_html = f"""{_header_html(data, contact_line, banner=False)}
+  {''.join(body_sections)}"""
+    return css, body_html
+
+
+def _render_compact(data: CvRenderData, contact_line: str, summary: str | None, accent: str, font_stack: str, dens: dict[str, str]) -> tuple[str, str]:
+    """Returns (css, body_html) for the compact/ATS layout — flat and
+    monochrome, plain-text skills/languages instead of pill chips, minimal
+    decoration so parsers extract the text cleanly."""
+    sections = data.sections
+    body_sections = []
+    if sections.includeSummary and summary:
+        body_sections.append(_section("Summary", f"<p>{escape(summary)}</p>"))
+    if data.experiences:
+        body_sections.append(_section("Experience", _experience_html(data.experiences)))
+    if data.projects:
+        body_sections.append(_section("Projects", _project_html(data.projects)))
+    if data.skills:
+        body_sections.append(_section("Skills", _skills_plain_html(data.skills)))
+    if data.education:
+        body_sections.append(_section("Education", _education_html(data.education)))
+    if data.certifications:
+        body_sections.append(_section("Certifications", _certifications_html(data.certifications)))
+    if data.achievements:
+        body_sections.append(_section("Achievements", _achievements_html(data.achievements)))
+    if data.languages:
+        body_sections.append(_section("Languages", _languages_plain_html(data.languages)))
+
+    css = _shared_css(font_stack, accent, dens) + f"""
+  header {{ border-bottom: 1px solid #d1d5db; padding-bottom: 3mm; margin-bottom: 5mm; }}
+  h1 {{ color: #111827; text-transform: uppercase; letter-spacing: 0.04em; }}
+  .headline {{ color: #374151; }}
+  .contact {{ color: #4b5563; }}
+  h2 {{ color: #111827; border-bottom: 1px solid {accent}; letter-spacing: 0.04em; }}
+  .plain-list {{ font-size: 9.5pt; color: #1f2430; margin: 0; }}
+"""
+    body_html = f"""{_header_html(data, contact_line, banner=False)}
+  {''.join(body_sections)}"""
+    return css, body_html
+
+
+_LAYOUT_RENDERERS = {
+    "single": _render_single,
+    "sidebar": _render_sidebar,
+    "timeline": _render_timeline,
+    "compact": _render_compact,
+}
+
+
 def build_cv_html(
     data: CvRenderData,
     template: str,
@@ -303,7 +433,7 @@ def build_cv_html(
     summary = sections.customSummary or profile.summary
     watermark_html = '<div class="watermark">Created with CareerHub — Free plan</div>' if watermark else ""
 
-    render = _render_sidebar if defaults["layout"] == "sidebar" else _render_single
+    render = _LAYOUT_RENDERERS.get(defaults["layout"], _render_single)
     layout_css, body_html = render(data, contact_line, summary, accent, font_stack, dens)
 
     return f"""<!DOCTYPE html>
