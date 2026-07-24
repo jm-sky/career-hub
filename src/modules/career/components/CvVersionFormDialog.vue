@@ -41,6 +41,8 @@ const TEMPLATE_DEFAULT_ACCENTS: Record<string, string> = {
   classic: '#1f2937',
   minimal: '#374151',
   sidebar: '#0f766e',
+  timeline: '#7c3aed',
+  compact: '#111827',
 }
 
 const TEMPLATE_DEFAULT_FONTS: Record<string, CvFontFamily> = {
@@ -49,6 +51,8 @@ const TEMPLATE_DEFAULT_FONTS: Record<string, CvFontFamily> = {
   classic: 'serif',
   minimal: 'minimal-sans',
   sidebar: 'modern-sans',
+  timeline: 'modern-sans',
+  compact: 'minimal-sans',
 }
 
 const open = defineModel<boolean>('open', { required: true })
@@ -210,6 +214,12 @@ const onSubmit = handleSubmit((values) => {
                       </SelectItem>
                       <SelectItem value="sidebar">
                         {{ t('career.cvVersions.templateOptions.sidebar') }}
+                      </SelectItem>
+                      <SelectItem value="timeline">
+                        {{ t('career.cvVersions.templateOptions.timeline') }}
+                      </SelectItem>
+                      <SelectItem value="compact">
+                        {{ t('career.cvVersions.templateOptions.compact') }}
                       </SelectItem>
                     </SelectGroup>
                   </SelectContent>
