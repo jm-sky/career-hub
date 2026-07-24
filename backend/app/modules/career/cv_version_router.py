@@ -5,6 +5,7 @@ the stored bytes back and 404s if nothing has been generated yet.
 """
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi.responses import HTMLResponse
 
 from app.modules.auth.dependencies import CurrentUser
 
@@ -89,6 +90,24 @@ async def generate_cv_version(
     if cv_version is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found")
     return await service.generate(cv_version, profile, current_user.name)
+
+
+@router.get("/cv-versions/{id}/preview", response_class=HTMLResponse)
+async def preview_cv_version(
+    *,
+    id: str,
+    current_user: CurrentUser,
+    profile: CurrentProfile,
+    service: CvVersionService = Depends(get_cv_version_service),
+) -> HTMLResponse:
+    """Render this CV version to HTML for an in-browser preview — no PDF
+    conversion, nothing stored. Reflects the current template/accent color/
+    section selection, including watermark, without needing a generate first."""
+    cv_version = await service.get_entity_for_profile(id, profile.id)
+    if cv_version is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="CV version not found")
+    html = await service.render_preview_html(cv_version, profile, current_user.name)
+    return HTMLResponse(content=html)
 
 
 @router.get("/cv-versions/{id}/download")

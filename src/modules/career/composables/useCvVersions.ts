@@ -60,6 +60,13 @@ export function useDownloadCvVersionPdf(service?: ICvVersionService) {
   })
 }
 
+export function usePreviewCvVersion(service?: ICvVersionService) {
+  return useMutation({
+    mutationFn: (id: string) => (service ?? cvVersionApiService).preview(id),
+    retry: profileMutationRetryFunction,
+  })
+}
+
 export function useCvVersions(service?: ICvVersionService) {
   const cvVersionsQuery = useCvVersionsQuery(service)
   const createMutation = useCreateCvVersion(service)
@@ -67,6 +74,7 @@ export function useCvVersions(service?: ICvVersionService) {
   const deleteMutation = useDeleteCvVersion(service)
   const generateMutation = useGenerateCvVersion(service)
   const downloadMutation = useDownloadCvVersionPdf(service)
+  const previewMutation = usePreviewCvVersion(service)
 
   return {
     cvVersionsQuery,
@@ -84,5 +92,7 @@ export function useCvVersions(service?: ICvVersionService) {
     isGenerating: generateMutation.isPending,
     downloadCvVersionPdf: downloadMutation.mutateAsync,
     isDownloading: downloadMutation.isPending,
+    previewCvVersion: previewMutation.mutateAsync,
+    isPreviewing: previewMutation.isPending,
   }
 }

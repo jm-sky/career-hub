@@ -31,9 +31,25 @@ import { useLanguagesQuery } from '@/modules/career/composables/useLanguages'
 import { useProjectsQuery } from '@/modules/career/composables/useProjects'
 import { useSkillsQuery } from '@/modules/career/composables/useSkills'
 import { cvVersionSchema } from '@/modules/career/validation/cvVersion.schema'
-import type { CreateCvVersionData, CvVersion, UpdateCvVersionData } from '@/modules/career/types/cvVersion.type'
+import type { CreateCvVersionData, CvFontFamily, CvVersion, UpdateCvVersionData } from '@/modules/career/types/cvVersion.type'
 
 const { t } = useI18n()
+
+const TEMPLATE_DEFAULT_ACCENTS: Record<string, string> = {
+  default: '#0f766e',
+  modern: '#0369a1',
+  classic: '#1f2937',
+  minimal: '#374151',
+  sidebar: '#0f766e',
+}
+
+const TEMPLATE_DEFAULT_FONTS: Record<string, CvFontFamily> = {
+  default: 'sans',
+  modern: 'modern-sans',
+  classic: 'serif',
+  minimal: 'minimal-sans',
+  sidebar: 'modern-sans',
+}
 
 const open = defineModel<boolean>('open', { required: true })
 
@@ -72,11 +88,14 @@ const certificationItems = computed(() => (certificationsQuery.data.value ?? [])
 const achievementItems = computed(() => (achievementsQuery.data.value ?? []).map(a => ({ id: a.id, label: a.title })))
 const languageItems = computed(() => (languagesQuery.data.value ?? []).map(l => ({ id: l.id, label: `${l.name} · ${l.level}` })))
 
-const { handleSubmit, resetForm } = useForm({
+const { handleSubmit, resetForm, values, setFieldValue } = useForm({
   validationSchema: toTypedSchema(cvVersionSchema),
   initialValues: {
     name: '',
     template: 'default',
+    accentColor: '',
+    fontFamily: 'sans',
+    density: 'standard',
     customSummary: '',
     includePhoto: true,
     includeSummary: true,
@@ -84,13 +103,19 @@ const { handleSubmit, resetForm } = useForm({
   },
 })
 
+const useCustomAccent = ref(false)
+
 watch(open, (isOpen) => {
   if (!isOpen) return
   const cv = props.cvVersion
+  useCustomAccent.value = !!cv?.accentColor
   resetForm({
     values: {
       name: cv?.name ?? '',
       template: cv?.template ?? 'default',
+      accentColor: cv?.accentColor ?? '',
+      fontFamily: cv?.fontFamily ?? TEMPLATE_DEFAULT_FONTS[cv?.template ?? 'default'] ?? 'sans',
+      density: cv?.density ?? 'standard',
       customSummary: cv?.sectionsConfig.customSummary ?? '',
       includePhoto: cv?.sectionsConfig.includePhoto ?? true,
       includeSummary: cv?.sectionsConfig.includeSummary ?? true,
@@ -106,10 +131,20 @@ watch(open, (isOpen) => {
   languageIds.value = cv?.sectionsConfig.languageIds ? [...cv.sectionsConfig.languageIds] : []
 })
 
+function toggleCustomAccent(enabled: boolean) {
+  useCustomAccent.value = enabled
+  if (enabled && !values.accentColor) {
+    setFieldValue('accentColor', TEMPLATE_DEFAULT_ACCENTS[values.template ?? 'default'] ?? '#0f766e')
+  }
+}
+
 const onSubmit = handleSubmit((values) => {
   emit('submit', {
     name: values.name,
     template: values.template,
+    accentColor: useCustomAccent.value ? (values.accentColor || TEMPLATE_DEFAULT_ACCENTS[values.template] || null) : null,
+    fontFamily: values.fontFamily,
+    density: values.density,
     isDefault: values.isDefault,
     sectionsConfig: {
       experienceIds: experienceIds.value,
@@ -173,9 +208,89 @@ const onSubmit = handleSubmit((values) => {
                       <SelectItem value="minimal">
                         {{ t('career.cvVersions.templateOptions.minimal') }}
                       </SelectItem>
+                      <SelectItem value="sidebar">
+                        {{ t('career.cvVersions.templateOptions.sidebar') }}
+                      </SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <div class="grid gap-6 md:grid-cols-2">
+          <FormField v-slot="{ componentField }" name="fontFamily">
+            <FormItem>
+              <FormLabel>{{ t('career.cvVersions.fields.fontFamily') }}</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="sans">
+                        {{ t('career.cvVersions.fontOptions.sans') }}
+                      </SelectItem>
+                      <SelectItem value="modern-sans">
+                        {{ t('career.cvVersions.fontOptions.modern-sans') }}
+                      </SelectItem>
+                      <SelectItem value="serif">
+                        {{ t('career.cvVersions.fontOptions.serif') }}
+                      </SelectItem>
+                      <SelectItem value="minimal-sans">
+                        {{ t('career.cvVersions.fontOptions.minimal-sans') }}
+                      </SelectItem>
+                      <SelectItem value="mono">
+                        {{ t('career.cvVersions.fontOptions.mono') }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+
+          <FormField v-slot="{ componentField }" name="density">
+            <FormItem>
+              <FormLabel>{{ t('career.cvVersions.fields.density') }}</FormLabel>
+              <FormControl>
+                <Select v-bind="componentField">
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="compact">
+                        {{ t('career.cvVersions.densityOptions.compact') }}
+                      </SelectItem>
+                      <SelectItem value="standard">
+                        {{ t('career.cvVersions.densityOptions.standard') }}
+                      </SelectItem>
+                      <SelectItem value="spacious">
+                        {{ t('career.cvVersions.densityOptions.spacious') }}
+                      </SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2">
+            <Checkbox :model-value="useCustomAccent" @update:model-value="(value) => toggleCustomAccent(!!value)" />
+            <span class="text-sm font-normal">{{ t('career.cvVersions.fields.customAccentColor') }}</span>
+          </div>
+          <FormField v-if="useCustomAccent" v-slot="{ componentField }" name="accentColor">
+            <FormItem class="flex items-center gap-2 space-y-0">
+              <FormControl>
+                <Input type="color" class="h-9 w-16 p-1" v-bind="componentField" />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -11,11 +11,17 @@ export interface CvSectionsConfig {
   includeSummary: boolean
 }
 
+export type CvFontFamily = 'sans' | 'modern-sans' | 'serif' | 'minimal-sans' | 'mono'
+export type CvDensity = 'compact' | 'standard' | 'spacious'
+
 export interface CvVersion {
   id: string
   profileId: string
   name: string
   template: string
+  accentColor: string | null
+  fontFamily: CvFontFamily | null
+  density: CvDensity | null
   sectionsConfig: CvSectionsConfig
   pdfUrl: string | null
   isDefault: boolean
@@ -26,6 +32,9 @@ export interface CvVersion {
 export interface CreateCvVersionData {
   name: string
   template?: string
+  accentColor?: string | null
+  fontFamily?: CvFontFamily | null
+  density?: CvDensity | null
   sectionsConfig?: Partial<CvSectionsConfig>
   isDefault?: boolean
 }
@@ -33,6 +42,9 @@ export interface CreateCvVersionData {
 export interface UpdateCvVersionData {
   name?: string
   template?: string
+  accentColor?: string | null
+  fontFamily?: CvFontFamily | null
+  density?: CvDensity | null
   sectionsConfig?: Partial<CvSectionsConfig>
   isDefault?: boolean
 }
@@ -53,4 +65,5 @@ export interface ICvVersionService {
   delete(id: string): Promise<void>
   generate(id: string): Promise<GenerateCvVersionResult>
   downloadPdf(id: string): Promise<Blob>
+  preview(id: string): Promise<string>
 }
