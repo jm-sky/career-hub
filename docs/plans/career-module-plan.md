@@ -131,6 +131,9 @@ rather than re-deriving it.
   interface (digest §5), so new endpoints, not new UI chat pattern.
 - `responsibilities_library` seed data feeds `suggest-responsibilities`.
 
+**DONE 2026-07-25:** Three AI endpoints fully implemented (backend + dependencies). 
+See `career-phase7-ai-features-log.md`.
+
 **Phase 8 — Public profile polish:**
 - `GET /profile/{slug}` already exists from Phase 1; this phase is about the *public*
   frontend page rendering (SEO meta tags, QR/share link, per-section visibility
