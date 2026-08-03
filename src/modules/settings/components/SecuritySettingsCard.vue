@@ -81,7 +81,7 @@ const handleManage2FA = async () => {
 </script>
 
 <template>
-  <Card>
+  <Card :interactive="false">
     <CardHeader>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2">

@@ -29,7 +29,7 @@ async function handleAnalyze() {
 </script>
 
 <template>
-  <Card>
+  <Card :interactive="false">
     <CardHeader>
       <div class="flex items-center gap-2">
         <Sparkles :size="20" />

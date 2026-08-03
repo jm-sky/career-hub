@@ -57,7 +57,10 @@ const resetDeleteModal = () => {
 
 <template>
   <div>
-    <Card class="border-destructive/50 p-6">
+    <Card
+      class="border-destructive/50 p-6"
+      :interactive="false"
+    >
       <div class="space-y-4">
         <div class="flex items-start gap-3">
           <div class="rounded-full bg-destructive/10 p-2">
@@ -105,7 +108,10 @@ const resetDeleteModal = () => {
       class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4"
       @click.self="resetDeleteModal(); isDeleteModalOpen = false"
     >
-      <Card class="w-full max-w-lg p-6 shadow-lg">
+      <Card
+        class="w-full max-w-lg p-6 shadow-lg"
+        :interactive="false"
+      >
         <div class="space-y-6">
           <div class="space-y-2">
             <div class="flex items-center gap-2 text-destructive">

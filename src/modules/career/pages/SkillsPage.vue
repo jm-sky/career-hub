@@ -125,7 +125,10 @@ async function handleDelete() {
         </div>
       </div>
 
-      <Card v-if="suggestOpen">
+      <Card
+        v-if="suggestOpen"
+        :interactive="false"
+      >
         <CardContent class="space-y-3 pt-6">
           <p class="text-sm font-medium">
             {{ t('career.ai.suggestSkills.title') }}

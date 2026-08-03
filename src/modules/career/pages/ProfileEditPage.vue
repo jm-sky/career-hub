@@ -97,7 +97,7 @@ const onSubmit = handleSubmit(async (values) => {
         </p>
       </div>
 
-      <Card>
+      <Card :interactive="false">
         <CardHeader>
           <div class="flex items-center gap-2">
             <UserRound :size="20" />

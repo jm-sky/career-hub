@@ -84,7 +84,7 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <Card>
+  <Card :interactive="false">
     <CardHeader>
       <div class="flex items-center gap-2">
         <Settings :size="20" />

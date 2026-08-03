@@ -80,7 +80,10 @@ const handleDisableTotpSuccess = async () => {
         </TabsList>
 
         <TabsContent value="totp" class="space-y-4">
-          <Card v-if="totpStatus?.enabled">
+          <Card
+            v-if="totpStatus?.enabled"
+            :interactive="false"
+          >
             <CardHeader>
               <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div class="flex items-center gap-2">
@@ -121,7 +124,10 @@ const handleDisableTotpSuccess = async () => {
 
           <div v-if="!totpStatus?.enabled">
             <TotpSetupForm v-if="showTotpSetup" :service @success="handleTotpSetupSuccess" />
-            <Card v-else>
+            <Card
+              v-else
+              :interactive="false"
+            >
               <CardHeader>
                 <CardTitle>{{ t('auth.two_factor.totp.title') }}</CardTitle>
                 <CardDescription>{{ t('auth.two_factor.totp.description') }}</CardDescription>
