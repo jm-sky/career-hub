@@ -101,7 +101,11 @@ onMounted(() => {
       </div>
 
       <div v-else class="grid gap-4 md:grid-cols-2">
-        <Card v-for="limit in limits" :key="limit.id">
+        <Card
+          v-for="limit in limits"
+          :key="limit.id"
+          :interactive="false"
+        >
           <CardHeader>
             <div class="flex items-center justify-between">
               <div>

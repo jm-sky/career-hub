@@ -111,7 +111,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <Card>
+  <Card :interactive="false">
     <!-- Start Step -->
     <template v-if="step === 'start'">
       <CardHeader>
